@@ -1,6 +1,20 @@
-FROM ./qwen2.5-coder-3b.Q4_K_M.gguf
+FROM ./qwen2.5-coder-3b-instruct.Q4_K_M.gguf
 
-PARAMETER temp 0.0
-PARAMETER top_p 1.0
+PARAMETER top_k 10
+PARAMETER top_p 0.5
+PARAMETER temperature 0.1
+PARAMETER stop "<|im_end|>"
 
-SYSTEM You are a text-to-SQL assistant. Generate valid SQL syntax for DuckDB. Never explain the query or use markdown. Limit the query to SELECT statements only. Avoid making any assumptions about schema.
+TEMPLATE """
+{{- if .System }}<|im_start|>system
+{{ .System }}<|im_end|>
+{{ end }}{{ if .Prompt }}<|im_start|>user
+{{ .Prompt }}<|im_end|>
+{{ end }}<|im_start|>assistant
+"""
+
+SYSTEM """
+You are a text-to-SQL assistant. Output exactly one valid SQL query. Do not output natural language.
+Do not output multiple queries. Use only SELECT statements. Preserve column and table names casing.
+If irrelevant, output 'Please, try again'.
+"""

@@ -1,10 +1,16 @@
+import html
 import json
 import os
+import random
+
+import requests
 
 DATASET_DIR = "dataset"
 TABLES_FILE = "tables.json"
 QUERIES_FILE = "queries.json"
 DATASET_FILE = "dataset.jsonl"
+TOKEN_URL = "https://opentdb.com/api_token.php"
+QUESTION_URL = "https://opentdb.com/api.php"
 
 def _get_tables(table):
     table_names = table["table_names_original"]
@@ -57,10 +63,12 @@ def _generate_messages(schema, question, query):
             "role": "system",
             "content": (
                 "You are a text-to-SQL assistant. "
-                "Generate valid SQL syntax for DuckDB. "
-                "Never explain the query or use markdown. "
-                "Limit the query to SELECT statements only. "
-                "Avoid making any assumptions about schema. "
+                "Output exactly one valid SQL query. "
+                "Do not output natural language. "
+                "Do not output multiple queries. "
+                "Use only SELECT statements. "
+                "Preserve column and table names casing. "
+                "If irrelevant, output 'Please, try again'. "
             )
         },
         {
@@ -69,12 +77,17 @@ def _generate_messages(schema, question, query):
         },
         {
             "role": "assistant",
-            "content": f"{query};",
+            "content": f"{query}",
         },
     ]
 
 
 def main():
+    token_resp = requests.get(TOKEN_URL, params={"command": "request"})
+    token = token_resp.json()["token"]
+    question_resp = requests.get(QUESTION_URL, params={"amount": 100, "token": token})
+    results = question_resp.json()["results"]
+
     queries_path = os.path.join(DATASET_DIR, QUERIES_FILE)
     tables_path = os.path.join(DATASET_DIR, TABLES_FILE)
 
@@ -90,9 +103,14 @@ def main():
         for sample in samples:
             schema = json.dumps(sample["tables"])
             for query in sample["queries"]:
-                message = _generate_messages(schema, query["question"], query["query"])
-                message_json = json.dumps({"messages": message})
+                messages = _generate_messages(schema, query["question"], query["query"] + ";")
+                message_json = json.dumps({"messages": messages})
                 f.write(message_json + "\n")
+                if random.randint(1, 10) == random.randint(1, 10):
+                    messages = _generate_messages(schema, html.unescape(random.choice(results)["question"]), "Please, try again.")
+                    message_json = json.dumps({"messages": messages})
+                    f.write(message_json + "\n")
+
 
 if __name__ == "__main__":
     main()

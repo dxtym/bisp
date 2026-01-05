@@ -1,19 +1,36 @@
-import { ChatOllama } from "@langchain/ollama";
 import { createUIMessageStreamResponse, UIMessage } from 'ai';
 import { toBaseMessages, toUIMessageStream } from '@ai-sdk/langchain';
+
+import { ChatOllama } from "@langchain/ollama";
+import { StateGraph, MessagesAnnotation } from '@langchain/langgraph';
+
+// TODO: Move to env variables
+const model = new ChatOllama({
+  baseUrl: "http://localhost:11434",
+  model: "qwen2sql",
+});
+
+async function callModel(state: typeof MessagesAnnotation.State) {
+  const response = await model.invoke(state.messages);
+  return { messages: [response] };
+}
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();
 
-  // TODO: model not answering as was finetuned
-  const model = new ChatOllama({
-    baseUrl: "http://localhost:11434",
-    model: "qwen2sql",
-  });
+  // TODO: Add tool call, translation, summarizer
+  const graph = new StateGraph(MessagesAnnotation)
+    .addNode('agent', callModel)
+    .addEdge('__start__', 'agent')
+    .addEdge('agent', '__end__')
+    .compile();
 
   const langchainMessages = await toBaseMessages(messages);
 
-  const stream = await model.stream(langchainMessages);
+  const stream = await graph.stream(
+    { messages: langchainMessages },
+    { streamMode: ['values', 'messages'] },
+  );
 
   return createUIMessageStreamResponse({
     stream: toUIMessageStream(stream),

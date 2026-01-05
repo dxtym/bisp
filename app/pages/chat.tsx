@@ -17,10 +17,10 @@ import {
   ConversationEmptyState,
   ConversationScrollButton
 } from "@/components/ai-elements/conversation";
-import { 
-  Message, 
-  MessageContent, 
-  MessageResponse 
+import {
+  Message,
+  MessageContent,
+  MessageResponse
 } from "@/components/ai-elements/message";
 
 export default function Chat() {
@@ -28,11 +28,6 @@ export default function Chat() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { messages, status, sendMessage } = useChat();
-
-  const handleSubmit = (message: PromptInputMessage) => {
-    sendMessage(message);
-    setText('');
-  }
 
   return (
     <div className="grid grid-rows-[1fr_auto] h-full">
@@ -42,8 +37,8 @@ export default function Chat() {
             {messages.length === 0 ? (
               <ConversationEmptyState
                 icon={<MessageSquare className="size-12" />}
-                title="Start a conversation"
-                description="Type a message below to begin chatting"
+                title="Suhbatni boshlang"
+                description="Suhbatni boshlash uchun quyida xabar yozing"
               />
             ) : (
               messages.map((message) => (
@@ -65,15 +60,19 @@ export default function Chat() {
         </Conversation>
       </div>
       <div className="flex items-end pb-8 px-50">
-        <PromptInput onSubmit={handleSubmit} className="mt-4" globalDrop multiple>
+        <PromptInput onSubmit={(message: PromptInputMessage) => {
+          sendMessage(message);
+          setText('');
+        }} className="mt-4" globalDrop multiple>
           <PromptInputBody>
             <PromptInputTextarea
-              onChange={(e) => setText(e.target.value)}
-              ref={textareaRef}
               value={text}
+              ref={textareaRef}
+              placeholder="Nima haqida bilmoqchisiz?"
+              onChange={(e) => setText(e.target.value)}
             />
           </PromptInputBody>
-          <PromptInputFooter>
+          <PromptInputFooter className="flex justify-end">
             <PromptInputSubmit disabled={!text && !status} status={status} />
           </PromptInputFooter>
         </PromptInput>

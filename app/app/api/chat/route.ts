@@ -1,19 +1,47 @@
+import * as z from "zod"
 import { createUIMessageStreamResponse, UIMessage } from 'ai';
 import { toBaseMessages, toUIMessageStream } from '@ai-sdk/langchain';
 
+import { tool } from '@langchain/core/tools';
 import { ChatOllama } from "@langchain/ollama";
 import { StateGraph, MessagesAnnotation } from '@langchain/langgraph';
+
+import { SystemRepository } from "@/lib/repository/system.repository";
+
+const systemRepo = new SystemRepository();
+
+async function callModel(state: typeof MessagesAnnotation.State) {
+  const response = await model.invoke(state.messages);
+  return { messages: [response] };
+}
+
+// TODO: Clean this
+// const getSchemaTool = tool(
+//   async () => {
+//     const schema = [];
+//     const tables = await systemRepo.getTables();
+//     tables.forEach(async (table: Table) => {
+//       const columns = await systemRepo.getColumns(table.name);
+//       schema.push({
+//         table: table.name,
+//         columns: columns.map(col => col.name),
+//       })
+//     })
+
+//     return JSON.stringify(schema);
+//   },
+//   {
+//     name: "get_schema",
+//     description: "Get database schema",
+//     schema: z.object(),
+//   }
+// )
 
 // TODO: Move to env variables
 const model = new ChatOllama({
   baseUrl: "http://localhost:11434",
   model: "qwen2sql",
 });
-
-async function callModel(state: typeof MessagesAnnotation.State) {
-  const response = await model.invoke(state.messages);
-  return { messages: [response] };
-}
 
 export async function POST(req: Request) {
   const { messages }: { messages: UIMessage[] } = await req.json();

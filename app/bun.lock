@@ -7,7 +7,7 @@
       "dependencies": {
         "@ai-sdk/langchain": "^2.0.6",
         "@ai-sdk/react": "^3.0.6",
-        "@duckdb/node-api": "^1.4.3-r.2",
+        "@clickhouse/client": "^1.15.0",
         "@langchain/core": "^1.1.8",
         "@langchain/ollama": "^1.1.0",
         "@radix-ui/react-collapsible": "^1.1.12",
@@ -120,19 +120,9 @@
 
     "@chevrotain/utils": ["@chevrotain/utils@11.0.3", "", {}, "sha512-YslZMgtJUyuMbZ+aKvfF3x1f5liK4mWNxghFRv7jqRR9C3R3fAOGTTKvxXDa2Y1s9zSbcpuO0cAxDYsc9SrXoQ=="],
 
-    "@duckdb/node-api": ["@duckdb/node-api@1.4.3-r.2", "", { "dependencies": { "@duckdb/node-bindings": "1.4.3-r.2" } }, "sha512-2by72HWrmuZFLanVClXme8n2QwMN82bi+b2jVTH2xGhAVMUGSdbsp/kTf2zxhfmsLtcX9gYwSzqMApIdz5GI2A=="],
+    "@clickhouse/client": ["@clickhouse/client@1.15.0", "", { "dependencies": { "@clickhouse/client-common": "1.15.0" } }, "sha512-QmW+p4c/r0oa3X6Un6lcBs4GZtJEQUdvf//x8GeqM5ru6m4oIUg3WwvermP3HE31kpEGoFOQfKbMN5ooR5gvNw=="],
 
-    "@duckdb/node-bindings": ["@duckdb/node-bindings@1.4.3-r.2", "", { "optionalDependencies": { "@duckdb/node-bindings-darwin-arm64": "1.4.3-r.2", "@duckdb/node-bindings-darwin-x64": "1.4.3-r.2", "@duckdb/node-bindings-linux-arm64": "1.4.3-r.2", "@duckdb/node-bindings-linux-x64": "1.4.3-r.2", "@duckdb/node-bindings-win32-x64": "1.4.3-r.2" } }, "sha512-yUnOblF+xL41TtPadt1JYAZEIQiYcFr5CKnQCqM+h/KRd1ft/PsX2kex5hQBFGzS/yBKn27c305hjGMgBvIfGQ=="],
-
-    "@duckdb/node-bindings-darwin-arm64": ["@duckdb/node-bindings-darwin-arm64@1.4.3-r.2", "", { "os": "darwin", "cpu": "arm64" }, "sha512-/hqVgl+jA8GX60ysO556e/vhUxDCD+PNcJFiqTT96Yvry8sqRwL5GOpB94wrUS+2fLZxQ5qTjH0WzqTGMeBHYw=="],
-
-    "@duckdb/node-bindings-darwin-x64": ["@duckdb/node-bindings-darwin-x64@1.4.3-r.2", "", { "os": "darwin", "cpu": "x64" }, "sha512-84Ix+4XU+JWyXP5Q/151fwS9piFI++rHLj9Jya2TMsdpBxSqxG7pUKfCRSLpsoxn7ej1AOVtZdcaO4TGTdl4Aw=="],
-
-    "@duckdb/node-bindings-linux-arm64": ["@duckdb/node-bindings-linux-arm64@1.4.3-r.2", "", { "os": "linux", "cpu": "arm64" }, "sha512-e/RfvosNxj97vsnKPm5ealyTeMXKFbJt7rgOHsF3nAqqzWL8WsVqJ3ZsW2fg6NWmJYkp7Mz3md/AR8mQNAuS4Q=="],
-
-    "@duckdb/node-bindings-linux-x64": ["@duckdb/node-bindings-linux-x64@1.4.3-r.2", "", { "os": "linux", "cpu": "x64" }, "sha512-YUnt2vJOXmn3y7dvgV2uw9hoKMy1IQIFV1uCX3ZeoIsmrshNwlhbBDyquGgt9HHn/2vz+omCGz0oGwTuifaKHA=="],
-
-    "@duckdb/node-bindings-win32-x64": ["@duckdb/node-bindings-win32-x64@1.4.3-r.2", "", { "os": "win32", "cpu": "x64" }, "sha512-TJoM4nUGuxPVv5G8S6wlgz2ojtOZKTSdud+brGSTKcxVlJF/UZ4tiXIa4gOhTEMmWMYes7Xc95I4YY7qF8DhUg=="],
+    "@clickhouse/client-common": ["@clickhouse/client-common@1.15.0", "", {}, "sha512-/1BXaNNsBzH2w5ALWiH6M9zS+cJwlM9uMnMj9e8ETwvDjJzO+nIYlyxzp8Prc+9pEDZ5iAilZ4F8c0YVCzzNaA=="],
 
     "@emnapi/core": ["@emnapi/core@1.8.0", "", { "dependencies": { "@emnapi/wasi-threads": "1.1.0", "tslib": "^2.4.0" } }, "sha512-ryJnSmj4UhrGLZZPJ6PKVb4wNPAIkW6iyLy+0TRwazd3L1u0wzMe8RfqevAh2HbcSkoeLiSYnOVDOys4JSGYyg=="],
 

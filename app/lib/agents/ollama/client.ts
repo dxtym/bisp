@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { IAgent } from "../interface";
+import { Message } from "@/app/(chat)/api/chat/types";
+
 import { ChatOllama } from "@langchain/ollama";
 import { BaseMessage } from "@langchain/core/messages";
 
@@ -10,7 +11,7 @@ const OllamaClientOptions = z.object({
 });
 type OllamaClientOptions = z.infer<typeof OllamaClientOptions>;
 
-class OllamaClient implements IAgent {
+class OllamaClient {
   private readonly model: ChatOllama;
 
   constructor(options?: OllamaClientOptions) {
@@ -20,11 +21,13 @@ class OllamaClient implements IAgent {
     });
   }
 
-  public async call(messages: BaseMessage[]): Promise<{ messages: BaseMessage[] }> {
-    console.log(messages);
-    const response = await this.model.invoke(messages);
-    console.log(response);
-    return { messages: [response] };
+  public async call(messages: BaseMessage[]): Promise<Message> {
+    try {
+      const response = await this.model.invoke(messages);
+      return { messages: [response] } as Message;
+    } catch (error) {
+      throw new Error(`Ollama error: ${error}`);
+    }
   }
 }
 

@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { IAgent } from "../interface";
+import { Message } from "@/app/(chat)/api/chat/types";
+
 import { ChatOpenAI } from "@langchain/openai";
 import { BaseMessage } from "@langchain/core/messages";
-
 
 const OpenAIClientOptions = z.object({
   model: z.string(),
@@ -12,22 +12,24 @@ const OpenAIClientOptions = z.object({
 });
 type OpenAIClientOptions = z.infer<typeof OpenAIClientOptions>;
 
-class OpenAIClient implements IAgent {
+class OpenAIClient {
   private readonly model: ChatOpenAI;
 
   constructor(options?: OpenAIClientOptions) {
     this.model = new ChatOpenAI({
       model: options?.model,
       apiKey: options?.apiKey,
-      temperature: options?.temperature ?? 0,
+      temperature: options?.temperature,
     })
   }
 
-  public async call(messages: BaseMessage[]): Promise<{ messages: BaseMessage[] }> {
-    console.log(messages);
-    const response = await this.model.invoke(messages);
-    console.log(response.content);
-    return { messages: [response] };
+  public async call(messages: BaseMessage[]): Promise<Message> {
+    try {
+      const response = await this.model.invoke(messages);
+      return { messages: [response] } as Message;
+    } catch (error) {
+      throw new Error(`OpenAI error: ${error}`);
+    }
   }
 }
 

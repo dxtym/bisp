@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { createClient, QueryParams, ResultSet } from "@clickhouse/client-web";
 
 const ClickHouseConfig = z.object({
@@ -9,12 +10,12 @@ const ClickHouseConfig = z.object({
 });
 type ClickHouseConfig = z.infer<typeof ClickHouseConfig>;
 
-class ClickHouseWebClient {
+export class ClickHouseWebClient {
+  private static instance: ClickHouseWebClient;
   private readonly client: ReturnType<typeof createClient>;
 
-  constructor(connectionString: string) {
+  private constructor(connectionString: string) {
     const config = this.parse(connectionString);
-
     this.client = createClient({
       url: config.url,
       username: config.username,
@@ -33,24 +34,18 @@ class ClickHouseWebClient {
         database: url.pathname.slice(1),
       };
     } catch (error) {
-      throw new Error(`Invalid connection string format: ${error}`);
+      throw new Error(`ClickHouse error: ${error}`);
     }
+  }
+
+  public static getInstance(connectionString: string): ClickHouseWebClient {
+    if (!ClickHouseWebClient.instance) {
+      ClickHouseWebClient.instance = new ClickHouseWebClient(connectionString);
+    }
+    return ClickHouseWebClient.instance;
   }
 
   public async query<T>(params: QueryParams): Promise<ResultSet<T>> {
     return this.client.query(params);
   }
-}
-
-let client: ClickHouseWebClient | null = null;
-
-export function createClickHouseClient(connectionString: string) {
-  client = new ClickHouseWebClient(connectionString);
-}
-
-export function getClickHouseClient(): ClickHouseWebClient {
-  if (!client) {
-    throw new Error("ClickHouse client not created")
-  }
-  return client
 }

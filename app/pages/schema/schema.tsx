@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 
-import { createClickHouseClient } from "@/lib/clickhouse/client";
+import { setCookie } from "./actions/cookies";
+import { ClickHouseWebClient } from "@/lib/clickhouse/client";
 import { Schema, SystemRepository } from "@/lib/repository/system.repository";
 
 import { LucideChevronDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -17,14 +17,15 @@ export default function SchemaPage() {
   const [connectionString, setConnectionString] = useState<string>("");
 
   const handleConnect = () => {
-    createClickHouseClient(connectionString);
-    const systemRepository = new SystemRepository();
+    const client = ClickHouseWebClient.getInstance(connectionString);
+    const systemRepository = new SystemRepository(client);
 
     systemRepository.loadSchema().
       then((schema) => {
         setSchema(schema);
+        setCookie("schema", JSON.stringify(schema));
       }).catch((error) => {
-        console.error("Failed to load schema:", error);
+        console.error(`Failed to load schema: ${error}`);
       });
   }
 

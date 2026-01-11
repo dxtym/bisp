@@ -1,6 +1,7 @@
+import ChatPage from "@/pages/chat/chat";
+import SchemaPage from "@/pages/schema/schema";
+
 import { Separator } from "@/components/ui/separator";
-import ChatPage from "@/pages/chat";
-import SchemaPage from "@/pages/schema";
 
 export default function Home() {
   return (

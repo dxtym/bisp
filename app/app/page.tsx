@@ -1,13 +1,15 @@
-import Chat from "@/pages/chat";
+import { Separator } from "@/components/ui/separator";
+import ChatPage from "@/pages/chat";
+import SchemaPage from "@/pages/schema";
 
 export default function Home() {
   return (
-    <div className="grid h-screen grid-cols-[1fr_3fr_1fr]">
+    <div className="grid h-screen grid-cols-[1fr_auto_2fr_auto_1fr]">
       <span></span>
-      <div className="overflow-hidden">
-        <Chat />
-      </div>
-      <span></span>
+      <Separator orientation="vertical" />
+      <ChatPage />
+      <Separator orientation="vertical" />
+      <SchemaPage />
     </div>
   );
 }

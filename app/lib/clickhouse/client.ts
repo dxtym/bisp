@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createClient, QueryParams, ResultSet } from "@clickhouse/client";
+import { createClient, QueryParams, ResultSet } from "@clickhouse/client-web";
 
 const ClickHouseConfig = z.object({
   url: z.string(),
@@ -9,16 +9,32 @@ const ClickHouseConfig = z.object({
 });
 type ClickHouseConfig = z.infer<typeof ClickHouseConfig>;
 
-class ClickHouseClient {
+class ClickHouseWebClient {
   private readonly client: ReturnType<typeof createClient>;
 
-  constructor(config: ClickHouseConfig) {
+  constructor(connectionString: string) {
+    const config = this.parse(connectionString);
+
     this.client = createClient({
       url: config.url,
       username: config.username,
       password: config.password,
       database: config.database,
-    })
+    });
+  }
+
+  private parse(connectionString: string): ClickHouseConfig {
+    try {
+      const url = new URL(connectionString);
+      return {
+        url: `${url.protocol}//${url.host}`,
+        username: url.username,
+        password: url.password,
+        database: url.pathname.slice(1),
+      };
+    } catch (error) {
+      throw new Error(`Invalid connection string format: ${error}`);
+    }
   }
 
   public async query<T>(params: QueryParams): Promise<ResultSet<T>> {
@@ -26,11 +42,15 @@ class ClickHouseClient {
   }
 }
 
-const clickhouseClient = new ClickHouseClient({
-  url: process.env.CLICKHOUSE_URL!,
-  username: process.env.CLICKHOUSE_USER!,
-  password: process.env.CLICKHOUSE_PASSWORD!,
-  database: process.env.CLICKHOUSE_DATABASE!
-});
+let client: ClickHouseWebClient | null = null;
 
-export default clickhouseClient;
+export function createClickHouseClient(connectionString: string) {
+  client = new ClickHouseWebClient(connectionString);
+}
+
+export function getClickHouseClient(): ClickHouseWebClient {
+  if (!client) {
+    throw new Error("ClickHouse client not created")
+  }
+  return client
+}

@@ -23,7 +23,7 @@ import {
   MessageResponse
 } from "@/components/ai-elements/message";
 
-export default function Chat() {
+export default function ChatPage() {
   const [text, setText] = useState<string>('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -33,12 +33,12 @@ export default function Chat() {
     <div className="grid grid-rows-[1fr_auto] h-full">
       <div className="flex justify-center pt-8 px-50 overflow-y-auto">
         <Conversation>
-          <ConversationContent>
+          <ConversationContent className="h-full">
             {messages.length === 0 ? (
               <ConversationEmptyState
+                title="Hech qanday xabar yo'q"
+                description="Suhbatni boshlash uchun savol bering."
                 icon={<MessageSquare className="size-12" />}
-                title="Suhbatni boshlang"
-                description="Suhbatni boshlash uchun quyida xabar yozing"
               />
             ) : (
               messages.map((message) => (

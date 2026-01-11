@@ -1,5 +1,3 @@
-import { Schema } from "./types";
-
 import { createUIMessageStreamResponse } from "ai";
 import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
 
@@ -7,26 +5,9 @@ import { StateGraph, MessagesAnnotation, START, END } from "@langchain/langgraph
 
 import openAIClient from "@/lib/agents/openai/client";
 import ollamaClient from "@/lib/agents/ollama/client";
-import { SystemRepository } from "@/lib/repository/system.repository";
 import { BaseMessage, HumanMessage, SystemMessage } from "@langchain/core/messages";
+import { Schema } from "@/types/schema";
 
-const systemRepo = new SystemRepository();
-
-// TODO: move upper the tree
-async function getSchema(): Promise<string> {
-  const tables = await systemRepo.getTables();
-
-  const schemas: Schema[] = [];
-  for (const table of tables) {
-    const columns = await systemRepo.getColumns(table.name);
-    schemas.push({
-      table: table.name,
-      columns: columns.map(col => col.name),
-    } as Schema);
-  }
-
-  return JSON.stringify(schemas);
-}
 
 async function callOpenAI(state: typeof MessagesAnnotation.State): Promise<{ messages: BaseMessage[] }> {
   const messages = [
@@ -45,7 +26,7 @@ async function callOpenAI(state: typeof MessagesAnnotation.State): Promise<{ mes
 }
 
 async function callOllama(state: typeof MessagesAnnotation.State): Promise<{ messages: BaseMessage[] }> {
-  const schema = await getSchema();
+  const schema = localStorage.getItem("schema");
   const messages = [
     ...state.messages.slice(0, -1),
     new HumanMessage(`

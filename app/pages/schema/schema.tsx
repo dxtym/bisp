@@ -31,7 +31,7 @@ export default function SchemaPage() {
 
   return (
     <div className="p-4 flex flex-col h-full">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 my-2">
         <div>
           <h1 className="text-xl font-semibold text-foreground tracking-tight">Kuzatuv Paneli</h1>
           <p className="text-muted-foreground text-sm mt-1">Ma’lumotlar omboringizni shu yerni o’zida sozlang</p>
@@ -57,12 +57,11 @@ export default function SchemaPage() {
         </div>
         <Separator className="my-2" />
         <div className="flex flex-row  justify-between gap-1">
-          <p className="text-sm">Tuzilma</p>
-          <p className="text-muted-foreground text-sm">{`${schema.length} ta jadval`}</p>
+          <p className="text-sm text-muted-foreground">Tuzilma</p>
+          <p className="text-sm">{`${schema.length} ta jadval`}</p>
         </div>
       </div>
-
-      <div className="mt-3 h-180 overflow-y-auto">
+      <div className="my-3 h-180 overflow-y-auto">
         {schema.map((s) => (
           <Collapsible
             key={s.table}
@@ -74,7 +73,7 @@ export default function SchemaPage() {
                 <h4 className="text-sm font-semibold">{s.table}</h4>
               </div>
               <div className="flex items-center gap-1">
-                <p className="text-muted-foreground text-sm">{`${s.columns.length} ta ustun`}</p>
+                <p className="text-sm">{`${s.columns.length} ta ustun`}</p>
                 <CollapsibleTrigger asChild>
                   <Button variant="link" size="icon" className="size-8">
                     <LucideChevronDown />
@@ -85,7 +84,7 @@ export default function SchemaPage() {
             <CollapsibleContent className="flex flex-col gap-2 py-2">
               {s.columns.map((column) => (
                 <div key={column} className="flex items-center mx-2 px-2 rounded-md border">
-                  <div className="px-2 py-2 text-sm font-sans">{column}</div>
+                  <div className="px-2 py-2 text-xs font-mono">{column}</div>
                 </div>
               ))}
             </CollapsibleContent>

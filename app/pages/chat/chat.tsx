@@ -59,23 +59,25 @@ export default function ChatPage() {
           <ConversationScrollButton />
         </Conversation>
       </div>
-      <div className="flex items-end pb-8 px-50">
-        <PromptInput onSubmit={(message: PromptInputMessage) => {
-          sendMessage(message);
-          setText('');
-        }} className="mt-4" globalDrop multiple>
-          <PromptInputBody>
-            <PromptInputTextarea
-              value={text}
-              ref={textareaRef}
-              placeholder="Nima haqida bilmoqchisiz?"
-              onChange={(e) => setText(e.target.value)}
-            />
-          </PromptInputBody>
-          <PromptInputFooter className="flex justify-end">
-            <PromptInputSubmit disabled={!text && !status} status={status} />
-          </PromptInputFooter>
-        </PromptInput>
+      <div className="flex items-end pb-8 px-4">
+        <div className="w-full max-w-2xl mx-auto">
+          <PromptInput onSubmit={(message: PromptInputMessage) => {
+            sendMessage(message);
+            setText('');
+          }} className="mt-4" globalDrop multiple>
+            <PromptInputBody>
+              <PromptInputTextarea
+                value={text}
+                ref={textareaRef}
+                placeholder="Nima haqida bilmoqchisiz?"
+                onChange={(e) => setText(e.target.value)}
+              />
+            </PromptInputBody>
+            <PromptInputFooter className="flex justify-end">
+              <PromptInputSubmit disabled={!text && !status} status={status} />
+            </PromptInputFooter>
+          </PromptInput>
+        </div>
       </div>
     </div>
   )

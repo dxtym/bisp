@@ -19,15 +19,22 @@ import {
 } from "@/components/ai-elements/conversation";
 import {
   Message,
-  MessageContent,
-  MessageResponse
+  MessageContent
 } from "@/components/ai-elements/message";
+import { DefaultChatTransport } from "ai";
 
-export default function ChatPage() {
+export default function Chat() {
   const [text, setText] = useState<string>('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, status, sendMessage } = useChat();
+  const { messages, status, sendMessage } = useChat({
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      prepareSendMessagesRequest({ messages, id }) {
+        return { body: { message: messages[messages.length - 1], id } };
+      },
+    })
+  });
 
   return (
     <div className="grid grid-rows-[1fr_auto] h-full">
@@ -46,9 +53,9 @@ export default function ChatPage() {
                   <MessageContent>
                     {message.parts.map((part, i) => {
                       return (
-                        <MessageResponse key={`${message.id}-${i}`}>
+                        <div key={`${message.id}-${i}`} className="whitespace-pre-wrap">
                           {part.type === 'text' ? part.text : ""}
-                        </MessageResponse>
+                        </div>
                       );
                     })}
                   </MessageContent>

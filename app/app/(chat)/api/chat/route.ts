@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { Message } from "./types";
 
 import { createUIMessageStreamResponse } from "ai";
@@ -8,6 +7,8 @@ import openAIClient from "@/lib/agents/openai/client";
 import ollamaClient from "@/lib/agents/ollama/client";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { StateGraph, MessagesAnnotation, START, END } from "@langchain/langgraph";
+import { ClickHouseWebClient } from "@/lib/clickhouse/client";
+import { SystemRepository } from "@/app/_repository/system";
 
 const graph = new StateGraph(MessagesAnnotation)
   .addNode("translator", translate)
@@ -36,9 +37,10 @@ async function translate(state: typeof MessagesAnnotation.State): Promise<Messag
 
 async function generate(state: typeof MessagesAnnotation.State): Promise<Message> {
   try {
-    const cookieStore = cookies();
-    const schema = (await cookieStore).get("schema")?.value;
+    const client = ClickHouseWebClient.getInstance();
+    const systemRepository = new SystemRepository(client);
 
+    const schema = await systemRepository.loadSchema();
     const messages = [
       ...state.messages.slice(0, -1),
       new HumanMessage(`
@@ -54,7 +56,6 @@ async function generate(state: typeof MessagesAnnotation.State): Promise<Message
   }
 }
 
-// TODO: stream only the final message
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();

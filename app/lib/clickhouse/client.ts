@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createClient, QueryParams, ResultSet } from "@clickhouse/client-web";
+import { createClient, PingResult, QueryParams, ResultSet } from "@clickhouse/client-web";
 
 const ClickHouseConfig = z.object({
   url: z.string(),
@@ -11,8 +11,8 @@ const ClickHouseConfig = z.object({
 type ClickHouseConfig = z.infer<typeof ClickHouseConfig>;
 
 export class ClickHouseWebClient {
-  private static instance: ClickHouseWebClient;
   private readonly client: ReturnType<typeof createClient>;
+  private static instance: ClickHouseWebClient | null = null;
 
   private constructor(connectionString: string) {
     const config = this.parse(connectionString);
@@ -38,14 +38,29 @@ export class ClickHouseWebClient {
     }
   }
 
-  public static getInstance(connectionString: string): ClickHouseWebClient {
+  public static getInstance(connectionString?: string): ClickHouseWebClient {
+    if (!connectionString) {
+      if (!ClickHouseWebClient.instance) {
+        throw new Error("No active connection");
+      }
+      return ClickHouseWebClient.instance;
+    }
+
     if (!ClickHouseWebClient.instance) {
       ClickHouseWebClient.instance = new ClickHouseWebClient(connectionString);
     }
     return ClickHouseWebClient.instance;
   }
 
+  public static hasInstance(): boolean {
+    return ClickHouseWebClient.instance !== null;
+  }
+
   public async query<T>(params: QueryParams): Promise<ResultSet<T>> {
     return this.client.query(params);
+  }
+
+  public async ping(): Promise<PingResult> {
+    return this.client.ping();
   }
 }

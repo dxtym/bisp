@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 
-import { setCookie } from "./actions/cookies";
-import { ClickHouseWebClient } from "@/lib/clickhouse/client";
-import { Schema, SystemRepository } from "@/lib/repository/system.repository";
+import { Schema } from "@/app/_repository/system";
 
 import { LucideChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,21 +10,28 @@ import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 
-export default function SchemaPage() {
+export default function Panel() {
   const [schema, setSchema] = useState<Schema[]>([]);
   const [connectionString, setConnectionString] = useState<string>("");
 
-  const handleConnect = () => {
-    const client = ClickHouseWebClient.getInstance(connectionString);
-    const systemRepository = new SystemRepository(client);
-
-    systemRepository.loadSchema().
-      then((schema) => {
-        setSchema(schema);
-        setCookie("schema", JSON.stringify(schema));
-      }).catch((error) => {
-        console.error(`Failed to load schema: ${error}`);
+  const handleConnect = async () => {
+    try {
+      const connectionResponse = await fetch("/api/clickhouse/connect", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ connectionString }),
       });
+      await connectionResponse.json();
+
+      const schemaResponse = await fetch("/api/clickhouse/schema");
+      const schemaJSON = await schemaResponse.json();
+
+      setSchema(schemaJSON.data);
+    } catch (error) {
+      console.error("Connection error:", error);
+    }
   }
 
   return (

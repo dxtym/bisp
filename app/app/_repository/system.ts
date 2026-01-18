@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { ClickHouseWebClient } from "../clickhouse/client";
+import { ClickHouseWebClient } from "../../lib/clickhouse/client";
 
 const Table = z.object({
   name: z.string(),

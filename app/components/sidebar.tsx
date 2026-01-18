@@ -21,7 +21,7 @@ const conversations = [
   { title: "Performance Optimization" },
 ]
 
-export default function SidebarPage() {
+export default function Sidebar() {
   return (
     <div className="p-4 flex flex-col h-full">
       <div className="flex h-10 pl-2 items-center">

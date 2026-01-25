@@ -27,7 +27,6 @@ export default function Panel() {
 
       const schemaResponse = await fetch("/api/clickhouse/schema");
       const schemaJSON = await schemaResponse.json();
-
       setSchema(schemaJSON.data);
     } catch (error) {
       console.error("Connection error:", error);
@@ -63,11 +62,11 @@ export default function Panel() {
         <Separator className="my-2" />
         <div className="flex flex-row  justify-between gap-1">
           <p className="text-sm text-muted-foreground">Tuzilma</p>
-          <p className="text-sm">{`${schema.length} ta jadval`}</p>
+          <p className="text-sm">{`${schema?.length} ta jadval`}</p>
         </div>
       </div>
       <div className="my-3 h-180 overflow-y-auto">
-        {schema.map((s) => (
+        {schema?.map((s) => (
           <Collapsible
             key={s.table}
             className="flex flex-col w-full border rounded-md mb-3"
@@ -78,7 +77,7 @@ export default function Panel() {
                 <h4 className="text-sm font-semibold">{s.table}</h4>
               </div>
               <div className="flex items-center gap-1">
-                <p className="text-sm">{`${s.columns.length} ta ustun`}</p>
+                <p className="text-sm">{`${s?.columns.length} ta ustun`}</p>
                 <CollapsibleTrigger asChild>
                   <Button variant="link" size="icon" className="size-8">
                     <LucideChevronDown />

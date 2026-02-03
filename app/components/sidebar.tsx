@@ -31,9 +31,10 @@ const conversations = [
 
 export default function Sidebar() {
   const clerk = useClerk();
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
   const [open, setOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
 
+  // TODO: make this component smaller
   return (
     <div className="p-4 flex flex-col h-full">
       <div className="flex h-10 pl-2 items-center">
@@ -55,7 +56,23 @@ export default function Sidebar() {
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="my-2 flex items-center justify-between px-2">
           <div className="text-sm text-muted-foreground">Suhbatlar</div>
-          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 rounded-full"
+            onClick={async () => {
+              await fetch('/api/conversation/create', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  userId: clerk.user?.id,
+                  title: "Nomsiz suhbat"
+                })
+              });
+            }}
+          >
             <Plus className="h-3 w-3" />
           </Button>
         </div>

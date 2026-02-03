@@ -33,7 +33,7 @@ class OllamaClient {
 
 const ollamaClient = new OllamaClient({
   baseUrl: process.env.OLLAMA_URL!,
-  model: process.env.OLLAMA_MODEL!
+  model: process.env.OLLAMA_MODEL!,
 })
 
 export default ollamaClient;

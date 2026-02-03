@@ -1,11 +1,12 @@
 import { Message } from "./types";
 
-import { createUIMessageStreamResponse } from "ai";
 import { toBaseMessages, toUIMessageStream } from "@ai-sdk/langchain";
+import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 
 import openAIClient from "@/lib/agents/openai/client";
 import ollamaClient from "@/lib/agents/ollama/client";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
+
 import { StateGraph, MessagesAnnotation, START, END } from "@langchain/langgraph";
 import { ClickHouseWebClient } from "@/lib/clickhouse/client";
 import { SystemRepository } from "@/app/_repository/system";
@@ -42,14 +43,15 @@ async function generate(state: typeof MessagesAnnotation.State): Promise<Message
 
     const schema = await systemRepository.loadSchema();
     const messages = [
-      ...state.messages.slice(0, -1),
       new HumanMessage(`
         Given the schema: ${JSON.stringify(schema)}.
         Answer the question: ${state.messages.at(-1)?.content}
       `)
     ]
 
-    const response = await ollamaClient.call(messages);
+    // TODO: switch to Ollama on production
+    // const response = await ollamaClient.call(messages);
+    const response = await openAIClient.call(messages);
     return { messages: [...response.messages] } as Message;
   } catch (error) {
     throw new Error(`Generate error: ${error}`);
@@ -66,6 +68,7 @@ export async function POST(req: Request) {
       { streamMode: ["values", "messages"] },
     );
 
+    // TODO: filter stream message by only last node message
     return createUIMessageStreamResponse({
       stream: toUIMessageStream(stream),
     });

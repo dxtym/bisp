@@ -1,7 +1,7 @@
 import { z } from "zod";
-import mongoDbClient from "@/lib/mongodb/client";
 import { Conversation } from "@/lib/mongodb/models/conversation";
 import { NextRequest, NextResponse } from "next/server";
+import { mongoDbConnect } from "@/lib/mongodb/client";
 
 const RequestSchema = z.object({
   userId: z.string().min(1),
@@ -10,12 +10,10 @@ const RequestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    await mongoDbConnect();
+
     const body = await req.json();
     const { userId, title } = RequestSchema.parse(body);
-    console.log(userId, title)
-
-    await mongoDbClient.connect();
-    console.log("here")
 
     const doc = await Conversation.create({
       userId: userId,
@@ -23,8 +21,6 @@ export async function POST(req: NextRequest) {
       title: title,
       messages: [],
     });
-    
-    console.log(JSON.stringify(doc))
 
     return NextResponse.json({
       success: true,

@@ -11,8 +11,8 @@ import { Separator } from "@/components/ui/separator"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
 import { useClerk } from "@clerk/nextjs";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-
-
+import { useAppSelector, useAppDispatch } from "@/lib/store/hooks"
+import { setActiveConversationId, createConversation } from "@/lib/store/slices/conversationSlice"
 
 const navigationItems = [
   { name: "Asosiy", icon: Home, href: "/" },
@@ -21,27 +21,33 @@ const navigationItems = [
   { name: "Sozlamalar", icon: Settings, href: "/settings" },
 ]
 
-const conversations = [
-  { title: "Project Discussion" },
-  { title: "API Integration Help" },
-  { title: "Database Schema Review" },
-  { title: "UI Component Ideas" },
-  { title: "Performance Optimization" },
-]
-
 export default function Sidebar() {
   const clerk = useClerk();
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
 
-  // TODO: make this component smaller
+  const dispatch = useAppDispatch();
+  const conversations = useAppSelector((state) => state.conversation.conversations);
+  const activeConversationId = useAppSelector((state) => state.conversation.activeConversationId);
+  const isLoading = useAppSelector((state) => state.conversation.isLoading);
+
+  const handleCreateConversation = async () => {
+    const userId = clerk.user?.id;
+    if (!userId) return;
+    dispatch(createConversation({ userId, title: "Yangi suhbat" }));
+  };
+
+  const handleSelectConversation = (conversationId: string) => {
+    dispatch(setActiveConversationId(conversationId));
+  };
+
   return (
     <div className="p-4 flex flex-col h-full">
       <div className="flex h-10 pl-2 items-center">
         <Image src="/logo.png" alt="Logo" width={50} height={50} className="h-6 w-6" />
       </div>
       <Separator className="my-2" />
-      <div className="my-2 px-2 text-sm text-muted-foreground">Bo’limlar</div>
+      <div className="my-2 px-2 text-sm text-muted-foreground">Bo&lsquo;limlar</div>
       {navigationItems.map((item) => (
         <Button
           key={item.name}
@@ -60,41 +66,41 @@ export default function Sidebar() {
             variant="ghost"
             size="icon"
             className="h-6 w-6 rounded-full"
-            onClick={async () => {
-              await fetch('/api/conversation/create', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  userId: clerk.user?.id,
-                  title: "Nomsiz suhbat"
-                })
-              });
-            }}
+            onClick={handleCreateConversation}
           >
             <Plus className="h-3 w-3" />
           </Button>
         </div>
         <ScrollArea className="flex-1">
-          {conversations.map((conversation) => (
-            <Button
-              key={conversation.title}
-              variant="ghost"
-              className="h-auto w-full justify-start py-2 text-left"
-            >
-              <span className="truncate text-sm font-normal">
-                {conversation.title}
-              </span>
-            </Button>
-          ))}
+          {isLoading && conversations.length === 0 ? (
+            <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+              Yuklanmoqda...
+            </div>
+          ) : conversations.length === 0 ? (
+            <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+              Suhbatlar mavjud emas.
+            </div>
+          ) : (
+            conversations.map((conversation) => (
+              <Button
+                key={conversation.conversationId}
+                variant={activeConversationId === conversation.conversationId ? "secondary" : "ghost"}
+                className="h-auto w-full justify-start py-2 text-left"
+                onClick={() => handleSelectConversation(conversation.conversationId)}
+              >
+                <span className="truncate text-sm font-normal">
+                  {conversation.title || "Nomsiz suhbat"}
+                </span>
+              </Button>
+            ))
+          )}
         </ScrollArea>
       </div>
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleContent asChild>
           <div className="left-4 right-4 bottom-20 bg-popover text-popover-foreground rounded-md p-4 shadow-lg">
             <div className="flex flex-row items-center justify-between">
-              <div className="text-sm text-muted-foreground">Ko&lsquo;rinish</div>
+              <div className="text-sm text-muted-foreground">Ilova rangi</div>
               <ToggleGroup variant="outline" type="single" defaultValue={theme} >
                 <ToggleGroupItem value="light"><Sun className="inline-block mr-1 h-4 w-4" /></ToggleGroupItem>
                 <ToggleGroupItem value="dark"><Moon className="inline-block mr-1 h-4 w-4" /></ToggleGroupItem>

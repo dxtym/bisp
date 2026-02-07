@@ -1,9 +1,7 @@
 import { z } from "zod";
 
-import { Message } from "@/app/(chat)/api/chat/types";
-
-import { ChatOllama } from "@langchain/ollama";
-import { BaseMessage } from "@langchain/core/messages";
+import { createOpenAI } from "@ai-sdk/openai";
+import { streamText, type ModelMessage, type LanguageModel } from "ai";
 
 const OllamaClientOptions = z.object({
   baseUrl: z.string(),
@@ -12,19 +10,22 @@ const OllamaClientOptions = z.object({
 type OllamaClientOptions = z.infer<typeof OllamaClientOptions>;
 
 class OllamaClient {
-  private readonly model: ChatOllama;
+  private readonly model: LanguageModel;
 
   constructor(options?: OllamaClientOptions) {
-    this.model = new ChatOllama({
-      baseUrl: options?.baseUrl,
-      model: options?.model,
+    const provider = createOpenAI({
+      baseURL: `${options?.baseUrl}/v1`,
+      apiKey: "ollama",
     });
+    this.model = provider(options?.model ?? "llama3");
   }
 
-  public async call(messages: BaseMessage[]): Promise<Message> {
+  public stream(messages: ModelMessage[]) {
     try {
-      const response = await this.model.invoke(messages);
-      return { messages: [response] } as Message;
+      return streamText({
+        model: this.model,
+        messages,
+      });
     } catch (error) {
       throw new Error(`Ollama error: ${error}`);
     }
@@ -34,6 +35,6 @@ class OllamaClient {
 const ollamaClient = new OllamaClient({
   baseUrl: process.env.OLLAMA_URL!,
   model: process.env.OLLAMA_MODEL!,
-})
+});
 
 export default ollamaClient;

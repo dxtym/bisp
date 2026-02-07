@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { Message } from "@/app/(chat)/api/chat/types";
+import { createOpenAI } from "@ai-sdk/openai";
+import { generateText, type ModelMessage, type LanguageModel } from "ai";
 
-import { ChatOpenAI } from "@langchain/openai";
-import { BaseMessage } from "@langchain/core/messages";
+const TRANSLATOR_SYSTEM_PROMPT = `You are a translator of Uzbek to English. Do not use markdown. Do not explain your answer. Only single message answer allowed.`;
 
 const OpenAIClientOptions = z.object({
   model: z.string(),
@@ -13,20 +13,23 @@ const OpenAIClientOptions = z.object({
 type OpenAIClientOptions = z.infer<typeof OpenAIClientOptions>;
 
 class OpenAIClient {
-  private readonly model: ChatOpenAI;
+  private readonly model: LanguageModel;
 
   constructor(options?: OpenAIClientOptions) {
-    this.model = new ChatOpenAI({
-      model: options?.model,
+    const provider = createOpenAI({
       apiKey: options?.apiKey,
-      temperature: options?.temperature,
-    })
+    });
+    this.model = provider(options?.model ?? "gpt-4o-mini");
   }
 
-  public async call(messages: BaseMessage[]): Promise<Message> {
+  public async call(messages: ModelMessage[]): Promise<string> {
     try {
-      const response = await this.model.invoke(messages);
-      return { messages: [response] } as Message;
+      const { text } = await generateText({
+        model: this.model,
+        system: TRANSLATOR_SYSTEM_PROMPT,
+        messages,
+      });
+      return text;
     } catch (error) {
       throw new Error(`OpenAI error: ${error}`);
     }
@@ -36,6 +39,6 @@ class OpenAIClient {
 const openAIClient = new OpenAIClient({
   model: process.env.OPENAI_MODEL!,
   apiKey: process.env.OPENAI_API_KEY!,
-})
+});
 
 export default openAIClient;

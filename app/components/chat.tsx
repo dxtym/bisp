@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useChat } from '@ai-sdk/react';
 import { MessageSquare, Lightbulb, Play } from "lucide-react";
 import {
@@ -24,13 +24,68 @@ import {
 } from "@/components/ai-elements/message";
 import { Button } from "./ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
+import { updateMessages } from "@/lib/store/slices/conversationSlice";
 
 export default function Chat() {
   const [text, setText] = useState<string>('');
   const [table, setTable] = useState<Record<string, unknown>[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const prevStatusRef = useRef<string>('ready');
 
-  const { messages, status, sendMessage } = useChat();
+  const dispatch = useAppDispatch();
+  const activeConversationId = useAppSelector((state) => state.conversation.activeConversationId);
+  const activeConversation = useAppSelector((state) => state.conversation.activeConversation);
+
+  const { messages, status, sendMessage, setMessages } = useChat({
+    id: activeConversationId ?? undefined,
+  });
+
+  useEffect(() => {
+    if (activeConversation && activeConversation.messages.length > 0) {
+      const loadedMessages = activeConversation.messages.map((msg, index) => ({
+        id: `loaded-${index}-${new Date(msg.createdAt).getTime()}`,
+        role: msg.role as "user" | "assistant" | "system",
+        parts: [{ type: "text" as const, text: msg.content }],
+      }));
+      setMessages(loadedMessages);
+    } else if (activeConversation && activeConversation.messages.length === 0) {
+      setMessages([]);
+    }
+  }, [activeConversation, setMessages]);
+
+  const persistMessages = useCallback(async () => {
+    if (!activeConversationId || messages.length === 0) return;
+
+    const messagesToSave = messages.map((msg) => {
+      const textContent = msg.parts
+        ?.filter((part): part is { type: "text"; text: string } => part.type === "text")
+        .map((part) => part.text)
+        .join("") || "";
+
+      return {
+        senderId: msg.role === "user" ? "user" : "assistant",
+        role: msg.role as "user" | "assistant" | "system",
+        content: textContent,
+        createdAt: new Date(),
+      };
+    });
+
+    dispatch(updateMessages({ conversationId: activeConversationId, messages: messagesToSave }));
+  }, [activeConversationId, messages, dispatch]);
+
+  useEffect(() => {
+    const prevStatus = prevStatusRef.current;
+    prevStatusRef.current = status;
+
+    if (
+      (prevStatus === 'streaming' || prevStatus === 'submitted') &&
+      status === 'ready' &&
+      messages.length > 0
+    ) {
+      persistMessages();
+    }
+  }, [status, messages.length, persistMessages]);
 
   const getQuery = (): string => {
     const messagesByAgent = messages.filter((m) => m.role === 'assistant');
@@ -44,23 +99,17 @@ export default function Chat() {
       const query = getQuery();
       const response = await fetch('/api/clickhouse/query', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          query: "SELECT * FROM orders;"
-          // query: query,
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
       });
 
       const result = await response.json();
-      setTable(result.data.data); // TODO: adjust to a more proper structure
+      setTable(result.data.data);
     } catch (error) {
       console.error('Query submit error:', error);
     }
   }
 
-  // TODO: make this component smaller
   return (
     <div className="grid grid-rows-[1fr_auto] h-full">
       <div className="flex justify-center pt-8 px-50 overflow-y-auto">
@@ -80,7 +129,11 @@ export default function Chat() {
                       {message.parts.map((part, i) => {
                         return (
                           <MessageResponse key={`${message.id}-${i}`} className="whitespace-pre-wrap">
-                            {part.type === 'text' ? part.text : ""}
+                            {part.type === 'text' ? (
+                              message.role === 'assistant'
+                                ? `\`\`\`\n${part.text}\n\`\`\``
+                                : part.text
+                            ) : ''}
                           </MessageResponse>
                         );
                       })}

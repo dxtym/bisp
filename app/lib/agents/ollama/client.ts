@@ -6,6 +6,8 @@ import { streamText, type ModelMessage, type LanguageModel } from "ai";
 const OllamaClientOptions = z.object({
   baseUrl: z.string(),
   model: z.string(),
+  username: z.string().optional(),
+  password: z.string().optional(),
 });
 type OllamaClientOptions = z.infer<typeof OllamaClientOptions>;
 
@@ -13,9 +15,17 @@ class OllamaClient {
   private readonly model: LanguageModel;
 
   constructor(options?: OllamaClientOptions) {
+    const headers: Record<string, string> = {};
+
+    if (options?.username && options?.password) {
+      const credentials = Buffer.from(`${options.username}:${options.password}`).toString("base64");
+      headers["Authorization"] = `Basic ${credentials}`;
+    }
+
     const provider = createOpenAI({
       baseURL: `${options?.baseUrl}/v1`,
       apiKey: "ollama",
+      headers,
     });
     this.model = provider(options?.model ?? "llama3");
   }
@@ -35,6 +45,8 @@ class OllamaClient {
 const ollamaClient = new OllamaClient({
   baseUrl: process.env.OLLAMA_URL!,
   model: process.env.OLLAMA_MODEL!,
+  username: process.env.OLLAMA_USERNAME,
+  password: process.env.OLLAMA_PASSWORD,
 });
 
 export default ollamaClient;

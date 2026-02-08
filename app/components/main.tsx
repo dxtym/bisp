@@ -1,51 +1,35 @@
 "use client";
 
-import { SignInButton, SignUpButton } from "@clerk/nextjs";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import Hero from "./hero";
+import Navbar from "./navbar";
+import Footer from "./footer";
 
 export default function Main() {
   return (
-    <div className="min-h-screen text-white">
-      <header className="max-w-5xl mx-auto px-5 py-5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Image
-            src="/logo.png"
-            alt="logo"
-            width={70}
-            height={70}
-          />
-        </div>
-        <nav className="flex items-center gap-4">
-          <a className="hidden sm:inline-block text-sm text-white hover:text-gray-500">Asosiy</a>
-          <a className="hidden sm:inline-block text-sm text-white hover:text-gray-500">Narxlar</a>
-          <a className="hidden sm:inline-block text-sm text-white hover:text-gray-500">Savollar</a>
-          <SignUpButton mode="redirect">
-            <Button variant="ghost" className="rounded-md px-4 py-2 text-sm text-white">Kirish</Button>
-          </SignUpButton>
-        </nav>
+    <div className="relative min-h-screen text-white">
+      <div className="fixed top-[10%] bottom-[10%] left-[20%] right-[20%] -z-10">
+        <div
+          className="h-full w-full"
+          style={{
+            backgroundSize: "50px 50px",
+            backgroundImage: `
+              linear-gradient(to right, rgb(255 255 255 / 0.1) 1px, transparent 1px),
+              linear-gradient(to bottom, rgb(255 255 255 / 0.1) 1px, transparent 1px)
+            `,
+            maskImage: "radial-gradient(circle at 50% 50%, black 30%, transparent 60%)",
+            WebkitMaskImage: "radial-gradient(circle at 50% 50%, black 30%, transparent 60%)",
+          }}
+        />
+      </div>
+      <header className="fixed top-0 left-0 right-0 z-50">
+        <Navbar />
       </header>
-      <main className="max-w-5xl mx-auto py-20 sm:py-28">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">Donishmand</h1>
-            <p className="mt-4 text-lg text-gray-500">Siz yozing, biz bajaramiz!</p>
-            <div className="mt-8 flex flex-row gap-3">
-              <SignUpButton mode="redirect">
-                <Button variant="ghost" className="rounded-md bg-black text-white px-6 py-3 text-sm">Boshlash</Button>
-              </SignUpButton>
-              <SignInButton mode="redirect">
-                <Button variant="ghost" className="px-5 py-3 text-sm hover:bg-white">Kirish</Button>
-              </SignInButton>
-            </div>
-          </div>
-          <div className="flex items-center justify-end">
-            <div className="w-full max-w-md bg-linear-to-br from-[#f8fafc] to-white rounded-2xl shadow-xl border">
-              <Image src="/logo.png" alt="app preview" width={560} height={420} className="rounded-lg object-cover" />
-            </div>
-          </div>
-        </div>
+      <main className="fixed inset-0 flex items-center justify-center">
+        <Hero />
       </main>
+      <footer className="fixed bottom-0 left-0 right-0 z-50 py-5">
+        <Footer />
+      </footer>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useChat } from '@ai-sdk/react';
-import { MessageSquare, Lightbulb, Play } from "lucide-react";
+import { MessageSquare, Lightbulb } from "lucide-react";
 import {
   PromptInput,
   PromptInputBody,
@@ -22,14 +22,12 @@ import {
   MessageContent,
   MessageResponse
 } from "@/components/ai-elements/message";
-import { Button } from "./ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { QueryResultModal } from "@/components/modal";
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import { updateMessages } from "@/lib/store/slices/conversationSlice";
 
 export default function Chat() {
   const [text, setText] = useState<string>('');
-  const [table, setTable] = useState<Record<string, unknown>[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const prevStatusRef = useRef<string>('ready');
 
@@ -87,28 +85,10 @@ export default function Chat() {
     }
   }, [status, messages.length, persistMessages]);
 
-  const getQuery = (): string => {
-    const messagesByAgent = messages.filter((m) => m.role === 'assistant');
-    const lastMessageByAgent = messagesByAgent[messagesByAgent.length - 1];
-    const query = lastMessageByAgent?.parts.filter((part) => part.type === 'text') ?? [];
-    return query.length > 0 ? query[query.length - 1].text : '';
+  const getQueryFromMessage = (message: typeof messages[0]): string => {
+    const query = message.parts.filter((part) => part.type === 'text');
+    return query.length > 0 ? query[0].text : '';
   };
-
-  const handleQuerySubmit = async () => {
-    try {
-      const query = getQuery();
-      const response = await fetch('/api/clickhouse/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query })
-      });
-
-      const result = await response.json();
-      setTable(result.data.data);
-    } catch (error) {
-      console.error('Query submit error:', error);
-    }
-  }
 
   return (
     <div className="grid grid-rows-[1fr_auto] h-full">
@@ -141,37 +121,8 @@ export default function Chat() {
                   </Message>
                   {
                     status === 'ready' && message.role === 'assistant' && (
-                      <div className="flex justify-start flex-col">
-                        <Button variant="default" size="sm" className="rounded-full w-8 h-8 p-0" onClick={handleQuerySubmit}>
-                          <Play className="w-3 h-3" />
-                        </Button>
-                      </div>
-                    )
-                  }
-                  {/* TODO: shrink the table width to cover every column */}
-                  {
-                    table.length > 0 && message.role === 'assistant' && (
-                      <div className="mt-4 border rounded-lg overflow-hidden">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              {Object.keys(table[0]).map((column) => (
-                                <TableHead key={column}>{column}</TableHead>
-                              ))}
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {table.map((row, index) => (
-                              <TableRow key={index}>
-                                {Object.keys(table[0]).map((column) => (
-                                  <TableCell key={column}>
-                                    {String(row[column] ?? '')}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
+                      <div className="flex justify-start mt-2">
+                        <QueryResultModal query={getQueryFromMessage(message)} />
                       </div>
                     )
                   }

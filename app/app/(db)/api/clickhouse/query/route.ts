@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: false,
         message: "No active ClickHouse instance",
-      });
+      }, { status: 400 });
     }
 
     const body = await request.json();
@@ -27,12 +27,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: data,
-    });
+    }, { status: 200 });
 
   } catch (error) {
     return NextResponse.json({
       success: false,
       message: error instanceof Error ? error.message : "Something went wrong",
-    });
+    }, { status: 500 });
   }
 }

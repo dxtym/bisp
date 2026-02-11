@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
-import { ConversationRepository } from "@/app/_repository/conversation";
+import { ConversationRepository } from "@/lib/repository/conversation";
 
 const RequestSchema = z.object({
   userId: z.string().min(1),
@@ -18,11 +18,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: doc,
-    });
+    }, { status: 201 });
   } catch (error) {
     return NextResponse.json({
       success: false,
       message: error instanceof Error ? error.message : "Something went wrong",
-    });
+    }, { status: 500 });
   }
 }

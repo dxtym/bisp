@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect } from "react"
-import { Plus } from "lucide-react"
-
 import { useUser } from "@clerk/nextjs"
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks"
 import {
@@ -22,8 +20,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import Profile from "@/components/profile"
-import { Separator } from "./ui/separator"
-import { Button } from "./ui/button"
+import Header from "@/components/header"
 
 export default function Menu() {
   const { user } = useUser()
@@ -41,21 +38,12 @@ export default function Menu() {
   return (
     <Sidebar variant="inset" collapsible="offcanvas">
       <SidebarHeader>
-        <div className="flex justify-between">
-          <p className="text-muted-foreground">Suhbatlar</p>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-5 w-5 rounded-full"
-            onClick={() => {
-              if (!user) return
-              dispatch(createConversation({ userId: user.id, title: "Yangi suhbat" }))
-            }}
-          >
-            <Plus />
-          </Button>
-        </div>
-        <Separator />
+        <Header
+          onCreate={() => {
+            if (!user) return;
+            dispatch(createConversation({ userId: user.id, title: "Yangi suhbat" }))
+          }}
+        />
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu>

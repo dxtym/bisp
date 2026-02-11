@@ -9,7 +9,7 @@ export default function Profile() {
   const { user } = useUser()
 
   return (
-    <div className="border-t pt-3">
+    <div className="py-2">
       <div className="flex items-center justify-between rounded-sm bg-muted border border-neutral-700 px-2 py-2">
         <div className="flex flex-col">
           <span className="text-sm font-medium truncate">

@@ -21,7 +21,7 @@ import { IMessage } from "@/lib/mongodb/models/conversation";
 import { nanoid } from "nanoid";
 
 export default function Chat() {
-  const messagesRef = useRef(0);
+  const messagesRef = useRef<number>(0);
 
   const { messages, status, sendMessage, setMessages } = useChat();
 
@@ -65,13 +65,13 @@ export default function Chat() {
 
       messagesRef.current = messages.length;
     }
-  }, [messages, conversation, dispatch]);
+  }, [messages, dispatch, conversation, setMessages]);
 
   return (
     <div className="grid h-full grid-rows-[1fr_auto]">
       <div className="flex justify-center overflow-hidden">
         <Conversation className="w-full max-w-2xl">
-          <ConversationContent className="px-4">
+          <ConversationContent className="max-h-[100] px-0">
             {messages.length === 0 ? (
               <ConversationEmptyState
                 title="Hech qanday xabar yoq"

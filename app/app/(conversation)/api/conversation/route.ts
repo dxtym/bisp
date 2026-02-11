@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ConversationRepository } from "@/app/_repository/conversation";
+import { ConversationRepository } from "@/lib/repository/conversation";
 
 const repository = new ConversationRepository();
 
@@ -20,11 +20,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: conversations,
-    });
+    }, { status: 200 });
   } catch (error) {
     return NextResponse.json({
       success: false,
       message: error instanceof Error ? error.message : "Something went wrong",
-    });
+    }, { status: 500 });
   }
 }

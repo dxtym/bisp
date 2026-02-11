@@ -1,7 +1,7 @@
 import openAIClient from "@/lib/agents/openai/client";
 import ollamaClient from "@/lib/agents/ollama/client";
 import { ClickHouseWebClient } from "@/lib/clickhouse/client";
-import { SystemRepository } from "@/app/_repository/system";
+import { SystemRepository } from "@/lib/repository/system";
 import { convertToModelMessages } from "ai";
 
 export async function POST(req: Request) {

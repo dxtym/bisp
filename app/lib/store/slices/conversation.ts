@@ -89,12 +89,6 @@ const conversationSlice = createSlice({
         state.conversations.unshift(action.payload);
         state.conversation = action.payload;
       })
-
-      .addCase(addMessage.fulfilled, (state, action) => {
-        if (state.conversation && state.conversation.id === action.payload.conversationId) {
-          state.conversation.messages.push(action.payload.message);
-        }
-      })
   },
 });
 

@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server";
-import { ConversationRepository } from "@/app/_repository/conversation";
+import { ConversationRepository } from "@/lib/repository/conversation";
 
 const AddMessageSchema = z.object({
   message: z.object({
     role: z.enum(["user", "assistant"]),
     content: z.string().min(1),
-    createdAt: z.coerce.date().optional().default(() => new Date()),
+    createdAt: z.coerce.date(),
   }),
 });
 
@@ -41,7 +41,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       data: conversation,
-    });
+    }, { status: 200 });
   } catch (error) {
     return NextResponse.json({
       success: false,

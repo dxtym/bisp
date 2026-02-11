@@ -21,7 +21,6 @@ export default function Home() {
           <div className="flex items-center p-4">
             <SidebarTrigger />
           </div>
-          <Separator />
           <div className="flex flex-1">
             <div className="flex-3 overflow-y-auto">
               <Chat />

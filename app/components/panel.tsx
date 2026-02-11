@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { Schema } from "@/app/_repository/system";
+import { Schema } from "@/lib/repository/system";
 
 import { LucideChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";

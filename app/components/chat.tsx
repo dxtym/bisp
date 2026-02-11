@@ -1,16 +1,8 @@
 "use client"
 
-import { useRef, useState, useEffect, useCallback } from "react";
-import { useChat } from '@ai-sdk/react';
+import { useEffect, useRef } from "react";
+import { UIMessage, useChat } from "@ai-sdk/react";
 import { MessageSquare, Lightbulb } from "lucide-react";
-import {
-  PromptInput,
-  PromptInputBody,
-  PromptInputFooter,
-  PromptInputSubmit,
-  type PromptInputMessage,
-  PromptInputTextarea
-} from "@/components/ai-elements/prompt-input"
 import {
   Conversation,
   ConversationContent,
@@ -19,117 +11,79 @@ import {
 } from "@/components/ai-elements/conversation";
 import {
   Message,
-  MessageContent,
-  MessageResponse
+  MessageContent
 } from "@/components/ai-elements/message";
-import { QueryResultModal } from "@/components/modal";
-import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
-import { updateMessages } from "@/lib/store/slices/conversationSlice";
+import Prompt from "./prompt";
+import ChatMessage from "./message";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { selectConversation, addMessage } from "@/lib/store/slices/conversation";
+import { IMessage } from "@/lib/mongodb/models/conversation";
+import { nanoid } from "nanoid";
 
 export default function Chat() {
-  const [text, setText] = useState<string>('');
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const prevStatusRef = useRef<string>('ready');
+  const messagesRef = useRef(0);
+
+  const { messages, status, sendMessage, setMessages } = useChat();
 
   const dispatch = useAppDispatch();
-  const activeConversationId = useAppSelector((state) => state.conversation.activeConversationId);
-  const activeConversation = useAppSelector((state) => state.conversation.activeConversation);
-
-  const { messages, status, sendMessage, setMessages } = useChat({
-    id: activeConversationId ?? undefined,
-  });
+  const conversation = useAppSelector(selectConversation);
 
   useEffect(() => {
-    if (activeConversation && activeConversation.messages.length > 0) {
-      const loadedMessages = activeConversation.messages.map((msg, index) => ({
-        id: `loaded-${index}-${new Date(msg.createdAt).getTime()}`,
-        role: msg.role as "user" | "assistant" | "system",
-        parts: [{ type: "text" as const, text: msg.content }],
-      }));
-      setMessages(loadedMessages);
-    } else if (activeConversation && activeConversation.messages.length === 0) {
-      setMessages([]);
-    }
-  }, [activeConversation, setMessages]);
+    if (!conversation) return;
 
-  const persistMessages = useCallback(async () => {
-    if (!activeConversationId || messages.length === 0) return;
+    const messages = conversation.messages.map((m: IMessage) => ({
+      id: nanoid(),
+      role: m.role,
+      parts: [{
+        type: "text",
+        text: m.content,
+      }]
+    } as UIMessage));
 
-    const messagesToSave = messages.map((msg) => {
-      const textContent = msg.parts
-        ?.filter((part): part is { type: "text"; text: string } => part.type === "text")
-        .map((part) => part.text)
-        .join("") || "";
+    setMessages(messages);
+    messagesRef.current = messages.length;
+  }, [conversation, setMessages]);
 
-      return {
-        senderId: msg.role === "user" ? "user" : "assistant",
-        role: msg.role as "user" | "assistant" | "system",
-        content: textContent,
+  useEffect(() => {
+    if (!conversation) return;
+
+    if (messages.length > messagesRef.current) {
+      const last = messages[messages.length - 1];
+      const message: IMessage = {
+        role: last.role as "user" | "assistant",
+        content: last.parts
+          .filter((p) => p.type === "text")
+          .map((p) => p.text)
+          .join(""),
         createdAt: new Date(),
       };
-    });
 
-    dispatch(updateMessages({ conversationId: activeConversationId, messages: messagesToSave }));
-  }, [activeConversationId, messages, dispatch]);
+      dispatch(addMessage({
+        conversationId: conversation.id,
+        message: message,
+      }));
 
-  useEffect(() => {
-    const prevStatus = prevStatusRef.current;
-    prevStatusRef.current = status;
-
-    if (
-      (prevStatus === 'streaming' || prevStatus === 'submitted') &&
-      status === 'ready' &&
-      messages.length > 0
-    ) {
-      persistMessages();
+      messagesRef.current = messages.length;
     }
-  }, [status, messages.length, persistMessages]);
-
-  const getQueryFromMessage = (message: typeof messages[0]): string => {
-    const query = message.parts.filter((part) => part.type === 'text');
-    return query.length > 0 ? query[0].text : '';
-  };
+  }, [messages, conversation, dispatch]);
 
   return (
-    <div className="grid grid-rows-[1fr_auto] h-full">
-      <div className="flex justify-center pt-8 px-50 overflow-y-auto">
-        <Conversation>
-          <ConversationContent className="h-full">
+    <div className="grid h-full grid-rows-[1fr_auto]">
+      <div className="flex justify-center overflow-hidden">
+        <Conversation className="w-full max-w-2xl">
+          <ConversationContent className="px-4">
             {messages.length === 0 ? (
               <ConversationEmptyState
-                title="Hech qanday xabar yo'q"
+                title="Hech qanday xabar yoq"
                 description="Suhbatni boshlash uchun savol bering."
                 icon={<MessageSquare className="size-12" />}
               />
             ) : (
               messages.map((message) => (
-                <>
-                  <Message from={message.role} key={message.id}>
-                    <MessageContent>
-                      {message.parts.map((part, i) => {
-                        return (
-                          <MessageResponse key={`${message.id}-${i}`} className="whitespace-pre-wrap">
-                            {part.type === 'text' ? (
-                              message.role === 'assistant'
-                                ? `\`\`\`\n${part.text}\n\`\`\``
-                                : part.text
-                            ) : ''}
-                          </MessageResponse>
-                        );
-                      })}
-                    </MessageContent>
-                  </Message>
-                  {
-                    status === 'ready' && message.role === 'assistant' && (
-                      <div className="flex justify-start mt-2">
-                        <QueryResultModal query={getQueryFromMessage(message)} />
-                      </div>
-                    )
-                  }
-                </>
+                <ChatMessage key={message.id} message={message} />
               ))
             )}
-            {(['streaming', 'submitted'].includes(status)) && (
+            {status === "submitted" && (
               <Message from="assistant" key="thinking">
                 <MessageContent>
                   <div className="flex items-center gap-2 text-gray-600">
@@ -143,26 +97,7 @@ export default function Chat() {
           <ConversationScrollButton />
         </Conversation>
       </div>
-      <div className="flex items-end pb-8 px-4">
-        <div className="w-full max-w-2xl mx-auto">
-          <PromptInput onSubmit={(message: PromptInputMessage) => {
-            sendMessage(message);
-            setText('');
-          }} className="mt-4" globalDrop multiple>
-            <PromptInputBody>
-              <PromptInputTextarea
-                value={text}
-                ref={textareaRef}
-                placeholder="Nima haqida bilmoqchisiz?"
-                onChange={(e) => setText(e.target.value)}
-              />
-            </PromptInputBody>
-            <PromptInputFooter className="flex justify-end">
-              <PromptInputSubmit disabled={!text && !status} status={status} />
-            </PromptInputFooter>
-          </PromptInput>
-        </div>
-      </div>
+      <Prompt status={status} onSubmit={sendMessage} />
     </div>
   )
 }

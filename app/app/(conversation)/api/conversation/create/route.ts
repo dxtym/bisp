@@ -15,7 +15,6 @@ export async function POST(req: NextRequest) {
     const { userId, title } = RequestSchema.parse(body);
 
     const doc = await repository.create(userId, title);
-
     return NextResponse.json({
       success: true,
       data: doc,

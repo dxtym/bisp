@@ -13,14 +13,12 @@ export class ConversationRepository {
   public async create(userId: string, title?: string): Promise<IConversation> {
     try {
       await this.connect();
-
       const doc = await Conversation.create({
+        id: crypto.randomUUID(),
         userId: userId,
-        conversationId: crypto.randomUUID(),
         title: title,
         messages: [],
       });
-
       return doc.toObject() as IConversation;
     } catch (error) {
       throw new Error(`Create conversation error: ${error}`);
@@ -30,12 +28,10 @@ export class ConversationRepository {
   public async getAll(userId: string): Promise<IConversation[]> {
     try {
       await this.connect();
-
       const docs = await Conversation
         .find({ userId })
-        .sort({ updatedAt: -1 })
+        .sort({ createdAt: -1 })
         .lean<IConversation[]>();
-
       return docs;
     } catch (error) {
       throw new Error(`Get all conversations error: ${error}`);
@@ -45,30 +41,26 @@ export class ConversationRepository {
   public async getById(conversationId: string): Promise<IConversation | null> {
     try {
       await this.connect();
-
       const doc = await Conversation
-        .findOne({ conversationId })
+        .findOne({ id: conversationId })
         .lean<IConversation | null>();
-
       return doc;
     } catch (error) {
       throw new Error(`Get conversation by id error: ${error}`);
     }
   }
 
-  public async updateMessages(conversationId: string, messages: IMessage[]): Promise<IConversation | null> {
+  public async addMessage(conversationId: string, message: IMessage): Promise<IConversation | null> {
     try {
       await this.connect();
-
       const doc = await Conversation.findOneAndUpdate(
-        { conversationId },
-        { $set: { messages } },
+        { id: conversationId },
+        { $push: { messages: message } },
         { new: true },
       ).lean<IConversation | null>();
-
       return doc;
     } catch (error) {
-      throw new Error(`Update conversation messages error: ${error}`);
+      throw new Error(`Add message error: ${error}`);
     }
   }
 }

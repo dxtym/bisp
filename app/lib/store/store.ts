@@ -1,26 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import conversationReducer from "./slices/conversationSlice";
+import conversationReducer from "./slices/conversation";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       conversation: conversationReducer,
     },
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredPaths: [
-            "conversation.conversations",
-            "conversation.activeConversation",
-          ],
-          ignoredActions: [
-            "conversation/fetchConversations/fulfilled",
-            "conversation/fetchActiveConversation/fulfilled",
-            "conversation/updateMessages/fulfilled",
-            "conversation/createConversation/fulfilled",
-          ],
-        },
-      }),
   });
 };
 

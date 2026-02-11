@@ -1,31 +1,24 @@
 import mongoose from "mongoose";
 
 export interface IMessage {
-  senderId: string,
-  role: "user" | "assistant" | "system";
+  role: "user" | "assistant";
   content: string;
   createdAt: Date;
 }
 
 export interface IConversation {
+  id: string;
   userId: string;
-  conversationId: string;
   title: string;
   messages: IMessage[];
   createdAt: Date;
-  updatedAt: Date;
 }
 
 const messageSchema = new mongoose.Schema<IMessage>(
   {
-    senderId: {
-      type: String,
-      required: true,
-    },
     role: {
       type: String,
-      enum: ["user", "assistant", "system"],
-      default: "user",
+      enum: ["user", "assistant"],
     },
     content: {
       type: String,
@@ -41,30 +34,30 @@ const messageSchema = new mongoose.Schema<IMessage>(
 
 const conversationSchema = new mongoose.Schema<IConversation>(
   {
-    userId: {
-      type: String,
-      required: true,
-      index: true
-    },
-    conversationId: {
+    id: {
       type: String,
       required: true,
       unique: true,
       index: true,
     },
+    userId: {
+      type: String,
+      required: true,
+      index: true
+    },
     title: {
       type: String,
-      required: false
+      required: true
     },
     messages: {
       type: [messageSchema],
       default: []
     },
   },
-  { timestamps: true }
+  { _id: true, timestamps: true }
 );
 
-conversationSchema.index({ userId: 1, conversationId: 1 });
+conversationSchema.index({ id: 1, userId: 1 });
 
 export type Message = mongoose.InferSchemaType<typeof messageSchema>;
 export type Conversation = mongoose.InferSchemaType<typeof conversationSchema>;

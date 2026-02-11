@@ -6,12 +6,12 @@ const repository = new ConversationRepository();
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
+    const userId = searchParams.get("user_id");
 
     if (!userId) {
       return NextResponse.json({
         success: false,
-        message: "userId query parameter is required",
+        message: "user_id query parameter is required",
       }, { status: 400 });
     }
 

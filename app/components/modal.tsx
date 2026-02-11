@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Play, Database, Loader2 } from "lucide-react"
+import { Database, Loader2, LucidePlay } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -20,11 +20,11 @@ import {
 import { Button } from "@/components/ui/button"
 
 interface QueryResultModalProps {
-  query: string
+  query: string;
   onQueryExecute?: (query: string) => Promise<void>
 }
 
-export function QueryResultModal({ query, onQueryExecute }: QueryResultModalProps) {
+export function Modal({ query, onQueryExecute }: QueryResultModalProps) {
   const [open, setOpen] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -74,7 +74,7 @@ export function QueryResultModal({ query, onQueryExecute }: QueryResultModalProp
         onClick={handleExecuteQuery}
         title="Execute query"
       >
-        <Play className="w-3 h-3 fill-current" />
+        <LucidePlay className="w-3 h-3 fill-current" />
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>

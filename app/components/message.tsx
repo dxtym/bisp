@@ -27,31 +27,29 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   }
 
   return (
-    <>
-      <Message from={message.role} key={message.id}>
-        <MessageContent>
-          {message.parts.map((part, i) => {
-            switch (message.role) {
-              case "assistant":
-                return (
-                  <pre className="whitespace-pre-wrap">
-                    <code className="font-mono text-sm">
-                      <MessageResponse>
-                        {part.type === "text" ? part.text : ""}
-                      </MessageResponse>
-                    </code>
-                  </pre>
-                );
-              case "user":
-                return (
-                  <MessageResponse key={i}>
-                    {part.type === "text" ? part.text : ""}
-                  </MessageResponse>
-                );
-            };
-          })}
-        </MessageContent>
-      </Message>
+    <Message from={message.role} key={message.id}>
+      <MessageContent>
+        {message.parts.map((part, i) => {
+          switch (message.role) {
+            case "assistant":
+              return (
+                <pre className="whitespace-pre-wrap">
+                  <code className="font-mono text-sm">
+                    <MessageResponse>
+                      {part.type === "text" ? part.text : ""}
+                    </MessageResponse>
+                  </code>
+                </pre>
+              );
+            case "user":
+              return (
+                <MessageResponse key={i}>
+                  {part.type === "text" ? part.text : ""}
+                </MessageResponse>
+              );
+          };
+        })}
+      </MessageContent>
       {message.role === "assistant" && (
         <MessageActions>
           <MessageAction
@@ -73,6 +71,6 @@ export default function ChatMessage({ message }: ChatMessageProps) {
           </MessageAction>
         </MessageActions>
       )}
-    </>
+    </Message>
   );
 }

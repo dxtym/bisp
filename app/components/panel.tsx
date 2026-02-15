@@ -1,100 +1,120 @@
 "use client"
 
-import { useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { getSchema, selectSchema, selectUrl, setUrl } from "@/lib/store/slices/connection";
 
-import { Schema } from "@/lib/repository/system";
-
-import { LucideChevronDown } from "lucide-react";
+import { Database, LucideChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput
+} from "./ui/input-group";
+
+type DatabaseOption = {
+  value: string;
+  label: string;
+}
+
+const DatabaseOptions: DatabaseOption[] = [
+  { value: "clickhouse", label: "ClickHouse" },
+  { value: "snowflake", label: "Snowflake" },
+  { value: "postgresql", label: "PostgreSQL" }
+];
 
 export default function Panel() {
-  const [schema, setSchema] = useState<Schema[]>([]);
-  const [connectionString, setConnectionString] = useState<string>("");
+  const dispatch = useAppDispatch();
 
-  const handleConnect = async () => {
-    try {
-      const connectionResponse = await fetch("/api/clickhouse/connect", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ connectionString }),
-      });
-      await connectionResponse.json();
-
-      const schemaResponse = await fetch("/api/clickhouse/schema");
-      const schemaJSON = await schemaResponse.json();
-      setSchema(schemaJSON.data);
-    } catch (error) {
-      console.error("Connection error:", error);
-    }
-  }
+  const url = useAppSelector(selectUrl);
+  const schema = useAppSelector(selectSchema);
 
   return (
-    <div className="p-4 flex flex-col h-full">
-      <div className="flex flex-col gap-2 my-2">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground tracking-tight">Kuzatuv Paneli</h1>
-          <p className="text-muted-foreground text-sm mt-1">Ma’lumotlar omboringizni shu yerni o’zida sozlang</p>
+    <div className="p-4 flex flex-col h-full gap-4">
+      <div>
+        <h1 className="text-xl font-semibold text-foreground tracking-tight">Kuzatuv Paneli</h1>
+        <p className="text-muted-foreground text-sm mt-1">
+          Malumotlar omboringizni sozlang
+        </p>
+      </div>
+      <div className="flex flex-col gap-3">
+        <p className="text-sm font-medium">Sozlama</p>
+        <div className="flex flex-col gap-1.5">
+          <Select value={"clickhouse"}>
+            <SelectTrigger className="w-full h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DatabaseOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  <div className="flex items-center gap-2 text-xs">{opt.label}</div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <Separator className="my-2" />
-        <div className="flex w-full items-center gap-2">
+        <div className="flex flex-col gap-1.5">
           <InputGroup className="flex justify-center w-full">
             <InputGroupInput
-              value={connectionString}
-              onChange={(e) => setConnectionString(e.target.value)}
+              value={url}
+              onChange={(e) => dispatch(setUrl(e.target.value))}
               placeholder="https://username:password@host:port/database"
-              className="font-sans text-xs"
+              className="text-xs flex-1"
             />
             <InputGroupAddon align="inline-end">
               <InputGroupButton
                 variant="default"
-                onClick={handleConnect}
+                onClick={() => {
+                  if (!url.trim()) return;
+                  dispatch(getSchema({ url }));
+                }}
               >
                 Ulanish
               </InputGroupButton>
             </InputGroupAddon>
           </InputGroup>
         </div>
-        <Separator className="my-2" />
-        <div className="flex flex-row  justify-between gap-1">
-          <p className="text-sm text-muted-foreground">Tuzilma</p>
-          <p className="text-sm">{`${schema?.length} ta jadval`}</p>
-        </div>
       </div>
-      <div className="h-180 mb-3 overflow-y-auto gap-2">
-        {schema?.map((s) => (
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-medium">Tuzilma</p>
+        <p className="text-sm text-muted-foreground">{schema.length} ta jadval</p>
+      </div>
+      <div className="flex-1 overflow-y-auto flex flex-col gap-2">
+        {schema.map((s) => (
           <Collapsible
             key={s.table}
-            className="flex flex-col w-full border border-neutral-600 rounded-md my-3"
+            className="border border-neutral-700 rounded-md"
           >
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2 pl-2">
-                <div className="rounded-full bg-green-500 w-2 h-2"></div>
-                <h4 className="text-sm font-semibold">{s.table}</h4>
+            <div className="flex items-center justify-between py-1 px-2">
+              <div className="flex items-center gap-2">
+                <div className="rounded-full bg-green-500 size-2" />
+                <span className="text-sm font-medium">{s.table}</span>
               </div>
               <div className="flex items-center gap-1">
-                <p className="text-sm">{`${s?.columns.length} ta ustun`}</p>
+                <span className="text-xs text-muted-foreground">{s.columns.length} ta ustun</span>
                 <CollapsibleTrigger asChild>
-                  <Button variant="link" size="icon" className="size-8">
-                    <LucideChevronDown />
+                  <Button variant="ghost" size="icon" className="size-7">
+                    <LucideChevronDown className="size-4" />
                   </Button>
                 </CollapsibleTrigger>
               </div>
             </div>
-            <CollapsibleContent className="flex flex-col gap-2 py-2">
+            <CollapsibleContent className="flex flex-col gap-1 px-2 pb-2">
               {s.columns.map((column) => (
-                <div key={column} className="flex items-center mx-2 px-2 rounded-md border">
-                  <div className="px-2 py-2 text-xs font-mono">{column}</div>
+                <div
+                  key={column}
+                  className="px-2 py-1.5 text-xs font-mono bg-muted/50 rounded"
+                >
+                  {column}
                 </div>
               ))}
             </CollapsibleContent>
           </Collapsible>
         ))}
       </div>
-    </div >
+    </div>
   );
 }

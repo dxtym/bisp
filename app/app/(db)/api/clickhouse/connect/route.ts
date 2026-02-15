@@ -4,15 +4,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { ClickHouseWebClient } from "@/lib/clickhouse/client";
 
 const Request = z.object({
-  connectionString: z.string(),
+  url: z.string(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { connectionString } = Request.parse(body);
+    const { url } = Request.parse(body);
 
-    const client = ClickHouseWebClient.getInstance(connectionString);
+    const client = ClickHouseWebClient.getInstance(url);
     const pingResponse = await client.ping();
     if (!pingResponse.success) {
       return NextResponse.json({

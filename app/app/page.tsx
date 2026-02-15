@@ -17,13 +17,15 @@ export default function Home() {
     <StoreProvider>
       <SidebarProvider defaultOpen={true}>
         <Menu />
-        <SidebarInset>
-          <div className="absolute top-4 left-4 z-10">
-            <SidebarTrigger />
-          </div>
-            <div className="flex flex-1">
+        <SidebarInset className="flex flex-col h-[calc(100svh-1rem)] overflow-hidden">
+          <div className="flex flex-1 h-full">
             <div className="flex-2 overflow-y-auto">
-              <Chat />
+              <div className="p-3 border-b">
+                <SidebarTrigger />
+              </div>
+              <div className="h-[calc(100vh-1rem-3.5rem)]">
+                <Chat />
+              </div>
             </div>
             <Separator orientation="vertical" />
             <div className="flex-1 overflow-y-auto">

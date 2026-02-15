@@ -84,7 +84,7 @@ export default function Chat() {
     <div className="grid h-full grid-rows-[1fr_auto]">
       <div className="flex justify-center overflow-hidden">
         <Conversation className="w-full max-w-2xl">
-          <ConversationContent className="max-h-[100] px-0">
+          <ConversationContent className="h-full">
             {messages.length === 0 ? (
               <ConversationEmptyState
                 title="Hech qanday xabar yoq"

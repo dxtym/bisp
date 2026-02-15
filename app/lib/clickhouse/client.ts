@@ -14,8 +14,8 @@ export class ClickHouseWebClient {
   private readonly client: ReturnType<typeof createClient>;
   private static instance: ClickHouseWebClient | null = null;
 
-  private constructor(connectionString: string) {
-    const config = this.parse(connectionString);
+  private constructor(url: string) {
+    const config = this.parse(url);
     this.client = createClient({
       url: config.url,
       username: config.username,
@@ -24,13 +24,13 @@ export class ClickHouseWebClient {
     });
   }
 
-  private parse(connectionString: string): ClickHouseConfig {
+  private parse(url: string): ClickHouseConfig {
     try {
-      const url = new URL(connectionString);
+      const parsed = new URL(url);
       return {
-        url: `${url.protocol}//${url.host}`,
-        username: url.username,
-        password: url.password,
+        url: `${parsed.protocol}//${parsed.host}`,
+        username: parsed.username,
+        password: parsed.password,
         database: 'default',
       };
     } catch (error) {
@@ -38,8 +38,8 @@ export class ClickHouseWebClient {
     }
   }
 
-  public static getInstance(connectionString?: string): ClickHouseWebClient {
-    if (!connectionString) {
+  public static getInstance(url?: string): ClickHouseWebClient {
+    if (!url) {
       if (!ClickHouseWebClient.instance) {
         throw new Error("No active connection");
       }
@@ -47,7 +47,7 @@ export class ClickHouseWebClient {
     }
 
     if (!ClickHouseWebClient.instance) {
-      ClickHouseWebClient.instance = new ClickHouseWebClient(connectionString);
+      ClickHouseWebClient.instance = new ClickHouseWebClient(url);
     }
     return ClickHouseWebClient.instance;
   }

@@ -31,7 +31,7 @@ export class ClickHouseWebClient {
         url: `${url.protocol}//${url.host}`,
         username: url.username,
         password: url.password,
-        database: url.pathname.slice(1),
+        database: 'default',
       };
     } catch (error) {
       throw new Error(`ClickHouse error: ${error}`);

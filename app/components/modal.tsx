@@ -21,7 +21,7 @@ import { closeModal, selectModal } from "@/lib/store/slices/modal"
 
 export function Modal() {
   const dispatch = useAppDispatch()
-  const { query, table, isOpen } = useAppSelector(selectModal)
+  const { table, isOpen } = useAppSelector(selectModal);
 
   const columns = table.length > 0 ? Object.keys(table[0]) : []
 
@@ -30,14 +30,9 @@ export function Modal() {
       <DialogContent className="max-w-[90vw] w-full max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Database className="w-5 h-5" />
             Natijalar
           </DialogTitle>
-          <DialogDescription className="text-xs font-mono bg-muted p-3 rounded-md mt-2 max-h-24 overflow-y-auto">
-            {query}
-          </DialogDescription>
         </DialogHeader>
-
         <div className="flex-1 overflow-auto">
           {table.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">

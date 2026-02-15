@@ -22,7 +22,8 @@ import { IMessage } from "@/lib/mongodb/models/conversation";
 import { nanoid } from "nanoid";
 
 export default function Chat() {
-  const messagesRef = useRef<number>(0);
+  const messageRef = useRef<string>("");
+  const conversationRef = useRef<string>("");
 
   const { messages, status, sendMessage, setMessages } = useChat();
 
@@ -31,8 +32,9 @@ export default function Chat() {
 
   useEffect(() => {
     if (!conversation) return;
+    if (conversationRef.current === conversation.id) return;
 
-    const messages = conversation.messages.map((m: IMessage) => ({
+    const currentMessages = conversation.messages.map((m: IMessage) => ({
       id: nanoid(),
       role: m.role,
       parts: [{
@@ -41,32 +43,42 @@ export default function Chat() {
       }]
     } as UIMessage));
 
-    setMessages(messages);
-    messagesRef.current = messages.length;
+    setMessages(currentMessages);
+    messageRef.current = messages[messages.length - 1]?.id;
+    conversationRef.current = conversation.id;
   }, [conversation, setMessages]);
 
   useEffect(() => {
-    if (!conversation) return;
+    if (!conversation || !messages) return;
 
-    if (messages.length > messagesRef.current) {
-      const last = messages[messages.length - 1];
-      const message: IMessage = {
-        role: last.role as "user" | "assistant",
-        content: last.parts
-          .filter((p) => p.type === "text")
-          .map((p) => p.text)
-          .join(""),
-        createdAt: new Date(),
-      };
+    const last = messages.at(-1);
+    if (!last) return;
 
-      dispatch(addMessage({
-        conversationId: conversation.id,
-        message: message,
-      }));
+    const parts = last.parts.filter(p => p.type === "text");
+    if (!parts.length) return;
 
-      messagesRef.current = messages.length;
+    if (last.role === "assistant") {
+      const done = parts.every(p => p.state === "done");
+      if (!done) return;
     }
-  }, [messages, dispatch, conversation, setMessages]);
+
+    if (messageRef.current === last.id) return;
+    dispatch(
+      addMessage({
+        conversationId: conversation.id,
+        message: {
+          role: last.role as "user" | "assistant",
+          content: parts
+            .map(p => p.text ?? "")
+            .join("")
+            .trim(),
+          createdAt: new Date().toISOString(),
+        },
+      })
+    );
+
+    messageRef.current = last.id;
+  }, [messages, dispatch, conversation]);
 
   return (
     <div className="grid h-full grid-rows-[1fr_auto]">
@@ -87,7 +99,7 @@ export default function Chat() {
             {status === "submitted" && (
               <Message from="assistant" key="thinking">
                 <MessageContent>
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-white">
                     <Lightbulb className="size-4" />
                     <span>Fikrlayapman...</span>
                   </div>

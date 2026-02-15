@@ -10,7 +10,7 @@ import {
 import { UIMessage } from "ai";
 import { LucideCopy, LucidePlay } from "lucide-react";
 import { useAppDispatch } from "@/lib/store/hooks";
-import { openModal, executeQuery } from "@/lib/store/slices/modal";
+import { executeQuery, openModal } from "@/lib/store/slices/modal";
 
 interface ChatMessageProps {
   message: UIMessage;
@@ -26,17 +26,11 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       join();
   }
 
-  const handleExecute = () => {
-    const content = unwrapParts(message);
-    dispatch(openModal(content));
-    dispatch(executeQuery(content));
-  }
-
   return (
     <>
       <Message from={message.role} key={message.id}>
         <MessageContent>
-          {message.parts.map((part) => {
+          {message.parts.map((part, i) => {
             switch (message.role) {
               case "assistant":
                 return (
@@ -50,7 +44,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
                 );
               case "user":
                 return (
-                  <MessageResponse>
+                  <MessageResponse key={i}>
                     {part.type === "text" ? part.text : ""}
                   </MessageResponse>
                 );
@@ -62,7 +56,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         <MessageActions>
           <MessageAction
             label="Execute"
-            onClick={handleExecute}
+            onClick={() => {
+              dispatch(openModal());
+              dispatch(executeQuery(unwrapParts(message)))
+            }}
           >
             <LucidePlay className="size-4" />
           </MessageAction>

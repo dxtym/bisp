@@ -2,15 +2,13 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 
 interface ModalState {
-  query: string;
-  table: Record<string, unknown>[];
   isOpen: boolean;
+  table: Record<string, unknown>[];
 }
 
 const initialState: ModalState = {
-  query: "",
-  table: [],
   isOpen: false,
+  table: [],
 };
 
 export const executeQuery = createAsyncThunk(
@@ -35,13 +33,17 @@ const modalSlice = createSlice({
   name: "modal",
   initialState,
   reducers: {
-    openModal(state, action: PayloadAction<string>) {
+    openModal(state) {
       state.isOpen = true;
-      state.query = action.payload;
     },
     closeModal(state) {
       state.isOpen = false;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(executeQuery.fulfilled, (state, action: PayloadAction<Record<string, unknown>[]>) => {
+      state.table = action.payload;
+    });
   },
 });
 

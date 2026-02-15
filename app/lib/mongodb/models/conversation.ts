@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export interface IMessage {
   role: "user" | "assistant";
   content: string;
-  createdAt: Date;
+  createdAt: Date | string;
 }
 
 export interface IConversation {
@@ -11,7 +11,7 @@ export interface IConversation {
   userId: string;
   title: string;
   messages: IMessage[];
-  createdAt: Date;
+  createdAt: Date | string;
 }
 
 const messageSchema = new mongoose.Schema<IMessage>(

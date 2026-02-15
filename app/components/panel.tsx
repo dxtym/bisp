@@ -65,11 +65,11 @@ export default function Panel() {
           <p className="text-sm">{`${schema?.length} ta jadval`}</p>
         </div>
       </div>
-      <div className="my-3 h-180 overflow-y-auto">
+      <div className="h-180 mb-3 overflow-y-auto gap-2">
         {schema?.map((s) => (
           <Collapsible
             key={s.table}
-            className="flex flex-col w-full border rounded-md mb-3"
+            className="flex flex-col w-full border border-neutral-600 rounded-md my-3"
           >
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2 pl-2">

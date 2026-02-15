@@ -3,8 +3,6 @@ import { z } from "zod";
 import { createOpenAI } from "@ai-sdk/openai";
 import { generateText, type ModelMessage, type LanguageModel } from "ai";
 
-const TRANSLATOR_SYSTEM_PROMPT = `You are a translator of Uzbek to English. Do not use markdown. Do not explain your answer. Only single message answer allowed.`;
-
 const OpenAIClientOptions = z.object({
   model: z.string(),
   apiKey: z.string(),
@@ -26,8 +24,11 @@ class OpenAIClient {
     try {
       const { text } = await generateText({
         model: this.model,
-        system: TRANSLATOR_SYSTEM_PROMPT,
-        messages,
+        system: `
+        You are a translator of Uzbek to English. Do not use markdown.
+        Do not explain your answer. Only single message answer allowed.
+        `,
+        messages: [messages[messages.length - 1]],
       });
       return text;
     } catch (error) {

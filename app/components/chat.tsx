@@ -15,6 +15,7 @@ import {
 } from "@/components/ai-elements/message";
 import Prompt from "./prompt";
 import ChatMessage from "./message";
+import { Modal } from "./modal";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { selectConversation, addMessage } from "@/lib/store/slices/conversation";
 import { IMessage } from "@/lib/mongodb/models/conversation";
@@ -98,6 +99,7 @@ export default function Chat() {
         </Conversation>
       </div>
       <Prompt status={status} onSubmit={sendMessage} />
+      <Modal />
     </div>
   )
 }

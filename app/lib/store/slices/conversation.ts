@@ -92,9 +92,7 @@ const conversationSlice = createSlice({
   },
 });
 
-export const {
-  setConversation,
-} = conversationSlice.actions;
+export const { setConversation } = conversationSlice.actions;
 
 export const selectConversations = (state: RootState) => state.conversation.conversations;
 export const selectConversation = (state: RootState) => state.conversation.conversation;

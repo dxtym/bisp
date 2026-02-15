@@ -17,20 +17,16 @@ export default function Home() {
     <StoreProvider>
       <SidebarProvider defaultOpen={true}>
         <Menu />
-        <SidebarInset>
-          <div className="flex items-center p-4">
-            <SidebarTrigger />
+        <div className="flex flex-1">
+          <Separator orientation="vertical" />
+          <div className="flex-3 overflow-y-auto">
+            <Chat />
           </div>
-          <div className="flex flex-1">
-            <div className="flex-3 overflow-y-auto">
-              <Chat />
-            </div>
-            <Separator orientation="vertical" />
-            <div className="flex-1 overflow-y-auto">
-              <Panel />
-            </div>
+          <Separator orientation="vertical" />
+          <div className="flex-1 overflow-y-auto">
+            <Panel />
           </div>
-        </SidebarInset>
+        </div>
       </SidebarProvider>
     </StoreProvider>
   )

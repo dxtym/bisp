@@ -8,18 +8,28 @@ import {
   MessageResponse
 } from "@/components/ai-elements/message";
 import { UIMessage } from "ai";
-import { LucideCopy } from "lucide-react";
+import { LucideCopy, LucidePlay } from "lucide-react";
+import { useAppDispatch } from "@/lib/store/hooks";
+import { openModal, executeQuery } from "@/lib/store/slices/modal";
 
 interface ChatMessageProps {
   message: UIMessage;
 }
 
 export default function ChatMessage({ message }: ChatMessageProps) {
+  const dispatch = useAppDispatch();
+
   const unwrapParts = (message: UIMessage): string => {
     return message.parts.
       filter((part) => part.type === "text").
       map((part) => part.text).
       join();
+  }
+
+  const handleExecute = () => {
+    const content = unwrapParts(message);
+    dispatch(openModal(content));
+    dispatch(executeQuery(content));
   }
 
   return (
@@ -50,6 +60,12 @@ export default function ChatMessage({ message }: ChatMessageProps) {
       </Message>
       {message.role === "assistant" && (
         <MessageActions>
+          <MessageAction
+            label="Execute"
+            onClick={handleExecute}
+          >
+            <LucidePlay className="size-4" />
+          </MessageAction>
           <MessageAction
             label="Copy"
             onClick={() =>

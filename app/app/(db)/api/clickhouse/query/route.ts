@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     if (!ClickHouseWebClient.hasInstance()) {
       return NextResponse.json({
         success: false,
-        message: "No active ClickHouse instance",
+        message: "No connection",
       }, { status: 400 });
     }
 

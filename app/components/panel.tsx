@@ -2,29 +2,16 @@
 
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { getSchema, selectSchema, selectUrl, setUrl } from "@/lib/store/slices/connection";
-
-import { Database, LucideChevronDown } from "lucide-react";
+import { LucideChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput
-} from "./ui/input-group";
+} from "@/components/ui/input-group";
 
-type DatabaseOption = {
-  value: string;
-  label: string;
-}
-
-const DatabaseOptions: DatabaseOption[] = [
-  { value: "clickhouse", label: "ClickHouse" },
-  { value: "snowflake", label: "Snowflake" },
-  { value: "postgresql", label: "PostgreSQL" }
-];
 
 export default function Panel() {
   const dispatch = useAppDispatch();
@@ -42,20 +29,6 @@ export default function Panel() {
       </div>
       <div className="flex flex-col gap-3">
         <p className="text-sm font-medium">Sozlama</p>
-        <div className="flex flex-col gap-1.5">
-          <Select value={"clickhouse"}>
-            <SelectTrigger className="w-full h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {DatabaseOptions.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  <div className="flex items-center gap-2 text-xs">{opt.label}</div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
         <div className="flex flex-col gap-1.5">
           <InputGroup className="flex justify-center w-full">
             <InputGroupInput

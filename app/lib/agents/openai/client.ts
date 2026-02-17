@@ -11,22 +11,26 @@ const OpenAIClientOptions = z.object({
 type OpenAIClientOptions = z.infer<typeof OpenAIClientOptions>;
 
 class OpenAIClient {
-  private readonly model: LanguageModel;
+  private readonly _model: LanguageModel;
 
   constructor(options?: OpenAIClientOptions) {
     const provider = createOpenAI({
       apiKey: options?.apiKey,
     });
-    this.model = provider(options?.model ?? "gpt-4o-mini");
+    this._model = provider(options?.model ?? "gpt-4o-mini");
+  }
+
+  public get model(): LanguageModel {
+    return this._model;
   }
 
   public async call(messages: ModelMessage[]): Promise<string> {
     try {
       const { text } = await generateText({
-        model: this.model,
+        model: this._model,
         system: `
-        You are a translator of Uzbek to English. Do not use markdown.
-        Do not explain your answer. Only single message answer allowed.
+          You are a translator of Uzbek to English. Do not use markdown.
+          Do not explain your answer. Only single message answer allowed.
         `,
         messages: [messages[messages.length - 1]],
       });

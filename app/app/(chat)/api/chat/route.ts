@@ -1,32 +1,104 @@
+import { z } from "zod";
+import { NextResponse } from "next/server";
+import {
+  tool,
+  streamText,
+  stepCountIs,
+  generateText,
+  convertToModelMessages,
+  UIMessage,
+} from "ai";
+import { ClickHouseWebClient } from "@/lib/clickhouse/client";
+import { Schema, SystemRepository } from "@/lib/repository/system";
+import {
+  AGENT_PROMPT,
+  TRANSLATOR_PROMPT
+} from "@/app/(chat)/api/chat/const";
 import openAIClient from "@/lib/agents/openai/client";
 import ollamaClient from "@/lib/agents/ollama/client";
-import { ClickHouseWebClient } from "@/lib/clickhouse/client";
-import { SystemRepository } from "@/lib/repository/system";
-import { convertToModelMessages } from "ai";
+
+async function translator(prompt: string): Promise<string> {
+  const { text: response } = await generateText({
+    model: openAIClient.model,
+    system: TRANSLATOR_PROMPT,
+    prompt: prompt,
+  });
+  return response;
+}
+
+async function generator(question: string, schema: Schema[]): Promise<string> {
+  const metadata = schema.map((t) => `${t.table}: ${t.columns.join(", ")}`).join("\n");
+  const result = ollamaClient.stream([{
+    role: "user",
+    content: `Given the schema: ${metadata} Answer the question: ${question}`,
+  }]);
+
+  let response = "";
+  for await (const chunk of result.textStream) {
+    response += chunk;
+  }
+
+  return response;
+}
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const { messages }: { messages: UIMessage[] } = await req.json();
 
-    const messageContent = await convertToModelMessages(messages);
-    const translatedText = await openAIClient.call(messageContent);
+    let schema: Schema[] = [];
+    try {
+      const client = ClickHouseWebClient.getInstance();
+      const reposistory = new SystemRepository(client);
+      schema = await reposistory.loadSchema();
+    } catch (error) {
+      return NextResponse.json({
+        success: false,
+        message: error instanceof Error ? error.message : "Something went wrong",
+      }, { status: 400 });
+    }
 
-    const client = ClickHouseWebClient.getInstance();
-    const systemRepository = new SystemRepository(client);
-    const schema = await systemRepository.loadSchema();
-
-    const result = ollamaClient.stream([
-      {
-        role: "user",
-        content: `
-          Given the schema: ${JSON.stringify(schema)}.
-          Answer the question: ${translatedText}
-        `,
+    const result = streamText({
+      model: openAIClient.model,
+      system: AGENT_PROMPT,
+      messages: await convertToModelMessages(messages),
+      tools: {
+        translator: tool({
+          inputSchema: z.object({ prompt: z.string() }),
+          execute: async ({ prompt }) => ({ translation: await translator(prompt) }),
+        }),
+        generator: tool({
+          inputSchema: z.object({ question: z.string() }),
+          execute: async ({ question }) => ({ generation: await generator(question, schema) }),
+        }),
+        executor: tool({
+          inputSchema: z.object({ query: z.string() }),
+          needsApproval: true,
+          execute: async ({ query }) => {
+            try {
+              const client = ClickHouseWebClient.getInstance();
+              const response = await client.query({ query });
+              const result = await response.json();
+              return { result: result, success: true };
+            } catch (error) {
+              return {
+                result: null,
+                success: false,
+                error: error instanceof Error ? error.message : "Something went wrong",
+              };
+            }
+          },
+        }),
       },
-    ]);
+      stopWhen: stepCountIs(10),
+    });
 
-    return result.toUIMessageStreamResponse();
+    return result.toUIMessageStreamResponse({
+      onError: (error) => (error instanceof Error ? error.message : "Xatolik"),
+    });
   } catch (error) {
-    throw new Error(`Chat error: ${error}`);
+    return NextResponse.json({
+      success: false,
+      message: error instanceof Error ? error.message : "Something went wrong",
+    }, { status: 500 });
   }
 }

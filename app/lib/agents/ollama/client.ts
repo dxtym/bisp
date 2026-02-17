@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOllama } from "ollama-ai-provider-v2";
 import { streamText, type ModelMessage, type LanguageModel } from "ai";
 
 const OllamaClientOptions = z.object({
@@ -22,10 +22,9 @@ class OllamaClient {
       headers["Authorization"] = `Basic ${credentials}`;
     }
 
-    const provider = createOpenAI({
-      baseURL: `${options?.baseUrl}/v1`,
-      apiKey: "ollama",
-      headers,
+    const provider = createOllama({
+      baseURL: options?.baseUrl,
+      headers: headers,
     });
     this.model = provider(options?.model ?? "llama3");
   }

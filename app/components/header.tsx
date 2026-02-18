@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 import { Button } from "./ui/button";
 
 type MenuHeaderProps = {
-  onCreate: () => void;
+  onCreate: () => void
 };
 
 export default function Header({ onCreate }: MenuHeaderProps) {

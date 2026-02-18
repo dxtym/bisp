@@ -12,7 +12,7 @@ import { ClickHouseWebClient } from "@/lib/clickhouse/client";
 import { Schema, SystemRepository } from "@/lib/repository/system";
 import {
   AGENT_PROMPT,
-  TRANSLATOR_PROMPT
+  TRANSLATOR_PROMPT,
 } from "@/app/(chat)/api/chat/const";
 import openAIClient from "@/lib/agents/openai/client";
 import ollamaClient from "@/lib/agents/ollama/client";
@@ -28,26 +28,26 @@ async function translator(prompt: string): Promise<string> {
 
 async function generator(question: string, schema: Schema[]): Promise<string> {
   const metadata = schema.map((t) => `${t.table}: ${t.columns.join(", ")}`).join("\n");
-  const result = ollamaClient.stream([{
-    role: "user",
-    content: `Given the schema: ${metadata} Answer the question: ${question}`,
-  }]);
-
-  let response = "";
-  for await (const chunk of result.textStream) {
-    response += chunk;
-  }
-
+  const { text: response } = await ollamaClient.generate(
+    `Given the schema: ${metadata} Answer the question: ${question}`,
+  );
   return response;
 }
 
 export async function POST(req: Request) {
   try {
-    const { messages }: { messages: UIMessage[] } = await req.json();
+    const { messages, url }: { messages: UIMessage[]; url?: string } = await req.json();
+
+    if (!url) {
+      return NextResponse.json({
+        success: false,
+        message: "No connection URL provided",
+      }, { status: 400 });
+    }
 
     let schema: Schema[] = [];
     try {
-      const client = ClickHouseWebClient.getInstance();
+      const client = new ClickHouseWebClient(url);
       const reposistory = new SystemRepository(client);
       schema = await reposistory.loadSchema();
     } catch (error) {
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
           needsApproval: true,
           execute: async ({ query }) => {
             try {
-              const client = ClickHouseWebClient.getInstance();
+              const client = new ClickHouseWebClient(url);
               const response = await client.query({ query });
               const result = await response.json();
               return { result: result, success: true };

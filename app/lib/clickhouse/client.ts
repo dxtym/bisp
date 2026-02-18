@@ -12,9 +12,8 @@ type ClickHouseConfig = z.infer<typeof ClickHouseConfig>;
 
 export class ClickHouseWebClient {
   private readonly client: ReturnType<typeof createClient>;
-  private static instance: ClickHouseWebClient | null = null;
 
-  private constructor(url: string) {
+  constructor(url: string) {
     const config = this.parse(url);
     this.client = createClient({
       url: config.url,
@@ -36,24 +35,6 @@ export class ClickHouseWebClient {
     } catch (error) {
       throw new Error(`ClickHouse error: ${error}`);
     }
-  }
-
-  public static getInstance(url?: string): ClickHouseWebClient {
-    if (!url) {
-      if (!ClickHouseWebClient.instance) {
-        throw new Error("No active connection");
-      }
-      return ClickHouseWebClient.instance;
-    }
-
-    if (!ClickHouseWebClient.instance) {
-      ClickHouseWebClient.instance = new ClickHouseWebClient(url);
-    }
-    return ClickHouseWebClient.instance;
-  }
-
-  public static hasInstance(): boolean {
-    return ClickHouseWebClient.instance !== null;
   }
 
   public async query<T>(params: QueryParams): Promise<ResultSet<T>> {

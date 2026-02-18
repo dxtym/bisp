@@ -2,6 +2,7 @@ import type { RootState } from "../store";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Schema } from "@/lib/repository/system";
 
+export const STORAGE_KEY = "storage_key";
 
 interface ConnectionState {
   url: string;
@@ -9,7 +10,7 @@ interface ConnectionState {
 }
 
 const initialState: ConnectionState = {
-  url: "",
+  url: localStorage.getItem(STORAGE_KEY) || "",
   schema: [],
 };
 
@@ -17,21 +18,11 @@ export const getSchema = createAsyncThunk(
   "database/getSchema",
   async ({ url }: { url: string }) => {
     try {
-      const response = await fetch(`/api/clickhouse/connect`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
+      const response = await fetch(`/api/clickhouse/schema?url=${url}`);
       const result = await response.json();
-      if (!result.success) throw new Error(result.error);
-    } catch (error) {
-      throw new Error(`Failed to connect: ${error}`);
-    }
+      if (!result.success) throw new Error(result.message);
 
-    try {
-      const response = await fetch(`/api/clickhouse/schema`);
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
+      localStorage.setItem(STORAGE_KEY, url);
       return result.data as Schema[];
     } catch (error) {
       throw new Error(`Failed to get schema: ${error}`);

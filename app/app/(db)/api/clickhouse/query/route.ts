@@ -5,22 +5,22 @@ import { ClickHouseWebClient } from "@/lib/clickhouse/client";
 
 const QueryRequest = z.object({
   query: z.string(),
+  url: z.string(),
 });
 
 export async function POST(request: NextRequest) {
   try {
-    if (!ClickHouseWebClient.hasInstance()) {
+    const body = await request.json();
+    const { query, url } = QueryRequest.parse(body);
+
+    if (!url) {
       return NextResponse.json({
         success: false,
-        message: "No connection",
+        message: "No connection URL provided",
       }, { status: 400 });
     }
 
-    const body = await request.json();
-    const { query } = QueryRequest.parse(body);
-
-    const client = ClickHouseWebClient.getInstance();
-
+    const client = new ClickHouseWebClient(url);
     const result = await client.query({ query });
     const data = await result.json();
 
@@ -28,7 +28,6 @@ export async function POST(request: NextRequest) {
       success: true,
       data: data,
     }, { status: 200 });
-
   } catch (error) {
     return NextResponse.json({
       success: false,

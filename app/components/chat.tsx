@@ -16,18 +16,27 @@ import {
 import { Message, MessageContent } from "@/components/ai-elements/message"
 import Prompt from "./prompt"
 import ChatMessage from "./message"
-import { Modal } from "./modal"
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks"
 import { selectConversation, addMessage } from "@/lib/store/slices/conversation"
 import { IMessage } from "@/lib/mongodb/models/conversation"
 import { nanoid } from "nanoid"
+import { toast } from "sonner"
+import { STORAGE_KEY } from "@/lib/store/slices/connection"
 
 export default function Chat() {
   const messageRef = useRef<string>("");
   const conversationRef = useRef<string>("");
 
   const { messages, status, sendMessage, setMessages, addToolApprovalResponse } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      body: () => ({
+        url: localStorage.getItem(STORAGE_KEY)
+      })
+    }),
+    onError: (error) => {
+      toast.error(error.message || "Xatolik yuz berdi");
+    },
     sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
   });
 
@@ -64,7 +73,6 @@ export default function Chat() {
     }
 
     if (messageRef.current === last.id) return
-
     dispatch(
       addMessage({
         conversationId: conversation.id,
@@ -122,7 +130,6 @@ export default function Chat() {
         </Conversation>
       </div>
       <Prompt status={status} onSubmit={sendMessage} />
-      <Modal />
     </div>
   )
 }

@@ -1,20 +1,21 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import { ClickHouseWebClient } from "@/lib/clickhouse/client";
 import { SystemRepository } from "@/lib/repository/system";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    if (!ClickHouseWebClient.hasInstance()) {
+    const url = request.nextUrl.searchParams.get("url");
+
+    if (!url) {
       return NextResponse.json({
         success: false,
-        message: "No active ClickHouse instance",
+        message: "No connection URL provided",
       }, { status: 400 });
     }
 
-    const client = ClickHouseWebClient.getInstance();
+    const client = new ClickHouseWebClient(url);
     const systemRepository = new SystemRepository(client);
-
     const schema = await systemRepository.loadSchema();
 
     return NextResponse.json({

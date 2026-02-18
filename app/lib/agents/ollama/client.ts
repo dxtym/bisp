@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { createOllama } from "ollama-ai-provider-v2";
-import { streamText, type ModelMessage, type LanguageModel } from "ai";
+import { generateText, type LanguageModel } from "ai";
 
 const OllamaClientOptions = z.object({
   baseUrl: z.string(),
@@ -29,11 +29,11 @@ class OllamaClient {
     this.model = provider(options?.model ?? "llama3");
   }
 
-  public stream(messages: ModelMessage[]) {
+  public async generate(prompt: string) {
     try {
-      return streamText({
+      return await generateText({
         model: this.model,
-        messages,
+        prompt: prompt,
       });
     } catch (error) {
       throw new Error(`Ollama error: ${error}`);

@@ -1,18 +1,15 @@
 import { z } from "zod";
-
-import { createOllama } from "ollama-ai-provider-v2";
-import { generateText, type LanguageModel } from "ai";
+import { Ollama } from "ollama";
 
 const OllamaClientOptions = z.object({
   baseUrl: z.string(),
-  model: z.string(),
   username: z.string().optional(),
   password: z.string().optional(),
 });
 type OllamaClientOptions = z.infer<typeof OllamaClientOptions>;
 
 class OllamaClient {
-  private readonly model: LanguageModel;
+  private readonly ollama: Ollama;
 
   constructor(options?: OllamaClientOptions) {
     const headers: Record<string, string> = {};
@@ -22,19 +19,20 @@ class OllamaClient {
       headers["Authorization"] = `Basic ${credentials}`;
     }
 
-    const provider = createOllama({
-      baseURL: options?.baseUrl,
+    this.ollama = new Ollama({
+      host: options?.baseUrl,
       headers: headers,
     });
-    this.model = provider(options?.model ?? "llama3");
   }
 
-  public async generate(prompt: string) {
+  public async generate(prompt: string): Promise<{ text: string }> {
     try {
-      return await generateText({
-        model: this.model,
+      const response = await this.ollama.generate({
+        model: process.env.OLLAMA_MODEL!,
         prompt: prompt,
+        stream: false,
       });
+      return { text: response.response };
     } catch (error) {
       throw new Error(`Ollama error: ${error}`);
     }
@@ -43,7 +41,6 @@ class OllamaClient {
 
 const ollamaClient = new OllamaClient({
   baseUrl: process.env.OLLAMA_URL!,
-  model: process.env.OLLAMA_MODEL!,
   username: process.env.OLLAMA_USERNAME,
   password: process.env.OLLAMA_PASSWORD,
 });

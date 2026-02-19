@@ -13,7 +13,7 @@ const AGENT_PROMPT = `
   2. Generate SQL query from translation.
   3. Execute query and obtain results.
   Use the tools: translator, generator, executor.
-  Be as transparent as possible about the steps you are taking.
+  Explain the obtained results comprehensively in Uzbek. Limit to 100 words.
   If query denied, acknowledge politely. If no connection, mention that fact.
 `
 

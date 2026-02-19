@@ -14,6 +14,12 @@ const STATE_LABELS: Record<ToolState, string> = {
   "output-error": "Xatolik"
 }
 
+const TOOL_NAMES: Record<string, string> = {
+  "translator": "Tarjimon",
+  "generator": "Mutafakkir",
+  "executor": "Ijrochi"
+}  
+
 interface Props {
   toolName: string
   state: ToolState
@@ -41,7 +47,7 @@ export default function Card({
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="my-1">
       <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 rounded-t border p-2 text-sm">
         <div className="flex items-center gap-3">
-          <span className="font-medium">{toolName}</span>
+          <span className="font-medium">{TOOL_NAMES[toolName]}</span>
           <Badge variant="secondary" className="gap-1 text-xs">{STATE_LABELS[state]}</Badge>
         </div>
         <LucideChevronDown className={`size-3 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />

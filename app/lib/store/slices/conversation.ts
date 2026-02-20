@@ -64,6 +64,40 @@ export const addMessage = createAsyncThunk(
   }
 );
 
+export const updateConversationTitle = createAsyncThunk(
+  "conversation/updateConversationTitle",
+  async ({ conversationId, title }: { conversationId: string; title: string }) => {
+    try {
+      const response = await fetch(`/api/conversation/${conversationId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title }),
+      });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error);
+      return result.data as IConversation;
+    } catch (error) {
+      throw new Error(`Failed to update conversation title: ${error}`);
+    }
+  }
+);
+
+export const removeConversation = createAsyncThunk(
+  "conversation/removeConversation",
+  async (conversationId: string) => {
+    try {
+      const response = await fetch(`/api/conversation/${conversationId}`, {
+        method: "DELETE",
+      });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.error);
+      return conversationId;
+    } catch (error) {
+      throw new Error(`Failed to remove conversation: ${error}`);
+    }
+  }
+);
+
 const conversationSlice = createSlice({
   name: "conversation",
   initialState,
@@ -88,6 +122,25 @@ const conversationSlice = createSlice({
       .addCase(createConversation.fulfilled, (state, action) => {
         state.conversations.unshift(action.payload);
         state.conversation = action.payload;
+      })
+
+      .addCase(updateConversationTitle.fulfilled, (state, action) => {
+        const updatedConversation = action.payload;
+        const index = state.conversations.findIndex(c => c.id === updatedConversation.id);
+        if (index !== -1) {
+          state.conversations[index] = updatedConversation;
+        }
+        if (state.conversation?.id === updatedConversation.id) {
+          state.conversation = updatedConversation;
+        }
+      })
+
+      .addCase(removeConversation.fulfilled, (state, action) => {
+        const removedId = action.payload;
+        state.conversations = state.conversations.filter(c => c.id !== removedId);
+        if (state.conversation?.id === removedId) {
+          state.conversation = null;
+        }
       })
   },
 });

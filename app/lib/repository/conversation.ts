@@ -63,4 +63,28 @@ export class ConversationRepository {
       throw new Error(`Add message error: ${error}`);
     }
   }
+
+  public async updateTitle(conversationId: string, title: string): Promise<IConversation | null> {
+    try {
+      await this.connect();
+      const doc = await Conversation.findOneAndUpdate(
+        { id: conversationId },
+        { title: title },
+        { new: true },
+      ).lean<IConversation | null>();
+      return doc;
+    } catch (error) {
+      throw new Error(`Update conversation title error: ${error}`);
+    }
+  }
+
+  public async delete(conversationId: string): Promise<boolean> {
+    try {
+      await this.connect();
+      const result = await Conversation.deleteOne({ id: conversationId });
+      return result.deletedCount > 0;
+    } catch (error) {
+      throw new Error(`Delete conversation error: ${error}`);
+    }
+  }
 }

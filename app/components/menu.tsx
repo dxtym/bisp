@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useUser } from "@clerk/nextjs"
-import { useAppSelector, useAppDispatch } from "@/lib/store/hooks"
+import { useEffect, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import {
   fetchConversations,
   selectConversations,
@@ -11,7 +11,7 @@ import {
   createConversation,
   removeConversation,
   updateConversationTitle
-} from "@/lib/store/slices/conversation"
+} from "@/lib/store/slices/conversation";
 import {
   Sidebar,
   SidebarContent,
@@ -19,55 +19,55 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { Button } from "@/components/ui/button"
-import { Trash2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import Title from "@/components/title"
-import Profile from "@/components/profile"
-import Header from "@/components/header"
-import Modal from "@/components/modal"
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Title from "@/components/title";
+import Profile from "@/components/profile";
+import Header from "@/components/header";
+import Modal from "@/components/modal";
 
 export default function Menu() {
-  const { user } = useUser()
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const { user } = useUser();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [conversationToDelete, setConversationToDelete] = useState<{
     id: string;
     title: string;
-  } | null>(null)
+  } | null>(null);
 
-  const dispatch = useAppDispatch()
-  const conversations = useAppSelector(selectConversations)
-  const conversation = useAppSelector(selectConversation)
+  const dispatch = useAppDispatch();
+  const conversations = useAppSelector(selectConversations);
+  const conversation = useAppSelector(selectConversation);
 
   useEffect(() => {
     if (user) {
-      dispatch(fetchConversations(user.id))
+      dispatch(fetchConversations(user.id));
     }
-  }, [user, dispatch])
+  }, [user, dispatch]);
 
   const handleDeleteClick = (id: string, title: string) => {
-    setConversationToDelete({ id, title })
-    setDeleteDialogOpen(true)
-  }
+    setConversationToDelete({ id, title });
+    setDeleteDialogOpen(true);
+  };
 
   const handleDeleteConfirm = async () => {
-    if (!conversationToDelete) return
+    if (!conversationToDelete) return;
 
-    setDeletingId(conversationToDelete.id)
+    setDeletingId(conversationToDelete.id);
     try {
-      await dispatch(removeConversation(conversationToDelete.id))
-      setDeleteDialogOpen(false)
-      setConversationToDelete(null)
+      await dispatch(removeConversation(conversationToDelete.id));
+      setDeleteDialogOpen(false);
+      setConversationToDelete(null);
     } finally {
-      setDeletingId(null)
+      setDeletingId(null);
     }
-  }
+  };
 
   const handleTitleSave = async (conversationId: string, title: string) => {
-    await dispatch(updateConversationTitle({ conversationId, title }))
-  }
+    await dispatch(updateConversationTitle({ conversationId, title }));
+  };
 
   return (
     <>
@@ -76,7 +76,7 @@ export default function Menu() {
           <Header
             onCreate={() => {
               if (!user) return;
-              dispatch(createConversation({ userId: user.id, title: "Yangi suhbat" }))
+              dispatch(createConversation({ userId: user.id, title: "Yangi suhbat" }));
             }}
           />
         </SidebarHeader>
@@ -110,8 +110,8 @@ export default function Menu() {
                       />
                     </div>
                     <Button
-                      variant="ghost"
                       size="sm"
+                      variant="ghost"
                       className={cn(
                         "h-6 w-6 p-0 shrink-0 transition-all duration-200",
                         "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
@@ -119,11 +119,10 @@ export default function Menu() {
                         deletingId === c.id && "opacity-50"
                       )}
                       onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeleteClick(c.id, c.title)
+                        e.stopPropagation();
+                        handleDeleteClick(c.id, c.title);
                       }}
                       disabled={deletingId === c.id}
-                      aria-label={`O'chirish: ${c.title}`}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>

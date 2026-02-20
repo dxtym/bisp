@@ -141,7 +141,7 @@ const conversationSlice = createSlice({
         if (state.conversation?.id === removedId) {
           state.conversation = null;
         }
-      })
+      });
   },
 });
 

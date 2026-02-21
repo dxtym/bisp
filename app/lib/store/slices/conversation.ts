@@ -135,6 +135,18 @@ const conversationSlice = createSlice({
         }
       })
 
+      .addCase(addMessage.fulfilled, (state, action) => {
+        const { conversationId, message } = action.payload;
+        const conversationIndex = state.conversations.findIndex(c => c.id === conversationId);
+        if (conversationIndex !== -1) {
+          state.conversations[conversationIndex].messages.push(message);
+        }
+
+        if (state.conversation?.id === conversationId) {
+          state.conversation.messages.push(message);
+        }
+      })
+
       .addCase(removeConversation.fulfilled, (state, action) => {
         const removedId = action.payload;
         state.conversations = state.conversations.filter(c => c.id !== removedId);

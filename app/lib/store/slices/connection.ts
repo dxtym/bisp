@@ -37,6 +37,10 @@ const connectionSlice = createSlice({
     setUrl(state, action: PayloadAction<string>) {
       state.url = action.payload;
     },
+    clearUrl(state) {
+      state.url = "";
+      localStorage.removeItem(STORAGE_KEY);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -46,7 +50,7 @@ const connectionSlice = createSlice({
   },
 });
 
-export const { setUrl } = connectionSlice.actions;
+export const { setUrl, clearUrl } = connectionSlice.actions;
 
 export const selectUrl = (state: RootState) => state.connection.url;
 export const selectSchema = (state: RootState) => state.connection.schema;

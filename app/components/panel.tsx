@@ -1,7 +1,8 @@
 "use client"
 
+import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
-import { getSchema, selectSchema, selectUrl, setUrl } from "@/lib/store/slices/connection";
+import { getSchema, selectSchema, selectUrl, setUrl, clearUrl } from "@/lib/store/slices/connection";
 import {
   InputGroup,
   InputGroupAddon,
@@ -17,6 +18,10 @@ export default function Panel() {
 
   const url = useAppSelector(selectUrl);
   const schema = useAppSelector(selectSchema);
+
+  useEffect(() => {
+    dispatch(clearUrl());
+  }, [dispatch]);
 
   const handleConnect = async () => {
     if (!url.trim()) {

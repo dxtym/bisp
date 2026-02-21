@@ -44,7 +44,13 @@ export default function Chat() {
   const conversation = useAppSelector(selectConversation);
 
   useEffect(() => {
-    if (!conversation) return
+    if (!conversation) {
+      setMessages([])
+      messageRef.current = ""
+      conversationRef.current = ""
+      return
+    }
+
     if (conversationRef.current === conversation.id) return
 
     const currentMessages = conversation.messages.map((m: IMessage) => ({
@@ -54,9 +60,9 @@ export default function Chat() {
     } as UIMessage))
 
     setMessages(currentMessages)
-    messageRef.current = messages[messages.length - 1]?.id
+    messageRef.current = currentMessages[currentMessages.length - 1]?.id || ""
     conversationRef.current = conversation.id
-  }, [messages, conversation, setMessages]);
+  }, [conversation, setMessages]);
 
   useEffect(() => {
     if (!conversation || !messages) return

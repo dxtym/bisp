@@ -18,7 +18,7 @@ const TOOL_NAMES: Record<string, string> = {
   "translator": "Tarjimon",
   "generator": "Mutafakkir",
   "executor": "Ijrochi"
-}  
+}
 
 interface Props {
   toolName: string
@@ -48,7 +48,16 @@ export default function Card({
       <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 rounded-t border p-2 text-sm">
         <div className="flex items-center gap-3">
           <span className="font-medium">{TOOL_NAMES[toolName]}</span>
-          <Badge variant="secondary" className="gap-1 text-xs">{STATE_LABELS[state]}</Badge>
+          <Badge
+            variant="secondary"
+            className={`
+              gap-1 text-xs
+              ${state === "output-available" ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : ''}
+              ${state === "output-error" ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' : ''}
+            `}
+          >
+            {STATE_LABELS[state]}
+          </Badge>
         </div>
         <LucideChevronDown className={`size-3 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </CollapsibleTrigger>
@@ -56,7 +65,7 @@ export default function Card({
         {input && Object.keys(input).length > 0 && (
           <div className="border-b border-border p-2">
             <p className="mb-1 text-xs font-medium text-muted-foreground">Parametrlar</p>
-            <pre className="rounded bg-muted/50 p-2 text-xs">
+            <pre className="overflow-x-auto rounded bg-muted/50 p-2 text-xs">
               <code>{JSON.stringify(input, null, 2)}</code>
             </pre>
           </div>

@@ -12,10 +12,11 @@ import { ClickHouseWebClient } from "@/lib/clickhouse/client";
 import { Schema, SystemRepository } from "@/lib/repository/system";
 import {
   AGENT_PROMPT,
+  GENERATOR_PROMPT,
   TRANSLATOR_PROMPT,
 } from "@/app/(chat)/api/chat/const";
 import openAIClient from "@/lib/agents/openai/client";
-import ollamaClient from "@/lib/agents/ollama/client";
+// import ollamaClient from "@/lib/agents/ollama/client";
 
 async function translator(prompt: string): Promise<string> {
   const { text: response } = await generateText({
@@ -28,11 +29,21 @@ async function translator(prompt: string): Promise<string> {
 
 async function generator(question: string, schema: Schema[]): Promise<string> {
   const metadata = schema.map((t) => `${t.table}: ${t.columns.join(", ")}`).join("\n");
-  const { text: response } = await ollamaClient.generate(
-    `Given the schema: ${metadata} Answer the question: ${question}`,
-  );
+  const { text: response } = await generateText({
+    model: openAIClient.model,
+    system: GENERATOR_PROMPT,
+    prompt: `Given the schema: ${metadata} Answer the question: ${question}`,
+  });
   return response;
 }
+
+// async function generator(question: string, schema: Schema[]): Promise<string> {
+//   const metadata = schema.map((t) => `${t.table}: ${t.columns.join(", ")}`).join("\n");
+//   const { text: response } = await ollamaClient.generate(
+//     `Given the schema: ${metadata} Answer the question: ${question}`,
+//   );
+//   return response;
+// }
 
 export async function POST(req: Request) {
   try {

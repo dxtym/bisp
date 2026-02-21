@@ -1,12 +1,9 @@
 "use client"
 
 import { UIMessage } from "ai"
-import { LucideCopy } from "lucide-react"
 import Card, { ToolState } from "@/components/card"
 import {
   Message,
-  MessageAction,
-  MessageActions,
   MessageContent,
   MessageResponse
 } from "@/components/ai-elements/message"
@@ -20,7 +17,7 @@ interface Props {
 export default function ChatMessage({ message, onApprove, onDeny }: Props) {
   return (
     <Message from={message.role} key={message.id}>
-      <MessageContent> 
+      <MessageContent className={message.role === "assistant" ? "w-full" : ""}>
         {message.parts.map((part, i) => {
           if (part.type === "text" && part.text) {
             return (
@@ -48,20 +45,6 @@ export default function ChatMessage({ message, onApprove, onDeny }: Props) {
           }
         })}
       </MessageContent>
-      {message.role === "assistant" && (
-        <MessageActions>
-          <MessageAction label="Nusxa olish" onClick={() => {
-            navigator.clipboard.writeText(
-              message.parts.
-                filter((part) => part.type === "text").
-                map((part) => part.text).
-                join("")
-            )
-          }}>
-            <LucideCopy className="size-4" />
-          </MessageAction>
-        </MessageActions>
-      )}
     </Message>
   )
 }

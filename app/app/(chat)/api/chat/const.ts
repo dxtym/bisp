@@ -4,6 +4,12 @@ const TRANSLATOR_PROMPT = `
   No markdown or formatting allowed.
 `
 
+const GENERATOR_PROMPT = `
+  Given the question and schema, generate a valid SQL.
+  Output only the SQL query. No explanation or formatting allowed.
+  Limit your knowledge to the schema exclusively.
+`
+
 const AGENT_PROMPT = `
   Perform the following steps to answer the client request.
   If something not relevant to SQL, please reject politely.
@@ -17,4 +23,4 @@ const AGENT_PROMPT = `
   If query denied, acknowledge politely. If no connection, mention that fact.
 `
 
-export { TRANSLATOR_PROMPT, AGENT_PROMPT }
+export { TRANSLATOR_PROMPT, GENERATOR_PROMPT, AGENT_PROMPT }

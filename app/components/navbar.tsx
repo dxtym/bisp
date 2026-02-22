@@ -1,6 +1,6 @@
 import { LucideBookOpen } from "lucide-react";
 import { Button } from "./ui/button";
-import { SignInButton } from "@clerk/nextjs";
+import Link from "next/link";
 
 export default function Navbar() {
   return (
@@ -13,11 +13,11 @@ export default function Navbar() {
               Kutoob
             </div>
           </div>
-          <SignInButton mode="redirect">
+          <Link href="/sign-in">
             <Button variant="default" className="px-4 py-2 rounded-sm">
               Kirish
             </Button>
-          </SignInButton>
+          </Link>
         </div>
       </div>
     </nav>

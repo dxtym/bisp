@@ -1,18 +1,33 @@
-"use client"
+"use client";
 
-import Menu from "@/components/menu"
-import Chat from "@/components/chat"
-
-import { StoreProvider } from "@/lib/store/provider"
+import { useUser } from "@clerk/nextjs";
+import Main from "@/components/main";
+import Chat from "@/components/chat";
+import Menu from "@/components/menu";
+import Panel from "@/components/panel";
+import { StoreProvider } from "@/lib/store/provider";
 import {
   SidebarProvider,
   SidebarInset,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import Panel from "@/components/panel"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
+  const { isSignedIn, isLoaded } = useUser();
+
+  if (!isLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-muted-foreground">Yuklanmoqda...</div>
+      </div>
+    );
+  }
+
+  if (!isSignedIn) {
+    return <Main />;
+  }
+
   return (
     <StoreProvider>
       <SidebarProvider defaultOpen={true}>
@@ -35,5 +50,5 @@ export default function Home() {
         </SidebarInset>
       </SidebarProvider>
     </StoreProvider>
-  )
+  );
 }

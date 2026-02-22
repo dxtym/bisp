@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { SignInButton } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default function Hero() {
   return (
@@ -9,18 +9,19 @@ export default function Hero() {
         Siz Yozing - Biz Bajaramiz
       </h1>
       <p className="text-muted-foreground text-lg max-w-xl">
-        <span className="block">Kutoob malumot tahlilini suniy intellekt orqali</span>
-        <span className="block">
-          <span className="underline underline-offset-5">tezroq</span> va{" "}
-          <span className="underline underline-offset-5">osonroq</span> bajarish imkonini beradi.
+        <span className="block leading-relaxed">
+          Kutoob malumot tahlilini <span className="font-semibold">suniy intellekt</span> orqali
+        </span>
+        <span className="block leading-relaxed">
+          <span className="font-semibold underline underline-offset-4 decoration-2">tezroq</span> va <span className="font-semibold underline underline-offset-4 decoration-2">osonroq</span> bajarish imkonini beradi.
         </span>
       </p>
       <div className="flex flex-row gap-4 pt-4">
-        <SignInButton mode="redirect">
+        <Link href="/sign-in">
           <Button variant="default" size="lg" className="px-8 border border-neutral-600 hover:border-neutral-500">
             Kirish
           </Button>
-        </SignInButton>
+        </Link>
         <Button
           variant="secondary"
           size="lg"

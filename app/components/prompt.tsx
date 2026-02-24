@@ -27,7 +27,7 @@ export default function Prompt({ onSubmit, status }: PromptProps) {
   }, [onSubmit, setText]);
 
   return (
-    <div className="flex my-5">
+    <div className="flex my-3">
       <div className="w-full max-w-2xl mx-auto">
         <PromptInput onSubmit={handleSubmit} className="mt-4">
           <PromptInputBody>

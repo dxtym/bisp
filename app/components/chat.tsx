@@ -6,7 +6,7 @@ import {
   DefaultChatTransport,
   lastAssistantMessageIsCompleteWithApprovalResponses
 } from "ai"
-import { MessageSquare, Loader2 } from "lucide-react"
+import { MessageSquare, Lightbulb } from "lucide-react"
 import {
   Conversation,
   ConversationContent,
@@ -125,7 +125,7 @@ export default function Chat() {
               <Message from="assistant">
                 <MessageContent>
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="size-4 animate-spin" />
+                    <Lightbulb className="size-4 animate-caret-blink" />
                     <span>Fikrlayapman...</span>
                   </div>
                 </MessageContent>

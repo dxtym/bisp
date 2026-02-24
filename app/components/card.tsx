@@ -46,8 +46,8 @@ export default function Card({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="my-1">
       <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 rounded-t border p-2 text-sm">
+        <span className="font-medium">{TOOL_NAMES[toolName]}</span>
         <div className="flex items-center gap-3">
-          <span className="font-medium">{TOOL_NAMES[toolName]}</span>
           <Badge
             variant="secondary"
             className={`
@@ -58,15 +58,21 @@ export default function Card({
           >
             {STATE_LABELS[state]}
           </Badge>
+          <LucideChevronDown className={`size-3 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
         </div>
-        <LucideChevronDown className={`size-3 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
       </CollapsibleTrigger>
       <CollapsibleContent className="rounded-b border border-t-0 bg-background/50">
         {input && Object.keys(input).length > 0 && (
           <div className="border-b border-border p-2">
             <p className="mb-1 text-xs font-medium text-muted-foreground">Parametrlar</p>
-            <pre className="overflow-x-auto rounded bg-muted/50 p-2 text-xs">
-              <code>{JSON.stringify(input, null, 2)}</code>
+            <pre
+              className="overflow-x-auto rounded bg-muted/50 p-2 text-xs pb-4"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgb(138, 138, 138) transparent'
+              }}
+            >
+              <code className="block whitespace-pre">{JSON.stringify(input, null, 2)}</code>
             </pre>
           </div>
         )}
@@ -85,8 +91,14 @@ export default function Card({
         {state === "output-available" && (
           <div className="p-2">
             <p className="mb-1 text-xs font-medium text-muted-foreground">Natija</p>
-            <pre className="rounded bg-muted/50 p-2 text-xs">
-              <code>{typeof output === "string" ? output : JSON.stringify(output, null, 2)}</code>
+            <pre
+              className="overflow-x-auto rounded bg-muted/50 p-2 text-xs pb-4"
+              style={{
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgb(138 138 138) transparent'
+              }}
+            >
+              <code className="block whitespace-pre">{typeof output === "string" ? output : JSON.stringify(output, null, 2)}</code>
             </pre>
           </div>
         )}

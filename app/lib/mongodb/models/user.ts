@@ -1,22 +1,24 @@
 import mongoose from "mongoose";
 
 export interface IUser {
-  clerkId: string;
-  username: string;
+  id: string;
+  name: string;
   email: string;
+  image?: string;
+  passwordHash?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const userSchema = new mongoose.Schema<IUser>(
   {
-    clerkId: {
+    id: {
       type: String,
       required: true,
       unique: true,
       index: true,
     },
-    username: {
+    name: {
       type: String,
       required: true,
       trim: true,
@@ -29,12 +31,15 @@ const userSchema = new mongoose.Schema<IUser>(
       trim: true,
       index: true,
     },
+    image: {
+      type: String,
+    },
+    passwordHash: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
-
-userSchema.index({ clerkId: 1 });
-userSchema.index({ email: 1 });
 
 export type User = mongoose.InferSchemaType<typeof userSchema>;
 

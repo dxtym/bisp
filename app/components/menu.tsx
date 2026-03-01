@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import {
   fetchConversations,
@@ -29,7 +29,7 @@ import Header from "@/components/header";
 import Modal from "@/components/modal";
 
 export default function Menu() {
-  const { user } = useUser();
+  const { data: session } = useSession();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [conversationToDelete, setConversationToDelete] = useState<{
@@ -42,10 +42,10 @@ export default function Menu() {
   const conversation = useAppSelector(selectConversation);
 
   useEffect(() => {
-    if (user) {
-      dispatch(fetchConversations(user.id));
+    if (session?.user?.id) {
+      dispatch(fetchConversations(session.user.id));
     }
-  }, [user, dispatch]);
+  }, [session, dispatch]);
 
   const handleDeleteClick = (id: string, title: string) => {
     setConversationToDelete({ id, title });
@@ -75,8 +75,8 @@ export default function Menu() {
         <SidebarHeader>
           <Header
             onCreate={() => {
-              if (!user) return;
-              dispatch(createConversation({ userId: user.id, title: "Yangi suhbat" }));
+              if (!session?.user?.id) return;
+              dispatch(createConversation({ userId: session.user.id, title: "Yangi suhbat" }));
             }}
           />
         </SidebarHeader>

@@ -7,17 +7,18 @@ class UserRepository {
   }
 
   public async createUser(args: {
-    clerkId: string;
-    username: string;
+    name: string;
     email: string;
+    image?: string;
   }): Promise<IUser> {
     await this.connect();
 
     try {
       const user = await User.create({
-        clerkId: args.clerkId,
-        username: args.username,
+        id: crypto.randomUUID(),
+        name: args.name,
         email: args.email,
+        image: args.image,
       });
       return user.toObject();
     } catch (error) {
@@ -25,11 +26,31 @@ class UserRepository {
     }
   }
 
-  public async getUserByClerkId(clerkId: string): Promise<IUser | null> {
+  public async createUserWithCredentials(args: {
+    name: string;
+    email: string;
+    passwordHash: string;
+  }): Promise<IUser> {
     await this.connect();
 
     try {
-      const user = await User.findOne({ clerkId }).lean();
+      const user = await User.create({
+        id: crypto.randomUUID(),
+        name: args.name,
+        email: args.email,
+        passwordHash: args.passwordHash,
+      });
+      return user.toObject();
+    } catch (error) {
+      throw new Error(`Create user error: ${error}`);
+    }
+  }
+
+  public async getUserByEmail(email: string): Promise<IUser | null> {
+    await this.connect();
+
+    try {
+      const user = await User.findOne({ email }).lean();
       return user;
     } catch (error) {
       throw new Error(`Get user error: ${error}`);

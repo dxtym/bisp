@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -9,24 +8,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { BookOpen } from "lucide-react"
 
-function GoogleIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      className="size-4"
-      aria-hidden="true"
-    >
-      <path
-        d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
-
-export default function SignInPage() {
+export default function SignUpPage() {
   const router = useRouter()
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
@@ -36,16 +20,20 @@ export default function SignInPage() {
     e.preventDefault()
     setError("")
     setLoading(true)
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
+
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password }),
     })
+
     setLoading(false)
-    if (result?.error) {
-      setError("Email yoki parol noto'g'ri")
+
+    if (res.ok) {
+      router.push("/sign-in")
     } else {
-      router.push("/")
+      const data = await res.json()
+      setError(data.message || "Xatolik yuz berdi")
     }
   }
 
@@ -59,12 +47,24 @@ export default function SignInPage() {
             <span className="font-medium">Kutoob</span>
           </div>
           <div className="space-y-1">
-            <h1 className="text-xl font-semibold">Xush kelibsiz</h1>
+            <h1 className="text-xl font-semibold">Ro&apos;yxatdan o&apos;tish</h1>
             <p className="text-sm text-muted-foreground">
-              Hisobingizga kiring.
+              Yangi hisob yarating.
             </p>
           </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Ism</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Ismingiz"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -85,33 +85,26 @@ export default function SignInPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={8}
               />
             </div>
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Kirish..." : "Kirish"}
+              {loading ? "Ro'yxatdan o'tilmoqda..." : "Ro'yxatdan o'tish"}
             </Button>
           </form>
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">yoki</span>
-            <div className="h-px flex-1 bg-border" />
-          </div>
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => signIn("google", { callbackUrl: "/" })}
-          >
-            <GoogleIcon />
-            Google orqali kirish
-          </Button>
+
           <p className="text-sm text-center text-muted-foreground">
-            Hisobingiz yo&apos;qmi?{" "}
-            <Link href="/sign-up" className="underline underline-offset-4">
-              Ro&apos;yxatdan o&apos;ting
+            Hisobingiz bormi?{" "}
+            <Link href="/sign-in" className="underline underline-offset-4">
+              Kirish
             </Link>
+          </p>
+
+          <p className="text-xs text-muted-foreground text-center">
+            Davom etish orqali foydalanish shartlarimizga rozilik bildirasiz.
           </p>
         </div>
       </div>

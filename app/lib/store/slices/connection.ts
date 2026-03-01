@@ -10,7 +10,7 @@ interface ConnectionState {
 }
 
 const initialState: ConnectionState = {
-  url: localStorage.getItem(STORAGE_KEY) || "",
+  url: (typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null) || "",
   schema: [],
 };
 

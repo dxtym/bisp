@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
+import { useSession } from "next-auth/react";
 import Main from "@/components/main";
 import Chat from "@/components/chat";
 import Menu from "@/components/menu";
@@ -14,9 +14,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 
 export default function Home() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { data: session, status } = useSession();
 
-  if (!isLoaded) {
+  if (status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-muted-foreground">Yuklanmoqda...</div>
@@ -24,7 +24,7 @@ export default function Home() {
     );
   }
 
-  if (!isSignedIn) {
+  if (!session) {
     return <Main />;
   }
 

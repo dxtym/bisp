@@ -6,7 +6,7 @@ import {
   DefaultChatTransport,
   lastAssistantMessageIsCompleteWithApprovalResponses
 } from "ai"
-import { MessageSquare, Lightbulb } from "lucide-react"
+import { LuMessageSquare, LuLightbulb } from "react-icons/lu"
 import {
   Conversation,
   ConversationContent,
@@ -15,13 +15,26 @@ import {
 } from "@/components/ai-elements/conversation"
 import { Message, MessageContent } from "@/components/ai-elements/message"
 import Prompt from "./prompt"
-import ChatMessage from "./message"
+import Bubble from "./message"
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks"
 import { selectConversation, addMessage } from "@/lib/store/slices/conversation"
 import { IMessage } from "@/lib/mongodb/models/conversation"
 import { nanoid } from "nanoid"
 import { toast } from "sonner"
 import { STORAGE_KEY } from "@/lib/store/slices/connection"
+
+function Thinking() {
+  return (
+    <Message from="assistant">
+      <MessageContent>
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <LuLightbulb className="size-4 animate-caret-blink" />
+          <span>Fikrlayapman...</span>
+        </div>
+      </MessageContent>
+    </Message>
+  )
+}
 
 export default function Chat() {
   const messageRef = useRef<string>("");
@@ -109,11 +122,11 @@ export default function Chat() {
               <ConversationEmptyState
                 title="Xabarlar yo'q"
                 description="Savol bering"
-                icon={<MessageSquare className="size-12" />}
+                icon={<LuMessageSquare className="size-12" />}
               />
             ) : (
               messages.map((message) => (
-                <ChatMessage
+                <Bubble
                   key={message.id}
                   message={message}
                   onApprove={handleApprove}
@@ -121,16 +134,7 @@ export default function Chat() {
                 />
               ))
             )}
-            {status === "submitted" && (
-              <Message from="assistant">
-                <MessageContent>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Lightbulb className="size-4 animate-caret-blink" />
-                    <span>Fikrlayapman...</span>
-                  </div>
-                </MessageContent>
-              </Message>
-            )}
+            {status === "submitted" && <Thinking />}
           </ConversationContent>
           <ConversationScrollButton />
         </Conversation>

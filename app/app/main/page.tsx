@@ -4,7 +4,7 @@ import Hero from "@/components/hero";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
-export default function MainPage() {
+export default function Page() {
   return (
     <div className="relative min-h-screen text-white">
       <div className="fixed top-[10%] bottom-[10%] left-[20%] right-[20%] -z-10">

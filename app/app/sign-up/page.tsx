@@ -6,9 +6,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { BookOpen } from "lucide-react"
+import { LuBookOpen } from "react-icons/lu"
 
-export default function SignUpPage() {
+export default function Page() {
   const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -43,7 +43,7 @@ export default function SignUpPage() {
       <div className="flex w-full lg:w-1/2 items-center justify-center px-8">
         <div className="w-full max-w-sm space-y-8">
           <div className="flex items-center gap-2">
-            <BookOpen className="size-5" />
+            <LuBookOpen className="size-5" />
             <span className="font-medium">Kutoob</span>
           </div>
           <div className="space-y-1">

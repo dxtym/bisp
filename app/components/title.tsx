@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { Check, Edit3, X } from "lucide-react";
+import { LuCheck, LuEdit3, LuX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -102,7 +102,7 @@ export default function Title({
               handleSave()
             }}
           >
-            <Check className="h-3 w-3" />
+            <LuCheck className="h-3 w-3" />
           </Button>
           <Button
             size="sm"
@@ -115,7 +115,7 @@ export default function Title({
               handleCancel()
             }}
           >
-            <X className="h-3 w-3" />
+            <LuX className="h-3 w-3" />
           </Button>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function Title({
             isActive && "opacity-100"
           )}
         >
-          <Edit3 className="h-3 w-3" />
+          <LuEdit3 className="h-3 w-3" />
         </Button>
       )}
     </div>

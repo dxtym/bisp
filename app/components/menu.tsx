@@ -21,12 +21,66 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { LuTrash2 } from "react-icons/lu";
 import { cn } from "@/lib/utils";
 import Title from "@/components/title";
 import Profile from "@/components/profile";
 import Header from "@/components/header";
 import Modal from "@/components/modal";
+
+interface ItemProps {
+  c: { id: string; title: string }
+  isActive: boolean
+  isDeleting: boolean
+  onSelect: () => void
+  onDelete: (id: string, title: string) => void
+  onTitleSave: (id: string, title: string) => Promise<void>
+}
+
+function Item({ c, isActive, isDeleting, onSelect, onDelete, onTitleSave }: ItemProps) {
+  return (
+    <SidebarMenuItem key={c.id}>
+      <div
+        className={cn(
+          "group relative flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden transition-all duration-200",
+          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+          "focus-visible:ring-2 ring-sidebar-ring",
+          isActive && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
+          isDeleting && "opacity-50 pointer-events-none animate-pulse"
+        )}
+      >
+        <div
+          className="flex-1 flex items-center gap-2 min-w-0 cursor-pointer"
+          onClick={onSelect}
+        >
+          <Title
+            title={c.title}
+            onSave={(title) => onTitleSave(c.id, title)}
+            isActive={isActive}
+            disabled={isDeleting}
+          />
+        </div>
+        <Button
+          size="sm"
+          variant="ghost"
+          className={cn(
+            "h-6 w-6 p-0 shrink-0 transition-all duration-200",
+            "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
+            "focus-visible:ring-2 ring-destructive/20",
+            isDeleting && "opacity-50"
+          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(c.id, c.title);
+          }}
+          disabled={isDeleting}
+        >
+          <LuTrash2 className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    </SidebarMenuItem>
+  )
+}
 
 export default function Menu() {
   const { data: session } = useSession();
@@ -88,46 +142,15 @@ export default function Menu() {
               </div>
             ) : (
               conversations.map((c) => (
-                <SidebarMenuItem key={c.id}>
-                  <div
-                    className={cn(
-                      "group relative flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden transition-all duration-200",
-                      "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                      "focus-visible:ring-2 ring-sidebar-ring",
-                      c.id === conversation?.id && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
-                      deletingId === c.id && "opacity-50 pointer-events-none animate-pulse"
-                    )}
-                  >
-                    <div
-                      className="flex-1 flex items-center gap-2 min-w-0 cursor-pointer"
-                      onClick={() => dispatch(setConversation(c))}
-                    >
-                      <Title
-                        title={c.title}
-                        onSave={(title) => handleTitleSave(c.id, title)}
-                        isActive={c.id === conversation?.id}
-                        disabled={deletingId === c.id}
-                      />
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className={cn(
-                        "h-6 w-6 p-0 shrink-0 transition-all duration-200",
-                        "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
-                        "focus-visible:ring-2 ring-destructive/20",
-                        deletingId === c.id && "opacity-50"
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteClick(c.id, c.title);
-                      }}
-                      disabled={deletingId === c.id}
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </Button>
-                  </div>
-                </SidebarMenuItem>
+                <Item
+                  key={c.id}
+                  c={c}
+                  isActive={c.id === conversation?.id}
+                  isDeleting={deletingId === c.id}
+                  onSelect={() => dispatch(setConversation(c))}
+                  onDelete={handleDeleteClick}
+                  onTitleSave={handleTitleSave}
+                />
               ))
             )}
           </SidebarMenu>

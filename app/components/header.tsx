@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus } from "lucide-react";
+import { LuPlus } from "react-icons/lu";
 import { Button } from "./ui/button";
 
 type MenuHeaderProps = {
@@ -17,7 +17,7 @@ export default function Header({ onCreate }: MenuHeaderProps) {
         className="p-[3.5] h-5 w-5 rounded-full"
         onClick={onCreate}
       >
-        <Plus />
+        <LuPlus />
       </Button>
     </div>
   );

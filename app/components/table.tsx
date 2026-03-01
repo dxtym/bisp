@@ -1,6 +1,6 @@
 "use client"
 
-import { LucideChevronDown } from "lucide-react";
+import { LuChevronDown } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
@@ -21,7 +21,7 @@ export default function Table({ name, columns }: TableProps) {
           <span className="text-xs text-muted-foreground">{columns.length} ta ustun</span>
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="icon" className="size-7">
-              <LucideChevronDown className="size-4" />
+              <LuChevronDown className="size-4" />
             </Button>
           </CollapsibleTrigger>
         </div>

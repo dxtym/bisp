@@ -1,7 +1,7 @@
 "use client"
 
 import { UIMessage } from "ai"
-import Card, { ToolState } from "@/components/card"
+import Tool, { ToolState } from "@/components/tool"
 import {
   Message,
   MessageContent,
@@ -14,7 +14,7 @@ interface Props {
   onDeny?: (id: string) => void
 }
 
-export default function ChatMessage({ message, onApprove, onDeny }: Props) {
+export default function Bubble({ message, onApprove, onDeny }: Props) {
   return (
     <Message from={message.role} key={message.id}>
       <MessageContent className={message.role === "assistant" ? "w-full" : ""}>
@@ -30,7 +30,7 @@ export default function ChatMessage({ message, onApprove, onDeny }: Props) {
             const toolPart = part as Record<string, unknown>
             const toolName = part.type.replace("tool-", "")
             return (
-              <Card
+              <Tool
                 key={i}
                 toolName={toolName}
                 state={toolPart.state as ToolState}

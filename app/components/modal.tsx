@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Trash2 } from "lucide-react"
+import { LuTrash2 } from "react-icons/lu"
 
 interface Props {
   open: boolean
@@ -26,7 +26,7 @@ export default function Modal({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Trash2 className="h-5 w-5 text-destructive" />
+            <LuTrash2 className="h-5 w-5 text-destructive" />
             Suhbatni ochirish
           </DialogTitle>
         </DialogHeader>

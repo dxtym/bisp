@@ -2,7 +2,7 @@
 
 import { useSession, signOut } from "next-auth/react"
 import { Button } from "./ui/button"
-import { LucideLogOut } from "lucide-react"
+import { LuLogOut } from "react-icons/lu"
 
 export default function Profile() {
   const { data: session } = useSession()

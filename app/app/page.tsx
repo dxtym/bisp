@@ -5,7 +5,7 @@ import Main from "@/components/main";
 import Chat from "@/components/chat";
 import Menu from "@/components/menu";
 import Panel from "@/components/panel";
-import { StoreProvider } from "@/lib/store/provider";
+import { Provider } from "@/components/providers/store";
 import {
   SidebarProvider,
   SidebarInset,
@@ -29,7 +29,7 @@ export default function Home() {
   }
 
   return (
-    <StoreProvider>
+    <Provider>
       <SidebarProvider defaultOpen={true}>
         <Menu />
         <SidebarInset className="flex flex-col h-[calc(100svh-1rem)] overflow-hidden">
@@ -49,6 +49,6 @@ export default function Home() {
           </div>
         </SidebarInset>
       </SidebarProvider>
-    </StoreProvider>
+    </Provider>
   );
 }

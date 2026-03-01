@@ -1,9 +1,15 @@
 import "./globals.css";
 
+import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/theme"
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
+
+export const metadata: Metadata = {
+  title: "Kutoob",
+  description: "Natural-language ClickHouse query interface",
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +21,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <SessionProvider>
       <html lang="en">

@@ -14,7 +14,7 @@ import {
   AGENT_PROMPT,
   GENERATOR_PROMPT,
   TRANSLATOR_PROMPT,
-} from "@/app/(chat)/api/chat/const";
+} from "@/app/api/chat/const";
 import openAIClient from "@/lib/agents/openai/client";
 // import ollamaClient from "@/lib/agents/ollama/client";
 

@@ -1,4 +1,4 @@
-import { LucideBookOpen } from "lucide-react";
+import { LuBookOpen } from "react-icons/lu";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
@@ -8,7 +8,7 @@ export default function Navbar() {
       <div className="mx-auto backdrop-blur-lg border border-zinc-800 rounded-md px-4 py-3 shadow-lg">
         <div className="flex items-center justify-between">
           <div className="flex flex-row items-center space-x-2">
-            <LucideBookOpen className="w-5 h-5" />
+            <LuBookOpen className="w-5 h-5" />
             <div className="text-neutral-100 font-semibold text-md">
               Kutoob
             </div>

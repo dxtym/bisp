@@ -40,7 +40,7 @@ export default function Page() {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar className="hidden lg:flex lg:w-1/2" />
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-8 bg-white text-zinc-900 [&_label]:text-zinc-700 [&_.text-muted-foreground]:!text-zinc-500">
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-8 bg-muted/30">
         <div className="w-full max-w-sm space-y-8">
           <div className="space-y-1 text-center">
             <h1 className="text-xl font-semibold">Ro&apos;yxatdan o&apos;tish</h1>
@@ -58,7 +58,7 @@ export default function Page() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="capitalize border-zinc-800" 
+                className="capitalize border-neutral-700" 
               />
             </div>
             <div className="space-y-2">
@@ -70,7 +70,7 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border-zinc-800"
+                className="border-neutral-700"
               />
             </div>
             <div className="space-y-2">
@@ -83,13 +83,13 @@ export default function Page() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="border-zinc-800" 
+                className="border-neutral-700" 
               />
             </div>
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
-            <Button type="submit" variant="secondary" className="w-full mt-3 border-black hover:border-zinc-700" disabled={loading}>
+            <Button type="submit" variant="secondary" className="w-full mt-3 border border-neutral-500 hover:border-neutral-600" disabled={loading}>
               {loading ? "Ro'yxatdan o'tilmoqda..." : "Ro'yxatdan o'tish"}
             </Button>
           </form>

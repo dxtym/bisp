@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { LuCheck, LuChevronDown, LuX } from "react-icons/lu";
+import { LuCheck, LuChevronDown, LuWrench, LuX } from "react-icons/lu";
 
 export type ToolState = "input-streaming" | "input-available" | "approval-requested" | "output-available" | "output-error"
 
@@ -111,7 +111,10 @@ export default function Tool({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="my-1">
       <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 rounded-t border p-2 text-sm">
-        <span className="font-medium">{TOOL_NAMES[toolName]}</span>
+        <div className="flex items-center gap-2">
+          <LuWrench className="size-3.5 text-muted-foreground" />
+          <span className="font-medium">{TOOL_NAMES[toolName]}</span>
+        </div>
         <div className="flex items-center gap-3">
           <Badge
             variant="secondary"

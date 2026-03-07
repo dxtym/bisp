@@ -1,4 +1,5 @@
 import { LuBookOpen } from "react-icons/lu"
+import Conversation from "@/components/conversation"
 
 interface SidebarProps {
   className?: string
@@ -6,19 +7,14 @@ interface SidebarProps {
 
 export default function Sidebar({ className }: SidebarProps) {
   return (
-    <div className={`bg-black text-white flex flex-col justify-between h-screen p-10 ${className ?? ""}`}>
+    <div className={`relative overflow-hidden bg-muted/30 text-white flex flex-col h-screen p-10 ${className ?? ""}`}>
       <div className="flex items-center gap-2">
         <LuBookOpen className="size-5" />
         <span className="font-semibold text-lg">Kutoob</span>
       </div>
-      <blockquote className="space-y-3">
-        <p className="text-lg relaxed">
-          &ldquo;Bu dastur malumotlar bilan ishlash usulimizni butunlay ozgartirdi. Endi hech qanday texnik bilimsiz ham kerakli javoblarni bir zumda olish mumkin. Ajoyib.&rdquo;
-        </p>
-        <footer className="text-base text-zinc-500">
-          — Jasur Toshmatov, Malumotlar tahlilchisi
-        </footer>
-      </blockquote>
+      <div className="flex-1 flex items-center">
+        <Conversation />
+      </div>
     </div>
   )
 }

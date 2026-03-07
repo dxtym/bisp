@@ -8,6 +8,8 @@ import {
   convertToModelMessages,
   UIMessage,
 } from "ai";
+import { auth } from "@/auth";
+import { userRepository } from "@/lib/repository/user";
 import { ClickHouseWebClient } from "@/lib/clickhouse/client";
 import { Schema, SystemRepository } from "@/lib/repository/system";
 import {
@@ -48,6 +50,13 @@ async function generator(question: string, schema: Schema[]): Promise<string> {
 
 export async function POST(req: Request) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({
+        message: "Unauthorized"
+      }, { status: 401 });
+    }
+
     const { messages, url }: { messages: UIMessage[]; url?: string } = await req.json();
 
     if (!url) {
@@ -67,6 +76,11 @@ export async function POST(req: Request) {
         success: false,
         message: error instanceof Error ? error.message : "Something went wrong",
       }, { status: 400 });
+    }
+
+    const hasQuota = await userRepository.checkAndDecrementQueryCount(session.user.id);
+    if (!hasQuota) {
+      return NextResponse.json({ message: "Out of quota" }, { status: 403 });
     }
 
     const result = streamText({

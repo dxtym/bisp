@@ -9,12 +9,12 @@ type MenuHeaderProps = {
 
 export default function Header({ onCreate }: MenuHeaderProps) {
   return (
-    <div className="flex justify-between items-center py-2">
-      <p className="text-muted-foreground">Suhbatlar</p>
+    <div className="flex justify-between items-center p-1">
+      <p className="text-sm font-semibold">Suhbatlar</p>
       <Button
         size="sm"
         variant="ghost"
-        className="p-[3.5] h-5 w-5 rounded-full"
+        className="h-7 w-7 p-0 rounded-md"
         onClick={onCreate}
       >
         <LuPlus />

@@ -42,9 +42,8 @@ function Item({ c, isActive, isDeleting, onSelect, onDelete, onTitleSave }: Item
     <SidebarMenuItem key={c.id}>
       <div
         className={cn(
-          "group relative flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-hidden transition-all duration-200",
+          "group/item flex w-full items-center gap-2 rounded-sm py-2 px-3 text-sm transition-colors",
           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-          "focus-visible:ring-2 ring-sidebar-ring",
           isActive && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
           isDeleting && "opacity-50 pointer-events-none animate-pulse"
         )}
@@ -65,6 +64,7 @@ function Item({ c, isActive, isDeleting, onSelect, onDelete, onTitleSave }: Item
           variant="ghost"
           className={cn(
             "h-6 w-6 p-0 shrink-0 transition-all duration-200",
+            "opacity-0 group-hover/item:opacity-100",
             "text-muted-foreground hover:text-destructive hover:bg-destructive/10",
             "focus-visible:ring-2 ring-destructive/20",
             isDeleting && "opacity-50"
@@ -134,7 +134,7 @@ export default function Menu() {
             }}
           />
         </SidebarHeader>
-        <SidebarContent>
+        <SidebarContent className="px-2">
           <SidebarMenu>
             {conversations.length === 0 ? (
               <div className="px-2 py-4 text-sm text-muted-foreground text-center">

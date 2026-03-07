@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { Loader } from "@/components/ai-elements/loader";
 import Main from "@/components/main";
 import Chat from "@/components/chat";
 import Menu from "@/components/menu";
@@ -19,7 +20,7 @@ export default function Home() {
   if (status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-muted-foreground">Yuklanmoqda...</div>
+        <Loader size={24} className="text-muted-foreground" />
       </div>
     );
   }

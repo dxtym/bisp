@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { LuTrash2 } from "react-icons/lu"
 
 interface Props {
   open: boolean
@@ -23,25 +22,23 @@ export default function Modal({
 }: Props) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <LuTrash2 className="h-5 w-5 text-destructive" />
-            Suhbatni ochirish
-          </DialogTitle>
+          <DialogTitle className="text-sm font-semibold">Suhbatni ochirish</DialogTitle>
         </DialogHeader>
-        <DialogFooter className="flex-col sm:flex-row gap-2">
+        <p className="text-sm text-muted-foreground">Bu amalni qaytarib bolmaydi.</p>
+        <DialogFooter className="gap-2">
           <Button
-            variant="outline"
-            className="w-full sm:w-auto"
+            variant="ghost"
+            size="sm"
             onClick={() => onOpenChange(false)}
           >
-            Qaytish
+            Bekor qilish
           </Button>
           <Button
             variant="destructive"
+            size="sm"
             onClick={onConfirm}
-            className="w-full sm:w-auto"
           >
             Ochirish
           </Button>

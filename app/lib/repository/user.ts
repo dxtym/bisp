@@ -56,6 +56,31 @@ class UserRepository {
       throw new Error(`Get user error: ${error}`);
     }
   }
+
+  public async getQueriesCount(id: string): Promise<number | null> {
+    await this.connect();
+
+    try {
+      const user = await User.findOne({ id }, { queriesCount: 1 }).lean();
+      return user ? (user.queriesCount ?? 0) : null;
+    } catch (error) {
+      throw new Error(`Get queries count error: ${error}`);
+    }
+  }
+
+  public async checkAndDecrementQueryCount(id: string): Promise<boolean> {
+    await this.connect();
+
+    try {
+      const result = await User.updateOne(
+        { id, queriesCount: { $gt: 0 } },
+        { $inc: { queriesCount: -1 } }
+      );
+      return result.modifiedCount > 0;
+    } catch (error) {
+      throw new Error(`Decrement query count error: ${error}`);
+    }
+  }
 }
 
 export const userRepository = new UserRepository();

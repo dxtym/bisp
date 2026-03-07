@@ -37,7 +37,7 @@ export default function Page() {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar className="hidden lg:flex lg:w-1/2" />
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-8 bg-white text-zinc-900 [&_label]:text-zinc-700 [&_.text-muted-foreground]:!text-zinc-500">
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-8 bg-muted/30">
         <div className="w-full max-w-sm space-y-8">
           <div className="space-y-1 text-center">
             <h1 className="text-xl font-semibold">Xush kelibsiz</h1>
@@ -55,7 +55,7 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border-zinc-800" 
+                className="border-neutral-700" 
               />
             </div>
             <div className="space-y-2">
@@ -67,24 +67,24 @@ export default function Page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="border-zinc-800"
+                className="border-neutral-700"
               />
             </div>
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
-            <Button type="submit" variant="secondary" className="w-full mt-3 border-black hover:border-zinc-700" disabled={loading}>
+            <Button type="submit" variant="secondary" className="w-full mt-3 border border-neutral-500 hover:border-neutral-600" disabled={loading}>
               {loading ? "Kirish..." : "Kirish"}
             </Button>
           </form>
           <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-zinc-200" />
-            <span className="text-sm text-zinc-500">yoki</span>
-            <div className="h-px flex-1 bg-zinc-200" />
+            <div className="h-px flex-1 bg-neutral-700" />
+            <span className="text-sm text-muted-foreground">yoki</span>
+            <div className="h-px flex-1 bg-neutral-700" />
           </div>
           <Button
             variant="secondary"
-            className="w-full border-black-500 hover:border-zinc-700"
+            className="w-full border border-neutral-500 hover:border-neutral-600"
             onClick={() => signIn("google", { callbackUrl: "/" })}
           >
             <FaGoogle className="size-4" />

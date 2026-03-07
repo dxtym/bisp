@@ -6,6 +6,8 @@ export interface IUser {
   email: string;
   image?: string;
   passwordHash?: string;
+  queriesCount: number;
+  plan: "free" | "pro" | "max";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +38,15 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     passwordHash: {
       type: String,
+    },
+    queriesCount: {
+      type: Number,
+      default: 5,
+    },
+    plan: {
+      type: String,
+      enum: ["free", "pro", "max"],
+      default: "free",
     },
   },
   { timestamps: true }

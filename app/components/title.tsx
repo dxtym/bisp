@@ -134,7 +134,7 @@ export default function Title({
           variant="ghost"
           onClick={handleStartEdit}
           className={cn(
-            "h-4 w-4 p-0 opacity-0 group-hover/title:opacity-100 transition-opacity duration-200",
+            "h-4 w-4 p-0 opacity-0 group-hover/title:opacity-100 group-hover/item:opacity-100",
             "text-muted-foreground hover:text-foreground hover:bg-muted",
             isActive && "opacity-100"
           )}

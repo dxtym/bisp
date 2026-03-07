@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.54",
     "@ai-sdk/openai": "^3.0.26",
     "@ai-sdk/react": "^3.0.6",
     "@clickhouse/client-web": "^1.16.0",

@@ -7,8 +7,8 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LuBookOpen } from "react-icons/lu"
-import { FcGoogle } from "react-icons/fc"
+import { FaGoogle } from "react-icons/fa"
+import Sidebar from "@/components/sidebar"
 
 export default function Page() {
   const router = useRouter()
@@ -36,14 +36,10 @@ export default function Page() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <div className="hidden lg:block lg:w-1/2" />
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-8">
+      <Sidebar className="hidden lg:flex lg:w-1/2" />
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-8 bg-white text-zinc-900 [&_label]:text-zinc-700 [&_.text-muted-foreground]:!text-zinc-500">
         <div className="w-full max-w-sm space-y-8">
-          <div className="flex items-center gap-2">
-            <LuBookOpen className="size-5" />
-            <span className="font-medium">Kutoob</span>
-          </div>
-          <div className="space-y-1">
+          <div className="space-y-1 text-center">
             <h1 className="text-xl font-semibold">Xush kelibsiz</h1>
             <p className="text-sm text-muted-foreground">
               Hisobingizga kiring.
@@ -59,6 +55,7 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="border-zinc-800" 
               />
             </div>
             <div className="space-y-2">
@@ -70,32 +67,33 @@ export default function Page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="border-zinc-800"
               />
             </div>
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" variant="secondary" className="w-full mt-3 border-black hover:border-zinc-700" disabled={loading}>
               {loading ? "Kirish..." : "Kirish"}
             </Button>
           </form>
           <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-border" />
-            <span className="text-xs text-muted-foreground">yoki</span>
-            <div className="h-px flex-1 bg-border" />
+            <div className="h-px flex-1 bg-zinc-200" />
+            <span className="text-sm text-zinc-500">yoki</span>
+            <div className="h-px flex-1 bg-zinc-200" />
           </div>
           <Button
-            variant="outline"
-            className="w-full"
+            variant="secondary"
+            className="w-full border-black-500 hover:border-zinc-700"
             onClick={() => signIn("google", { callbackUrl: "/" })}
           >
-            <FcGoogle className="size-4" />
+            <FaGoogle className="size-4" />
             Google orqali kirish
           </Button>
           <p className="text-sm text-center text-muted-foreground">
             Hisobingiz yo&apos;qmi?{" "}
             <Link href="/sign-up" className="underline underline-offset-4">
-              Ro&apos;yxatdan o&apos;ting
+              Royxatdan oting
             </Link>
           </p>
         </div>

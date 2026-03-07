@@ -15,12 +15,13 @@ import {
   GENERATOR_PROMPT,
   TRANSLATOR_PROMPT,
 } from "@/app/api/chat/const";
-import openAIClient from "@/lib/agents/openai/client";
+// import openAIClient from "@/lib/agents/openai/client";
 // import ollamaClient from "@/lib/agents/ollama/client";
+import anthropicClient from "@/lib/agents/anthropic/client";
 
 async function translator(prompt: string): Promise<string> {
   const { text: response } = await generateText({
-    model: openAIClient.model,
+    model: anthropicClient.model,
     system: TRANSLATOR_PROMPT,
     prompt: prompt,
   });
@@ -30,7 +31,7 @@ async function translator(prompt: string): Promise<string> {
 async function generator(question: string, schema: Schema[]): Promise<string> {
   const metadata = schema.map((t) => `${t.table}: ${t.columns.join(", ")}`).join("\n");
   const { text: response } = await generateText({
-    model: openAIClient.model,
+    model: anthropicClient.model,
     system: GENERATOR_PROMPT,
     prompt: `Given the schema: ${metadata} Answer the question: ${question}`,
   });
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
     }
 
     const result = streamText({
-      model: openAIClient.model,
+      model: anthropicClient.model,
       system: AGENT_PROMPT,
       messages: await convertToModelMessages(messages),
       tools: {

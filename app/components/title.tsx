@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
-import { LuCheck, LuEdit3, LuX } from "react-icons/lu";
+import { LuCheck, LuPencil, LuX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 
 interface Props {
@@ -139,7 +139,7 @@ export default function Title({
             isActive && "opacity-100"
           )}
         >
-          <LuEdit3 className="h-3 w-3" />
+          <LuPencil className="h-3 w-3" />
         </Button>
       )}
     </div>

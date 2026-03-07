@@ -6,7 +6,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { LuBookOpen } from "react-icons/lu"
+import Sidebar from "@/components/sidebar"
 
 export default function Page() {
   const router = useRouter()
@@ -39,20 +39,15 @@ export default function Page() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <div className="hidden lg:block lg:w-1/2" />
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-8">
+      <Sidebar className="hidden lg:flex lg:w-1/2" />
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-8 bg-white text-zinc-900 [&_label]:text-zinc-700 [&_.text-muted-foreground]:!text-zinc-500">
         <div className="w-full max-w-sm space-y-8">
-          <div className="flex items-center gap-2">
-            <LuBookOpen className="size-5" />
-            <span className="font-medium">Kutoob</span>
-          </div>
-          <div className="space-y-1">
+          <div className="space-y-1 text-center">
             <h1 className="text-xl font-semibold">Ro&apos;yxatdan o&apos;tish</h1>
             <p className="text-sm text-muted-foreground">
               Yangi hisob yarating.
             </p>
           </div>
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Ism</Label>
@@ -63,6 +58,7 @@ export default function Page() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                className="capitalize border-zinc-800" 
               />
             </div>
             <div className="space-y-2">
@@ -74,6 +70,7 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="border-zinc-800"
               />
             </div>
             <div className="space-y-2">
@@ -86,25 +83,21 @@ export default function Page() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
+                className="border-zinc-800" 
               />
             </div>
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" variant="secondary" className="w-full mt-3 border-black hover:border-zinc-700" disabled={loading}>
               {loading ? "Ro'yxatdan o'tilmoqda..." : "Ro'yxatdan o'tish"}
             </Button>
           </form>
-
           <p className="text-sm text-center text-muted-foreground">
             Hisobingiz bormi?{" "}
             <Link href="/sign-in" className="underline underline-offset-4">
               Kirish
             </Link>
-          </p>
-
-          <p className="text-xs text-muted-foreground text-center">
-            Davom etish orqali foydalanish shartlarimizga rozilik bildirasiz.
           </p>
         </div>
       </div>

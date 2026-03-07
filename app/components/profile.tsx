@@ -24,7 +24,7 @@ export default function Profile() {
           variant="secondary"
           onClick={() => signOut()}
         >
-          <LucideLogOut />
+          <LuLogOut />
         </Button>
       </div>
     </div>

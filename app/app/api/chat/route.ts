@@ -72,10 +72,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Hisobingizda so'rovlar tugagan" }, { status: 403 });
     }
 
+    const modelMessages = await convertToModelMessages(messages);
+    const lastUserIdx = modelMessages.findLastIndex((m) => m.role === "user");
+    let toolStepCount = modelMessages.slice(lastUserIdx + 1).filter((m) => m.role === "tool").length;
+
     const result = streamText({
       model: anthropicClient.model,
       system: AGENT_PROMPT,
-      messages: await convertToModelMessages(messages),
+      messages: modelMessages,
       tools: {
         translator: tool({
           description: TOOL_DESCRIPTIONS.translator.tool,
@@ -114,6 +118,18 @@ export async function POST(req: Request) {
         }),
       },
       stopWhen: stepCountIs(10),
+      prepareStep: () => {
+        if (toolStepCount < 3) {
+          return { toolChoice: "required" };
+        }
+        return { toolChoice: "none", activeTools: [] };
+      },
+      onStepFinish: ({ toolCalls }) => {
+        if (toolCalls.length > 0) toolStepCount++;
+      },
+      onFinish: () => {
+        toolStepCount = 0;
+      },
     });
 
     return result.toUIMessageStreamResponse({

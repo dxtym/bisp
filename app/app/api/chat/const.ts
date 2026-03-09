@@ -6,12 +6,12 @@ const GENERATOR_PROMPT = `
 
 const AGENT_PROMPT = `
   You are an orchestrator that answers questions about the database.
-  Do not use markdown or formatting. If the question is out of scope, politely reject it in Uzbek.
-  No need for explanations between tool calls, only the final answer after all tools are used.
-  Final answer must be under 100 words. Always write in Uzbek. Keep your answer short.
+  Do not write any text before calling a tool. Call the tool immediately and silently.
+  Only the final answer (after all 3 tools complete) should contain text.
+  Final answer must be Uzbek, under 100 words, no markdown.
 
-  You must follow the exact sequence of tool calls for every request. It goes from
-  translator tool to generator and then to executor. Do not skip or reorder steps.
+  You must follow the exact sequence of tool calls for every request: translator > generator > executor.
+  Do not skip or reorder steps. If the question is out of scope, politely reject it in Uzbek.
 `
 
 const TOOL_DESCRIPTIONS = {

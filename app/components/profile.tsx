@@ -11,7 +11,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
-import { LuLogOut, LuSparkles, LuSun, LuMoon } from "react-icons/lu"
+import Image from "next/image"
+import { LuLogOut, LuSparkles, LuSun, LuMoon, LuSearch } from "react-icons/lu"
 
 export default function Profile() {
   const { data: session } = useSession()
@@ -29,8 +30,8 @@ export default function Profile() {
     <div className="py-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="flex w-full cursor-pointer items-center justify-between rounded-sm bg-muted/50 border px-2 py-2 hover:bg-muted/80 transition-colors">
-            <div className="flex flex-col">
+          <div className="flex w-full justify-between cursor-pointer items-center gap-3 rounded-sm bg-muted/50 border px-2 py-2 hover:bg-muted/80 transition-colors">
+            <div className="flex flex-col min-w-0">
               <span className="text-sm font-medium truncate">
                 {session?.user?.name ?? "Guest"}
               </span>
@@ -38,9 +39,28 @@ export default function Profile() {
                 {`So'rovlar: ${queriesCount} / 5`}
               </span>
             </div>
+            <div className="size-8 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium">
+              {session?.user?.image ? (
+                <Image
+                  src={session.user.image}
+                  alt={session.user.name ?? ""}
+                  width={32}
+                  height={32}
+                  className="object-cover"
+                />
+              ) : (
+                <span>{session?.user?.name?.[0]?.toUpperCase() ?? "G"}</span>
+              )}
+            </div>
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-[var(--radix-dropdown-menu-trigger-width)]">
+          <DropdownMenuItem asChild>
+            <Link href="/search" className="flex items-center gap-2">
+              <LuSearch className="h-4 w-4" />
+              Qidiruv
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/pricing" className="flex items-center gap-2">
               <LuSparkles className="h-4 w-4" />
@@ -56,7 +76,7 @@ export default function Profile() {
             ) : (
               <LuMoon className="h-4 w-4" />
             )}
-            {resolvedTheme === "dark" ? "Yorug'" : "Qorong'i"}
+            {resolvedTheme === "dark" ? "Kunduzgi" : "Tungi"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

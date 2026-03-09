@@ -29,7 +29,6 @@ const Thinking = memo(function Thinking() {
     <Message from="assistant">
       <MessageContent>
         <div className="flex items-center gap-2 text-muted-foreground">
-          <LuLightbulb className="size-4 animate-pulse" />
           <Shimmer>Fikrlayapman...</Shimmer>
         </div>
       </MessageContent>

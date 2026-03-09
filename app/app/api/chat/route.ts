@@ -15,18 +15,16 @@ import { Schema, SystemRepository } from "@/lib/repository/system";
 import {
   AGENT_PROMPT,
   GENERATOR_PROMPT,
-  TRANSLATOR_PROMPT,
   TOOL_DESCRIPTIONS,
 } from "@/app/api/chat/const";
 import anthropicClient from "@/lib/agents/anthropic/client";
 
 async function translator(prompt: string): Promise<string> {
-  const { text: response } = await generateText({
-    model: anthropicClient.model,
-    system: TRANSLATOR_PROMPT,
-    prompt: `Translate this: ${prompt}`,
-  });
-  return response;
+  const response = await fetch(
+    `https://api.mymemory.translated.net/get?q=${encodeURIComponent(prompt)}&langpair=uz|en`
+  );
+  const data = await response.json();
+  return data.responseData.translatedText as string;
 }
 
 async function generator(question: string, schema: Schema[]): Promise<string> {

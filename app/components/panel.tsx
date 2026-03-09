@@ -76,7 +76,7 @@ export default function Panel() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.2, delay: i * 0.05 }}
-                className="h-9 rounded-md bg-sidebar-accent/50 animate-pulse"
+                className="h-8 rounded-md bg-sidebar-accent/80 animate-pulse"
               />
             ))}
           </div>

@@ -11,7 +11,7 @@ class AnthropicClient {
 
   constructor(options?: AnthropicClientOptions) {
     const provider = createAnthropic({ apiKey: options?.apiKey });
-    this._model = provider(options?.model ?? "claude-haiku-4-5-20251001");
+    this._model = provider(options?.model ?? "claude-haiku-4-5");
   }
 
   get model(): LanguageModel {

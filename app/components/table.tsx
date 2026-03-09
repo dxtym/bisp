@@ -11,8 +11,8 @@ interface TableProps {
 
 export default function Table({ name, columns }: TableProps) {
   return (
-    <Collapsible className="rounded-md bg-sidebar-accent/50">
-      <div className="flex items-center justify-between py-1 px-2">
+    <Collapsible className="rounded-md bg-sidebar-accent/80">
+      <div className="flex items-center justify-between py-0.5 px-2">
         <div className="flex items-center gap-2">
           <div className="rounded-full bg-green-500 size-2" />
           <span className="text-sm font-medium">{name}</span>

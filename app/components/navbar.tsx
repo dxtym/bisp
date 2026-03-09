@@ -2,7 +2,7 @@ import { LuBookOpen } from "react-icons/lu";
 import { Button } from "./ui/button";
 import Link from "next/link";
 
-export default function Navbar({ showSignIn = true }: { showSignIn?: boolean }) {
+export default function Navbar() {
   return (
     <nav className="my-5 mx-[25%]">
       <div className="mx-auto backdrop-blur-lg border border-border rounded-md px-4 py-3 shadow-lg">
@@ -13,13 +13,11 @@ export default function Navbar({ showSignIn = true }: { showSignIn?: boolean }) 
               Kutoob
             </div>
           </div>
-          {showSignIn && (
-            <Link href="/sign-in">
-              <Button variant="default" className="px-4 py-2 rounded-sm">
-                Kirish
-              </Button>
-            </Link>
-          )}
+          <Link href="/sign-in">
+            <Button variant="default" className="px-4 py-2 rounded-sm">
+              Kirish
+            </Button>
+          </Link>
         </div>
       </div>
     </nav>

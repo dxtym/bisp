@@ -41,7 +41,7 @@ function Item({ c, isActive, isDeleting, onSelect, onDelete, onTitleSave }: Item
     <SidebarMenuItem key={c.id}>
       <div
         className={cn(
-          "group/item flex w-full items-center gap-2 rounded-sm py-2 px-3 text-sm transition-colors",
+          "group/item flex w-full items-center gap-2 rounded-sm py-1 px-3 text-sm transition-colors",
           "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
           isActive && "bg-sidebar-accent font-medium text-sidebar-accent-foreground",
           isDeleting && "opacity-50 pointer-events-none animate-pulse"

@@ -16,16 +16,15 @@ import {
   AGENT_PROMPT,
   GENERATOR_PROMPT,
   TRANSLATOR_PROMPT,
+  TOOL_DESCRIPTIONS,
 } from "@/app/api/chat/const";
-// import openAIClient from "@/lib/agents/openai/client";
-// import ollamaClient from "@/lib/agents/ollama/client";
 import anthropicClient from "@/lib/agents/anthropic/client";
 
 async function translator(prompt: string): Promise<string> {
   const { text: response } = await generateText({
     model: anthropicClient.model,
     system: TRANSLATOR_PROMPT,
-    prompt: prompt,
+    prompt: `Translate this: ${prompt}`,
   });
   return response;
 }
@@ -35,18 +34,10 @@ async function generator(question: string, schema: Schema[]): Promise<string> {
   const { text: response } = await generateText({
     model: anthropicClient.model,
     system: GENERATOR_PROMPT,
-    prompt: `Given the schema: ${metadata} Answer the question: ${question}`,
+    prompt: `Schema: ${metadata} Answer this: ${question}`,
   });
   return response;
 }
-
-// async function generator(question: string, schema: Schema[]): Promise<string> {
-//   const metadata = schema.map((t) => `${t.table}: ${t.columns.join(", ")}`).join("\n");
-//   const { text: response } = await ollamaClient.generate(
-//     `Given the schema: ${metadata} Answer the question: ${question}`,
-//   );
-//   return response;
-// }
 
 export async function POST(req: Request) {
   try {
@@ -74,13 +65,13 @@ export async function POST(req: Request) {
     } catch (error) {
       return NextResponse.json({
         success: false,
-        message: error instanceof Error ? error.message : "Something went wrong",
+        message: error instanceof Error ? error.message : "Xatolik yuz berdi",
       }, { status: 400 });
     }
 
     const hasQuota = await userRepository.checkAndDecrementQueryCount(session.user.id);
     if (!hasQuota) {
-      return NextResponse.json({ message: "Out of quota" }, { status: 403 });
+      return NextResponse.json({ message: "Hisobingizda so'rovlar tugagan" }, { status: 403 });
     }
 
     const result = streamText({
@@ -89,15 +80,24 @@ export async function POST(req: Request) {
       messages: await convertToModelMessages(messages),
       tools: {
         translator: tool({
-          inputSchema: z.object({ prompt: z.string() }),
+          description: TOOL_DESCRIPTIONS.translator.tool,
+          inputSchema: z.object({
+            prompt: z.string().describe(TOOL_DESCRIPTIONS.translator.prompt),
+          }),
           execute: async ({ prompt }) => ({ translation: await translator(prompt) }),
         }),
         generator: tool({
-          inputSchema: z.object({ question: z.string() }),
+          description: TOOL_DESCRIPTIONS.generator.tool,
+          inputSchema: z.object({
+            question: z.string().describe(TOOL_DESCRIPTIONS.generator.question),
+          }),
           execute: async ({ question }) => ({ generation: await generator(question, schema) }),
         }),
         executor: tool({
-          inputSchema: z.object({ query: z.string() }),
+          description: TOOL_DESCRIPTIONS.executor.tool,
+          inputSchema: z.object({
+            query: z.string().describe(TOOL_DESCRIPTIONS.executor.query),
+          }),
           needsApproval: true,
           execute: async ({ query }) => {
             try {
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
               return {
                 result: null,
                 success: false,
-                error: error instanceof Error ? error.message : "Something went wrong",
+                error: error instanceof Error ? error.message : "Xatolik yuz berdi",
               };
             }
           },
@@ -119,12 +119,12 @@ export async function POST(req: Request) {
     });
 
     return result.toUIMessageStreamResponse({
-      onError: (error) => (error instanceof Error ? error.message : "Xatolik"),
+      onError: (error) => (error instanceof Error ? error.message : "Xatolik yuz berdi"),
     });
   } catch (error) {
     return NextResponse.json({
       success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
+      message: error instanceof Error ? error.message : "Xatolik yuz berdi",
     }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { memo, useEffect, useRef } from "react"
 import { UIMessage, useChat } from "@ai-sdk/react"
 import {
   DefaultChatTransport,
@@ -22,19 +22,20 @@ import { IMessage } from "@/lib/mongodb/models/conversation"
 import { nanoid } from "nanoid"
 import { toast } from "sonner"
 import { STORAGE_KEY } from "@/lib/store/slices/connection"
+import { Shimmer } from "./ai-elements/shimmer"
 
-function Thinking() {
+const Thinking = memo(function Thinking() {
   return (
     <Message from="assistant">
       <MessageContent>
         <div className="flex items-center gap-2 text-muted-foreground">
-          <LuLightbulb className="size-4 animate-caret-blink" />
-          <span>Fikrlayapman...</span>
+          <LuLightbulb className="size-4 animate-pulse" />
+          <Shimmer>Fikrlayapman...</Shimmer>
         </div>
       </MessageContent>
     </Message>
   )
-}
+})
 
 export default function Chat() {
   const messageRef = useRef<string>("");

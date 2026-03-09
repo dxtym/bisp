@@ -7,11 +7,13 @@ export const STORAGE_KEY = "storage_key";
 interface ConnectionState {
   url: string;
   schema: Schema[];
+  loading: boolean;
 }
 
 const initialState: ConnectionState = {
   url: (typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null) || "",
   schema: [],
+  loading: false,
 };
 
 export const getSchema = createAsyncThunk(
@@ -44,8 +46,15 @@ const connectionSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(getSchema.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(getSchema.fulfilled, (state, action) => {
         state.schema = action.payload;
+        state.loading = false;
+      })
+      .addCase(getSchema.rejected, (state) => {
+        state.loading = false;
       })
   },
 });
@@ -54,5 +63,6 @@ export const { setUrl, clearUrl } = connectionSlice.actions;
 
 export const selectUrl = (state: RootState) => state.connection.url;
 export const selectSchema = (state: RootState) => state.connection.schema;
+export const selectLoading = (state: RootState) => state.connection.loading;
 
 export default connectionSlice.reducer;

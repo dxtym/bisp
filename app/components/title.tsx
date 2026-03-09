@@ -136,7 +136,6 @@ export default function Title({
           className={cn(
             "h-4 w-4 p-0 opacity-0 group-hover/title:opacity-100 group-hover/item:opacity-100",
             "text-muted-foreground hover:text-foreground hover:bg-muted",
-            isActive && "opacity-100"
           )}
         >
           <LuPencil className="h-3 w-3" />

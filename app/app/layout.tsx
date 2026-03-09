@@ -24,7 +24,7 @@ const geistMono = Geist_Mono({
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <SessionProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <ThemeProvider
             attribute="class"

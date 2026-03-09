@@ -26,14 +26,13 @@ import { cn } from "@/lib/utils";
 import Title from "@/components/title";
 import Profile from "@/components/profile";
 import Header from "@/components/header";
-import Modal from "@/components/modal";
 
 interface ItemProps {
   c: { id: string; title: string }
   isActive: boolean
   isDeleting: boolean
   onSelect: () => void
-  onDelete: (id: string, title: string) => void
+  onDelete: (id: string) => void
   onTitleSave: (id: string, title: string) => Promise<void>
 }
 
@@ -71,7 +70,7 @@ function Item({ c, isActive, isDeleting, onSelect, onDelete, onTitleSave }: Item
           )}
           onClick={(e) => {
             e.stopPropagation();
-            onDelete(c.id, c.title);
+            onDelete(c.id);
           }}
           disabled={isDeleting}
         >
@@ -84,12 +83,7 @@ function Item({ c, isActive, isDeleting, onSelect, onDelete, onTitleSave }: Item
 
 export default function Menu() {
   const { data: session } = useSession();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [conversationToDelete, setConversationToDelete] = useState<{
-    id: string;
-    title: string;
-  } | null>(null);
 
   const dispatch = useAppDispatch();
   const conversations = useAppSelector(selectConversations);
@@ -101,19 +95,10 @@ export default function Menu() {
     }
   }, [session, dispatch]);
 
-  const handleDeleteClick = (id: string, title: string) => {
-    setConversationToDelete({ id, title });
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!conversationToDelete) return;
-
-    setDeletingId(conversationToDelete.id);
+  const handleDeleteClick = async (id: string) => {
+    setDeletingId(id);
     try {
-      await dispatch(removeConversation(conversationToDelete.id));
-      setDeleteDialogOpen(false);
-      setConversationToDelete(null);
+      await dispatch(removeConversation(id));
     } finally {
       setDeletingId(null);
     }
@@ -124,46 +109,39 @@ export default function Menu() {
   };
 
   return (
-    <>
-      <Sidebar variant="inset" collapsible="offcanvas">
-        <SidebarHeader>
-          <Header
-            onCreate={() => {
-              if (!session?.user?.id) return;
-              dispatch(createConversation({ userId: session.user.id, title: "Yangi suhbat" }));
-            }}
-          />
-        </SidebarHeader>
-        <SidebarContent className="px-2">
-          <SidebarMenu>
-            {conversations.length === 0 ? (
-              <div className="px-2 py-4 text-sm text-muted-foreground text-center">
-                Suhbatlar mavjud emas.
-              </div>
-            ) : (
-              conversations.map((c) => (
-                <Item
-                  key={c.id}
-                  c={c}
-                  isActive={c.id === conversation?.id}
-                  isDeleting={deletingId === c.id}
-                  onSelect={() => dispatch(setConversation(c))}
-                  onDelete={handleDeleteClick}
-                  onTitleSave={handleTitleSave}
-                />
-              ))
-            )}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter>
-          <Profile />
-        </SidebarFooter>
-      </Sidebar>
-      <Modal
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        onConfirm={handleDeleteConfirm}
-      />
-    </>
+    <Sidebar variant="inset" collapsible="offcanvas">
+      <SidebarHeader>
+        <Header
+          onCreate={() => {
+            if (!session?.user?.id) return;
+            dispatch(createConversation({ userId: session.user.id, title: "Yangi suhbat" }));
+          }}
+        />
+      </SidebarHeader>
+      <SidebarContent className="px-2">
+        <SidebarMenu>
+          {conversations.length === 0 ? (
+            <div className="px-2 py-4 text-sm text-muted-foreground text-center">
+              Suhbatlar mavjud emas.
+            </div>
+          ) : (
+            conversations.map((c) => (
+              <Item
+                key={c.id}
+                c={c}
+                isActive={c.id === conversation?.id}
+                isDeleting={deletingId === c.id}
+                onSelect={() => dispatch(setConversation(c))}
+                onDelete={handleDeleteClick}
+                onTitleSave={handleTitleSave}
+              />
+            ))
+          )}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarFooter>
+        <Profile />
+      </SidebarFooter>
+    </Sidebar>
   )
 }

@@ -2,7 +2,7 @@
 
 export default function Footer() {
   return (
-    <div className="text-center text-white/60 text-sm">
+    <div className="text-center text-muted-foreground text-sm">
       Kutoob | 2026
     </div>
   );

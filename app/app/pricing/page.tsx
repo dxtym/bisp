@@ -44,7 +44,7 @@ const plans = [
 
 export default function PricingPage() {
   return (
-    <div className="relative min-h-screen text-white">
+    <div className="relative min-h-screen text-foreground">
       <div className="fixed top-[10%] bottom-[10%] left-[20%] right-[20%] -z-10">
         <div
           className="h-full w-full"
@@ -61,7 +61,7 @@ export default function PricingPage() {
       </div>
 
       <header className="fixed top-0 left-0 right-0 z-50">
-        <Navbar />
+        <Navbar showSignIn={false} />
       </header>
 
       <main className="min-h-screen flex items-center justify-center px-4 -mt-16">
@@ -97,15 +97,15 @@ export default function PricingPage() {
                 custom={2 + i}
                 className={`flex-1 rounded-xl border bg-muted p-6 space-y-6 ${
                   plan.featured
-                    ? "border-neutral-500 shadow-[0_0_30px_rgba(255,255,255,0.06)]"
-                    : "border-neutral-700"
+                    ? "border-border/60 shadow-[0_0_30px_rgba(0,0,0,0.08)] dark:shadow-[0_0_30px_rgba(255,255,255,0.06)]"
+                    : "border-border"
                 }`}
               >
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold">{plan.name}</h2>
                     {plan.featured && (
-                      <span className="text-xs px-2 py-1 rounded-full bg-green-900/20 text-green-400 border border-green-800">
+                      <span className="text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
                         Tavsiya etiladi
                       </span>
                     )}
@@ -116,7 +116,7 @@ export default function PricingPage() {
                   </div>
                 </div>
 
-                <hr className="border-neutral-700" />
+                <hr className="border-border" />
 
                 <ul className="space-y-3">
                   {plan.benefits.map((b) => (
@@ -130,7 +130,7 @@ export default function PricingPage() {
 
                 <Button
                   variant="secondary"
-                  className="w-full border border-neutral-500 hover:border-neutral-600"
+                  className="w-full border border-border hover:border-border/70"
                 >
                   {plan.name} ni tanlash
                 </Button>

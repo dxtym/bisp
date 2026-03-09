@@ -48,14 +48,14 @@ export default function Hero() {
         custom={2}
       >
         <Link href="/sign-in">
-          <Button variant="default" size="lg" className="px-8 border border-neutral-600 hover:border-neutral-500">
+          <Button variant="default" size="lg" className="px-8 border border-border/40 hover:border-border/60">
             Kirish
           </Button>
         </Link>
         <Button
           variant="secondary"
           size="lg"
-          className="px-8 border border-neutral-500 hover:border-neutral-600"
+          className="px-8 border border-border hover:border-border/70"
           onClick={() => window.open("https://calendly.com", "_blank")}
         >
           Aloqa
@@ -68,7 +68,7 @@ export default function Hero() {
         animate="visible"
         custom={3}
       >
-        <p className="text-sm text-neutral-500 uppercase tracking-wider">
+        <p className="text-sm text-muted-foreground uppercase tracking-wider">
           Hamkorlar
         </p>
         <div className="flex flex-row items-center gap-8 pt-3 opacity-100">

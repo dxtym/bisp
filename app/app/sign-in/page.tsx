@@ -55,7 +55,7 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border-neutral-700" 
+                className="border-border"
               />
             </div>
             <div className="space-y-2">
@@ -67,24 +67,24 @@ export default function Page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="border-neutral-700"
+                className="border-border"
               />
             </div>
             {error && (
               <p className="text-sm text-destructive">{error}</p>
             )}
-            <Button type="submit" variant="secondary" className="w-full mt-3 border border-neutral-500 hover:border-neutral-600" disabled={loading}>
+            <Button type="submit" variant="secondary" className="w-full mt-3 border border-border hover:border-border/70" disabled={loading}>
               {loading ? "Kirish..." : "Kirish"}
             </Button>
           </form>
           <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-neutral-700" />
+            <div className="h-px flex-1 bg-border" />
             <span className="text-sm text-muted-foreground">yoki</span>
-            <div className="h-px flex-1 bg-neutral-700" />
+            <div className="h-px flex-1 bg-border" />
           </div>
           <Button
             variant="secondary"
-            className="w-full border border-neutral-500 hover:border-neutral-600"
+            className="w-full border border-border hover:border-border/70"
             onClick={() => signIn("google", { callbackUrl: "/" })}
           >
             <FaGoogle className="size-4" />

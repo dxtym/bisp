@@ -11,7 +11,7 @@ interface TableProps {
 
 export default function Table({ name, columns }: TableProps) {
   return (
-    <Collapsible className="border border-neutral-700 rounded-md">
+    <Collapsible className="rounded-md bg-sidebar-accent/50">
       <div className="flex items-center justify-between py-1 px-2">
         <div className="flex items-center gap-2">
           <div className="rounded-full bg-green-500 size-2" />
@@ -30,7 +30,7 @@ export default function Table({ name, columns }: TableProps) {
         {columns.map((column) => (
           <div
             key={column}
-            className="px-2 py-1.5 text-xs font-mono bg-muted/50 rounded"
+            className="px-2 py-1.5 text-xs font-mono bg-background rounded"
           >
             {column}
           </div>

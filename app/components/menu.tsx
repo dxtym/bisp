@@ -126,7 +126,9 @@ export default function Menu() {
           {isLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
               <SidebarMenuItem key={i}>
-                <Skeleton className="h-7 w-full rounded-sm" />
+                <div className="flex w-full items-center gap-2 rounded-sm py-1 px-2">
+                  <Skeleton className="h-4 flex-1 rounded-sm py-4" />
+                </div>
               </SidebarMenuItem>
             ))
           ) : conversations.length === 0 ? (

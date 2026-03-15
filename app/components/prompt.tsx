@@ -28,6 +28,7 @@ import { selectUrl } from "@/lib/store/slices/connection";
 import { SiClickhouse, SiPostgresql } from "react-icons/si";
 import { CheckIcon } from "lucide-react";
 import type { DbType } from "@/lib/db/types";
+import { detectDbType } from "@/lib/db/factory";
 
 type DbOption = {
   type: DbType;
@@ -40,16 +41,6 @@ const DB_OPTIONS: DbOption[] = [
   { type: "postgres",   label: "PostgreSQL", Icon: SiPostgresql },
 ];
 
-function detectDbType(url: string): DbType {
-  const lower = url.toLowerCase();
-  switch (true) {
-    case lower.startsWith("postgres://"):
-    case lower.startsWith("postgresql://"):
-      return "postgres";
-    default:
-      return "clickhouse";
-  }
-}
 
 interface PromptProps {
   status: ChatStatus;

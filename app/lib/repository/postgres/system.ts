@@ -1,6 +1,6 @@
 import { PostgresClient } from "@/lib/postgres/client";
 import { ISystemRepository } from "@/lib/db/types";
-import { Table, Column, Schema } from "@/lib/repository/common";
+import type { Table, Column, Schema } from "@/lib/repository/common";
 
 export class PostgresSystemRepository implements ISystemRepository {
   private readonly client: PostgresClient;

@@ -25,12 +25,15 @@ export class PostgresSystemRepository implements ISystemRepository {
 
   private async getColumns(table: string): Promise<Column[]> {
     try {
-      const rows = await this.client.executeQuery(`
+      const rows = await this.client.executeQuery(
+        `
         SELECT column_name AS name, data_type AS type
         FROM information_schema.columns
         WHERE table_schema = 'public'
-          AND table_name = '${table.replace(/'/g, "''")}'
-      `);
+          AND table_name = $1
+      `,
+        [table],
+      );
       return rows as Column[];
     } catch (error) {
       throw new Error(`Get columns error: ${error}`);

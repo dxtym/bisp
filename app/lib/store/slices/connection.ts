@@ -1,6 +1,6 @@
 import type { RootState } from "../store";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import { Schema } from "@/lib/repository/system";
+import { Schema } from "@/lib/repository/common";
 
 export const STORAGE_KEY = "storage_key";
 

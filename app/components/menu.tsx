@@ -7,6 +7,7 @@ import {
   fetchConversations,
   selectConversations,
   selectConversation,
+  selectIsLoading,
   setConversation,
   createConversation,
   removeConversation,
@@ -26,6 +27,7 @@ import { cn } from "@/lib/utils";
 import Title from "@/components/title";
 import Profile from "@/components/profile";
 import Header from "@/components/header";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ItemProps {
   c: { id: string; title: string }
@@ -88,6 +90,7 @@ export default function Menu() {
   const dispatch = useAppDispatch();
   const conversations = useAppSelector(selectConversations);
   const conversation = useAppSelector(selectConversation);
+  const isLoading = useAppSelector(selectIsLoading);
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -120,7 +123,13 @@ export default function Menu() {
       </SidebarHeader>
       <SidebarContent className="px-2">
         <SidebarMenu>
-          {conversations.length === 0 ? (
+          {isLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <SidebarMenuItem key={i}>
+                <Skeleton className="h-7 w-full rounded-sm" />
+              </SidebarMenuItem>
+            ))
+          ) : conversations.length === 0 ? (
             <div className="px-2 py-4 text-sm text-muted-foreground text-center">
               Suhbatlar mavjud emas.
             </div>

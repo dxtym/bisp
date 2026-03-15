@@ -1,12 +1,13 @@
 "use client"
 
-import { memo, useEffect, useRef } from "react"
+import { memo, useEffect, useRef, useState } from "react"
 import { UIMessage, useChat } from "@ai-sdk/react"
 import {
   DefaultChatTransport,
   lastAssistantMessageIsCompleteWithApprovalResponses
 } from "ai"
-import { LuMessageSquare, LuLightbulb } from "react-icons/lu"
+import { LuMessageSquare } from "react-icons/lu"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   Conversation,
   ConversationContent,
@@ -39,6 +40,7 @@ const Thinking = memo(function Thinking() {
 export default function Chat() {
   const messageRef = useRef<string>("");
   const conversationRef = useRef<string>("");
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
   const { messages, status, sendMessage, setMessages, addToolApprovalResponse } = useChat({
     transport: new DefaultChatTransport({
@@ -66,6 +68,7 @@ export default function Chat() {
 
     if (conversationRef.current === conversation.id) return
 
+    setIsLoadingMessages(true)
     const currentMessages = conversation.messages.map((m: IMessage) => ({
       id: nanoid(),
       role: m.role,
@@ -75,6 +78,7 @@ export default function Chat() {
     setMessages(currentMessages)
     messageRef.current = currentMessages[currentMessages.length - 1]?.id || ""
     conversationRef.current = conversation.id
+    setIsLoadingMessages(false)
   }, [conversation, setMessages]);
 
   useEffect(() => {
@@ -118,7 +122,14 @@ export default function Chat() {
       <div className="flex justify-center overflow-hidden">
         <Conversation className="w-full max-w-2xl">
           <ConversationContent className="h-full">
-            {messages.length === 0 ? (
+            {isLoadingMessages ? (
+              <div className="flex flex-col gap-3 p-4">
+                <Skeleton className="h-10 w-3/4 ml-auto" />
+                <Skeleton className="h-16 w-2/3" />
+                <Skeleton className="h-10 w-1/2 ml-auto" />
+                <Skeleton className="h-20 w-3/4" />
+              </div>
+            ) : messages.length === 0 ? (
               <ConversationEmptyState
                 title="Xabarlar yo'q"
                 description="Savol bering"

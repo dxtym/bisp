@@ -20,11 +20,11 @@ const TOOL_DESCRIPTIONS = {
     prompt: "Raw user query",
   },
   generator: {
-    tool: "Generates a valid SQL for ClickHouse",
+    tool: "Generates a valid SQL query",
     question: "Translated user query",
   },
   executor: {
-    tool: "Executes a SQL query against the ClickHouse",
+    tool: "Executes a SQL query against the database",
     query: "Valid SQL query",
   },
 }

@@ -10,8 +10,8 @@ import {
 } from "ai";
 import { auth } from "@/auth";
 import { userRepository } from "@/lib/repository/user";
-import { ClickHouseWebClient } from "@/lib/clickhouse/client";
-import { Schema, SystemRepository } from "@/lib/repository/system";
+import { detectDbType, createDbClient, createSystemRepository } from "@/lib/db/factory";
+import { Schema } from "@/lib/repository/system";
 import {
   AGENT_PROMPT,
   GENERATOR_PROMPT,
@@ -57,9 +57,10 @@ export async function POST(req: Request) {
 
     let schema: Schema[] = [];
     try {
-      const client = new ClickHouseWebClient(url);
-      const reposistory = new SystemRepository(client);
-      schema = await reposistory.loadSchema();
+      const type = detectDbType(url);
+      const client = createDbClient(url);
+      const repository = createSystemRepository(client, type);
+      schema = await repository.loadSchema();
     } catch (error) {
       return NextResponse.json({
         success: false,
@@ -103,9 +104,8 @@ export async function POST(req: Request) {
           needsApproval: true,
           execute: async ({ query }) => {
             try {
-              const client = new ClickHouseWebClient(url);
-              const response = await client.query({ query });
-              const result = await response.json();
+              const client = createDbClient(url);
+              const result = await client.executeQuery(query);
               return { result: result, success: true };
             } catch (error) {
               return {

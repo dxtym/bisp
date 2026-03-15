@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
-import { ClickHouseWebClient } from "@/lib/clickhouse/client";
+import { createDbClient } from "@/lib/db/factory";
+import { NextRequest, NextResponse } from "next/server";
 
 const QueryRequest = z.object({
   query: z.string(),
@@ -20,9 +19,8 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const client = new ClickHouseWebClient(url);
-    const result = await client.query({ query });
-    const data = await result.json();
+    const client = createDbClient(url);
+    const data = await client.executeQuery(query);
 
     return NextResponse.json({
       success: true,

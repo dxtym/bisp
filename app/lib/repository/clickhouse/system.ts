@@ -1,25 +1,10 @@
-import { z } from "zod";
 
-import { ClickHouseWebClient } from "../../lib/clickhouse/client";
+import { ClickHouseWebClient } from "@/lib/clickhouse/client";
+import { ISystemRepository } from "@/lib/db/types";
+import { Table, Column, Schema } from "@/lib/repository/common";
 
-const Table = z.object({
-  name: z.string(),
-})
-export type Table = z.infer<typeof Table>;
 
-const Column = z.object({
-  name: z.string(),
-  type: z.string(),
-})
-export type Column = z.infer<typeof Column>;
-
-const Schema = z.object({
-  table: z.string(),
-  columns: z.array(z.string()),
-})
-export type Schema = z.infer<typeof Schema>;
-
-export class SystemRepository {
+export class ClickHouseSystemRepository implements ISystemRepository {
   private readonly client: ClickHouseWebClient;
 
   constructor(client: ClickHouseWebClient) {

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { ClickHouseWebClient } from "@/lib/clickhouse/client";
-import { SystemRepository } from "@/lib/repository/system";
+import { detectDbType, createDbClient, createSystemRepository } from "@/lib/db/factory";
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,8 +13,9 @@ export async function GET(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const client = new ClickHouseWebClient(url);
-    const systemRepository = new SystemRepository(client);
+    const type = detectDbType(url);
+    const client = createDbClient(url);
+    const systemRepository = createSystemRepository(client, type);
     const schema = await systemRepository.loadSchema();
 
     return NextResponse.json({

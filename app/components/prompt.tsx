@@ -27,8 +27,7 @@ import { useAppSelector } from "@/lib/store/hooks";
 import { selectUrl } from "@/lib/store/slices/connection";
 import { SiClickhouse, SiPostgresql } from "react-icons/si";
 import { CheckIcon } from "lucide-react";
-import type { DbType } from "@/lib/db/types";
-import { detectDbType } from "@/lib/db/factory";
+import { type DbType, detectDbType } from "@/lib/db/types";
 
 type DbOption = {
   type: DbType;
@@ -53,15 +52,13 @@ export default function Prompt({ onSubmit, status }: PromptProps) {
   const url = useAppSelector(selectUrl);
 
   const dbType = url ? detectDbType(url) : "clickhouse";
-  const dbLabel = dbType === "postgres" ? "PostgreSQL" : "ClickHouse";
+  const { Icon: DbIcon, label: dbLabel } = DB_OPTIONS.find((o) => o.type === dbType)!;
 
   const handleSubmit = useCallback((message: PromptInputMessage) => {
     if (!message.text) return;
     onSubmit(message);
     setText('');
   }, [onSubmit, setText]);
-
-  const { Icon: DbIcon } = DB_OPTIONS.find((o) => o.type === dbType)!;
 
   return (
     <div className="flex my-3">

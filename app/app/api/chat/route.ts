@@ -11,7 +11,7 @@ import {
 import { auth } from "@/auth";
 import { userRepository } from "@/lib/repository/user";
 import { detectDbType, createDbClient, createSystemRepository } from "@/lib/db/factory";
-import { Schema } from "@/lib/repository/system";
+import { Schema } from "@/lib/repository/common";
 import {
   AGENT_PROMPT,
   GENERATOR_PROMPT,

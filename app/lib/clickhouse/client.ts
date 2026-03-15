@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-import { createClient, PingResult, QueryParams, ResultSet } from "@clickhouse/client-web";
+import { createClient, QueryParams, ResultSet } from "@clickhouse/client-web";
+import { DbClient } from "@/lib/db/types";
 
 const ClickHouseConfig = z.object({
   url: z.string(),
@@ -10,7 +11,7 @@ const ClickHouseConfig = z.object({
 });
 type ClickHouseConfig = z.infer<typeof ClickHouseConfig>;
 
-export class ClickHouseWebClient {
+export class ClickHouseWebClient implements DbClient {
   private readonly client: ReturnType<typeof createClient>;
 
   constructor(url: string) {
@@ -41,7 +42,13 @@ export class ClickHouseWebClient {
     return this.client.query(params);
   }
 
-  public async ping(): Promise<PingResult> {
-    return this.client.ping();
+  public async executeQuery(sql: string): Promise<Record<string, unknown>[]> {
+    const result = await this.client.query({ query: sql, format: "JSONEachRow" });
+    return result.json() as Promise<Record<string, unknown>[]>;
+  }
+
+  public async ping(): Promise<boolean> {
+    const result = await this.client.ping();
+    return result.success;
   }
 }

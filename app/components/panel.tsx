@@ -47,7 +47,7 @@ export default function Panel() {
             <InputGroupInput
               value={url}
               onChange={(e) => dispatch(setUrl(e.target.value))}
-              placeholder="https://username:password@host:port/database"
+              placeholder="Ma'lumotlar bazasi ulanish manzili"
               className="text-xs flex-1"
               disabled={loading}
             />

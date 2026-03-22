@@ -1,4 +1,4 @@
-import { Database } from "bun:sqlite";
+import Database from "better-sqlite3";
 import * as XLSX from "xlsx";
 import { Schema, BlobFile } from "@/lib/repository/common";
 
@@ -37,17 +37,18 @@ export async function executeQueryFromUrls(
       if (rows.length === 0) continue;
       const headers = rows[0].map(String);
       const cols = headers.map((h) => `"${h.replace(/"/g, '""')}" TEXT`).join(", ");
-      db.run(`CREATE TABLE "${name}" (${cols})`);
+      db.exec(`CREATE TABLE "${name}" (${cols})`);
       const insert = db.prepare(
         `INSERT INTO "${name}" VALUES (${headers.map(() => "?").join(", ")})`
       );
-      db.run("BEGIN");
-      for (const row of rows.slice(1)) {
-        insert.run(...headers.map((_, i) => String((row as unknown[])[i] ?? "")));
-      }
-      db.run("COMMIT");
+      const insertMany = db.transaction((dataRows: string[][]) => {
+        for (const row of dataRows) {
+          insert.run(...headers.map((_, i) => String(row[i] ?? "")));
+        }
+      });
+      insertMany(rows.slice(1) as string[][]);
     }
-    return db.query(sql).all() as Record<string, unknown>[];
+    return db.prepare(sql).all() as Record<string, unknown>[];
   } finally {
     db.close();
   }

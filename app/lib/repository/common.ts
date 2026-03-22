@@ -11,3 +11,8 @@ export type Schema = {
   table: string;
   columns: string[];
 };
+
+export type BlobFile = {
+  name: string;
+  url: string;
+};

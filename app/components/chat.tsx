@@ -21,8 +21,9 @@ import { selectConversation, addMessage } from "@/lib/store/slices/conversation"
 import { IMessage } from "@/lib/mongodb/models/conversation"
 import { nanoid } from "nanoid"
 import { toast } from "sonner"
-import { STORAGE_KEY } from "@/lib/store/slices/connection"
+import { BlobFile } from "@/lib/repository/common"
 import { Shimmer } from "./ai-elements/shimmer"
+import { STORAGE_KEY, FILE_STORAGE_KEY } from "@/lib/store/slices/connection"
 
 const Thinking = memo(function Thinking() {
   return (
@@ -43,9 +44,18 @@ export default function Chat() {
   const { messages, status, sendMessage, setMessages, addToolApprovalResponse } = useChat({
     transport: new DefaultChatTransport({
       api: "/api/chat",
-      body: () => ({
-        url: localStorage.getItem(STORAGE_KEY)
-      })
+      body: () => {
+        const url = localStorage.getItem(STORAGE_KEY) || undefined;
+        let blobs: BlobFile[] | undefined;
+        try {
+          const raw = localStorage.getItem(FILE_STORAGE_KEY);
+          if (raw) {
+            const data = JSON.parse(raw);
+            if (data?.blobs) blobs = data.blobs;
+          }
+        } catch { }
+        return { url, blobs };
+      }
     }),
     onError: (error) => {
       toast.error(error.message || "Xatolik yuz berdi");

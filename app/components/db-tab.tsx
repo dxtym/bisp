@@ -38,7 +38,7 @@ export default function DbTab() {
       <InputGroupInput
         value={url}
         onChange={(e) => dispatch(setUrl(e.target.value))}
-        placeholder="Malumotlar ombori ulanish manzili"
+        placeholder="Malumotlar ombori ulanish manzili kiriting"
         className="text-xs flex-1"
         disabled={loading}
       />

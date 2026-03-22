@@ -16,8 +16,8 @@ const fadeUp = {
 const plans = [
   {
     name: "Pro",
-    price: "$9",
-    period: "/oy",
+    price: "99,000",
+    period: "so'm/oy",
     featured: false,
     benefits: [
       { label: "So'rovlar", value: "50 ta/kun" },
@@ -28,8 +28,8 @@ const plans = [
   },
   {
     name: "Max",
-    price: "$29",
-    period: "/oy",
+    price: "299,000",
+    period: "so'm/oy",
     featured: true,
     benefits: [
       { label: "So'rovlar", value: "Cheksiz" },
@@ -38,12 +38,24 @@ const plans = [
       { label: "Qo'llab-quvvatlash", value: "Qo'ng'iroq + Email" },
     ],
   },
+  {
+    name: "Team",
+    price: "799,000",
+    period: "so'm/oy",
+    featured: false,
+    benefits: [
+      { label: "Foydalanuvchilar", value: "10 tagacha" },
+      { label: "So'rovlar", value: "Cheksiz" },
+      { label: "Boshqaruv paneli", value: "Korporativ" },
+      { label: "Qo'llab-quvvatlash", value: "Shaxsiy menejer" },
+    ],
+  },
 ]
 
 export default function PricingPage() {
   return (
     <div className="relative min-h-screen text-foreground">
-      <div className="fixed top-[10%] bottom-[10%] left-[20%] right-[20%] -z-10">
+      <div className="fixed top-[10%] bottom-[10%] left-[20%] right-[20%] -z-10 pointer-events-none">
         <div
           className="h-full w-full"
           style={{
@@ -57,9 +69,9 @@ export default function PricingPage() {
           }}
         />
       </div>
-      <main className="min-h-screen flex items-center justify-center px-4 -mt-16">
-        <div className="w-full max-w-3xl mx-auto">
-          <div className="mb-10 text-center space-y-2">
+      <main className="min-h-screen flex items-center justify-center px-4">
+        <div className="w-full max-w-5xl mx-auto space-y-10">
+          <div className="text-center space-y-2">
             <motion.h1
               className="text-4xl font-bold tracking-tight"
               variants={fadeUp}
@@ -69,15 +81,6 @@ export default function PricingPage() {
             >
               Tariflar
             </motion.h1>
-            <motion.p
-              className="text-sm text-muted-foreground"
-              variants={fadeUp}
-              initial="hidden"
-              animate="visible"
-              custom={1}
-            >
-              O&apos;zingizga mos tarifni tanlang
-            </motion.p>
           </div>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             {plans.map((plan, i) => (

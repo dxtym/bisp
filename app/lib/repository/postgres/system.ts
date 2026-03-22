@@ -46,7 +46,7 @@ export class PostgresSystemRepository implements ISystemRepository {
         const columns = await this.getColumns(table.name);
         schema.push({
           table: table.name,
-          columns: columns.map((col) => col.name),
+          columns,
         });
       }
 

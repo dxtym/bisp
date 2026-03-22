@@ -30,7 +30,7 @@ async function translator(prompt: string): Promise<string> {
 }
 
 async function generator(question: string, schema: Schema[]): Promise<string> {
-  const metadata = schema.map((t) => `${t.table}: ${t.columns.join(", ")}`).join("\n");
+  const metadata = schema.map((t) => `${t.table}: ${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")}`).join("\n");
   const { text: response } = await generateText({
     model: anthropicClient.model,
     system: GENERATOR_PROMPT,

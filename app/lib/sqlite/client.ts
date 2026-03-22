@@ -18,7 +18,7 @@ export async function loadSchemaFromUrls(blobs: BlobFile[]): Promise<Schema[]> {
   return Promise.all(
     blobs.map(async ({ name, url }) => {
       const rows = await parseCsvFromUrl(url);
-      const columns = (rows[0] ?? []).map(String);
+      const columns = (rows[0] ?? []).map((col) => ({ name: String(col), type: "TEXT" }));
       return { table: name, columns };
     })
   );

@@ -1,6 +1,7 @@
 "use client"
 
 import { type ComponentType, useRef, useState, useCallback } from "react";
+import { Suggestions, Suggestion } from "@/components/ai-elements/suggestion";
 import {
   PromptInput,
   PromptInputBody,
@@ -37,9 +38,14 @@ type DbOption = {
 
 const DB_OPTIONS: DbOption[] = [
   { type: "clickhouse", label: "ClickHouse", Icon: SiClickhouse },
-  { type: "postgres",   label: "PostgreSQL", Icon: SiPostgresql },
+  { type: "postgres", label: "PostgreSQL", Icon: SiPostgresql },
 ];
 
+const SUGGESTIONS = [
+  "Eng kop sotilgan mahsulotlar qaysilar?",
+  "Oxirgi oyda daromad qancha boldi?",
+  "Faol foydalanuvchilar sonini korsat",
+];
 
 interface PromptProps {
   status: ChatStatus;
@@ -63,6 +69,13 @@ export default function Prompt({ onSubmit, status }: PromptProps) {
   return (
     <div className="flex my-3">
       <div className="w-full max-w-2xl mx-auto">
+        {!text && (
+          <Suggestions className="my-1">
+            {SUGGESTIONS.map((s) => (
+              <Suggestion key={s} suggestion={s} onClick={(v) => setText(v)} className="rounded-md" />
+            ))}
+          </Suggestions>
+        )}
         <PromptInput onSubmit={handleSubmit} className="mt-4">
           <PromptInputBody>
             <PromptInputTextarea

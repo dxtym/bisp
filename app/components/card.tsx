@@ -25,8 +25,8 @@ export default function PricingCard({
   return (
     <div
       className={cn(
-        "flex-1 rounded-xl border border-zinc-200 bg-white/60 shadow-sm backdrop-blur-sm dark:bg-zinc-900/50 dark:border-border p-6 space-y-6",
-        "transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-zinc-300 dark:hover:shadow-white/10 dark:hover:border-white/30",
+        "flex-1 rounded-xl border border-neutral-200 bg-white shadow-sm dark:bg-neutral-900 dark:border-border p-6 space-y-6",
+        "transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-neutral-300 dark:hover:shadow-white/10 dark:hover:border-white/30",
         featured
           ? "shadow-[0_0_30px_rgba(0,0,0,0.06)] dark:border-border/60 dark:shadow-[0_0_30px_rgba(255,255,255,0.06)]"
           : "dark:border-border"
@@ -59,9 +59,8 @@ export default function PricingCard({
       <Button
         variant="secondary"
         className={cn(
-          "w-full border border-zinc-200 transition-colors duration-200",
-          "hover:border-zinc-300 hover:bg-zinc-50",
-          "dark:border-border dark:bg-white dark:text-zinc-900 dark:hover:border-border/70 dark:hover:bg-white/90"
+          "w-full border border-neutral-200",
+          "dark:border-border dark:bg-white dark:text-zinc-900"
         )}
       >
         Tanlash

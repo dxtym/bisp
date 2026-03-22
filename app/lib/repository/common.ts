@@ -9,7 +9,7 @@ export type Column = {
 
 export type Schema = {
   table: string;
-  columns: string[];
+  columns: Column[];
 };
 
 export type BlobFile = {

@@ -8,6 +8,7 @@ import Table from "./table";
 import DbTab from "./db-tab";
 import FileTab from "./file-tab";
 import { Badge } from "./ui/badge";
+import { Database, FileSpreadsheet } from "lucide-react";
 
 export default function Panel() {
   const dispatch = useAppDispatch();
@@ -23,14 +24,14 @@ export default function Panel() {
         className="gap-0"
       >
         <div className="flex flex-col gap-3">
-          <TabsList className="w-full h-4">
-            <TabsTrigger value="database" className="flex-1 text-sm">Ombor</TabsTrigger>
-            <TabsTrigger value="file" className="flex-1 text-sm">Fayl</TabsTrigger>
+          <TabsList className="w-full !h-8 !rounded-sm">
+            <TabsTrigger value="database" className="flex-1 text-sm"><Database className="size-3.5" />Ombor</TabsTrigger>
+            <TabsTrigger value="file" className="flex-1 text-sm"><FileSpreadsheet className="size-3.5" />Fayl</TabsTrigger>
           </TabsList>
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-medium">Sozlama</p>
             {mode === "file" && (
-              <Badge variant="outline" className="text-green-500 border-green-500/30 bg-green-500/10 py-0 text-xs">Beta</Badge>
+              <Badge variant="outline" className="text-green-500 border-green-500/30 bg-green-500/10 py-0 text-xs rounded-sm">Beta</Badge>
             )}
           </div>
         </div>

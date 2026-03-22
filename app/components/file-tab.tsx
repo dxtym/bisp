@@ -59,7 +59,7 @@ export default function FileTab() {
         <InputGroup className="flex justify-center w-full">
           <InputGroupInput
             readOnly
-            placeholder="Excel fayl tanlang (.xlsx)"
+            placeholder="Excel fayl tanlang"
             className="text-xs flex-1 cursor-pointer"
             disabled={loading}
             onClick={() => fileInputRef.current?.click()}

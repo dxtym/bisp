@@ -126,7 +126,7 @@ export default function Menu() {
           {isLoading ? (
             Array.from({ length: 5 }).map((_, i) => (
               <SidebarMenuItem key={i}>
-                <div className="flex w-full items-center gap-2 rounded-sm py-1 px-2">
+                <div className="flex w-full items-center gap-2 rounded-sm py-0.5">
                   <Skeleton className="h-4 flex-1 rounded-sm py-4" />
                 </div>
               </SidebarMenuItem>

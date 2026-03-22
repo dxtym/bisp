@@ -1,5 +1,5 @@
 import type { IConversation, IMessage } from "@/lib/mongodb/models/conversation";
-import type { RootState } from "../store";
+import type { RootState } from "@/lib/store/store";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 
 interface ConversationState {

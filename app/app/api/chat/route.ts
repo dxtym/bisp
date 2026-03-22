@@ -12,6 +12,8 @@ import { auth } from "@/auth";
 import { userRepository } from "@/lib/repository/user";
 import { detectDbType, createDbClient, createSystemRepository } from "@/lib/db/factory";
 import { Schema } from "@/lib/repository/common";
+import * as duckdbClient from "@/lib/sqlite/client";
+import type { BlobFile } from "@/lib/repository/common";
 import {
   AGENT_PROMPT,
   GENERATOR_PROMPT,
@@ -46,21 +48,26 @@ export async function POST(req: Request) {
       }, { status: 401 });
     }
 
-    const { messages, url }: { messages: UIMessage[]; url?: string } = await req.json();
+    const { messages, url, blobs }: { messages: UIMessage[]; url?: string; blobs?: BlobFile[] } = await req.json();
+    const hasBlobs = !!(blobs?.length);
 
-    if (!url) {
+    if (!url && !hasBlobs) {
       return NextResponse.json({
         success: false,
-        message: "No connection URL provided",
+        message: "Ulanish manzili yoki fayl bering",
       }, { status: 400 });
     }
 
     let schema: Schema[] = [];
     try {
-      const type = detectDbType(url);
-      const client = createDbClient(url);
-      const repository = createSystemRepository(client, type);
-      schema = await repository.loadSchema();
+      if (hasBlobs) {
+        schema = await duckdbClient.loadSchemaFromUrls(blobs!);
+      } else {
+        const type = detectDbType(url!);
+        const client = createDbClient(url!);
+        const repository = createSystemRepository(client, type);
+        schema = await repository.loadSchema();
+      }
     } catch (error) {
       return NextResponse.json({
         success: false,
@@ -104,9 +111,10 @@ export async function POST(req: Request) {
           needsApproval: true,
           execute: async ({ query }) => {
             try {
-              const client = createDbClient(url);
-              const result = await client.executeQuery(query);
-              return { result: result, success: true };
+              const result = hasBlobs
+                ? await duckdbClient.executeQueryFromUrls(query, blobs!)
+                : await createDbClient(url!).executeQuery(query);
+              return { result, success: true };
             } catch (error) {
               return {
                 result: null,

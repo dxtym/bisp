@@ -30,7 +30,7 @@ export async function POST(req: Request) {
       const csv = XLSX.utils.sheet_to_csv(sheet);
       const safeName = sanitizeSheetName(sheetName);
       const rows = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1 });
-      const columns = (rows[0] ?? []).map(String);
+      const columns = (rows[0] ?? []).map((col) => ({ name: String(col), type: "TEXT" }));
       const { url } = await put(`${fileId}/${safeName}.csv`, csv, {
         access: "public",
         contentType: "text/csv",

@@ -6,14 +6,13 @@ import {
   stepCountIs,
   generateText,
   convertToModelMessages,
-  UIMessage,
 } from "ai";
+import type { UIMessage } from "ai";
 import { auth } from "@/auth";
 import { userRepository } from "@/lib/repository/user";
 import { detectDbType, createDbClient, createSystemRepository } from "@/lib/db/factory";
-import { Schema } from "@/lib/repository/common";
+import type { Schema, BlobFile } from "@/lib/repository/common";
 import * as duckdbClient from "@/lib/sqlite/client";
-import type { BlobFile } from "@/lib/repository/common";
 import {
   AGENT_PROMPT,
   TOOL_DESCRIPTIONS,

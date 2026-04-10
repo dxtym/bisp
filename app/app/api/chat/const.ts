@@ -1,9 +1,3 @@
-const GENERATOR_PROMPT = `
-  Given the question and schema, generate a valid SQL.
-  Output only the SQL query. No explanation or formatting allowed.
-  Limit your knowledge to the schema exclusively.
-`
-
 const AGENT_PROMPT = `
   You are an orchestrator that answers questions about the database.
   Do not write any text before calling a tool. Call the tool immediately and silently.
@@ -29,4 +23,4 @@ const TOOL_DESCRIPTIONS = {
   },
 }
 
-export { GENERATOR_PROMPT, AGENT_PROMPT, TOOL_DESCRIPTIONS }
+export { AGENT_PROMPT, TOOL_DESCRIPTIONS }

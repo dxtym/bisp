@@ -1,48 +1,18 @@
-import { z } from "zod";
-import { Ollama } from "ollama";
-
-const OllamaClientOptions = z.object({
-  baseUrl: z.string(),
-  username: z.string().optional(),
-  password: z.string().optional(),
-});
-type OllamaClientOptions = z.infer<typeof OllamaClientOptions>;
+import { createOllama } from "ollama-ai-provider-v2";
+import { type LanguageModel } from "ai";
 
 class OllamaClient {
-  private readonly ollama: Ollama;
+  private readonly _model: LanguageModel;
 
-  constructor(options?: OllamaClientOptions) {
-    const headers: Record<string, string> = {};
-
-    if (options?.username && options?.password) {
-      const credentials = Buffer.from(`${options.username}:${options.password}`).toString("base64");
-      headers["Authorization"] = `Basic ${credentials}`;
-    }
-
-    this.ollama = new Ollama({
-      host: options?.baseUrl,
-      headers: headers,
-    });
+  constructor() {
+    const provider = createOllama({ baseURL: process.env.OLLAMA_URL! });
+    this._model = provider(process.env.OLLAMA_MODEL!);
   }
 
-  public async generate(prompt: string): Promise<{ text: string }> {
-    try {
-      const response = await this.ollama.generate({
-        model: process.env.OLLAMA_MODEL!,
-        prompt: prompt,
-        stream: false,
-      });
-      return { text: response.response };
-    } catch (error) {
-      throw new Error(`Ollama error: ${error}`);
-    }
+  get model(): LanguageModel {
+    return this._model;
   }
 }
 
-const ollamaClient = new OllamaClient({
-  baseUrl: process.env.OLLAMA_URL!,
-  username: process.env.OLLAMA_USERNAME,
-  password: process.env.OLLAMA_PASSWORD,
-});
-
+const ollamaClient = new OllamaClient();
 export default ollamaClient;

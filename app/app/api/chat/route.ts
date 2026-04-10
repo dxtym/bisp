@@ -16,25 +16,26 @@ import * as duckdbClient from "@/lib/sqlite/client";
 import type { BlobFile } from "@/lib/repository/common";
 import {
   AGENT_PROMPT,
-  GENERATOR_PROMPT,
   TOOL_DESCRIPTIONS,
 } from "@/app/api/chat/const";
 import anthropicClient from "@/lib/agents/anthropic/client";
+import openaiClient from "@/lib/agents/openai/client";
+import ollamaClient from "@/lib/agents/ollama/client";
 
 async function translator(prompt: string): Promise<string> {
-  const response = await fetch(
-    `https://api.mymemory.translated.net/get?q=${encodeURIComponent(prompt)}&langpair=uz|en`
-  );
-  const data = await response.json();
-  return data.responseData.translatedText as string;
+  const { text } = await generateText({
+    model: openaiClient.model,
+    system: "Translate the given Uzbek text to English. Output only the translation.",
+    prompt,
+  });
+  return text;
 }
 
 async function generator(question: string, schema: Schema[]): Promise<string> {
   const metadata = schema.map((t) => `${t.table}: ${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")}`).join("\n");
   const { text: response } = await generateText({
-    model: anthropicClient.model,
-    system: GENERATOR_PROMPT,
-    prompt: `Schema: ${metadata} Answer this: ${question}`,
+    model: ollamaClient.model,
+    prompt: `Given the schema: ${metadata} Answer the question: ${question}`,
   });
   return response;
 }

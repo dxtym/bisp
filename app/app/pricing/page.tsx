@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { motion } from "motion/react"
 import Footer from "@/components/footer"
 import PricingCard from "@/components/card"
@@ -15,6 +16,7 @@ const fadeUp = {
 
 const plans = [
   {
+    slug: "pro",
     name: "Pro",
     price: "99,000",
     period: "so'm/oy",
@@ -27,6 +29,7 @@ const plans = [
     ],
   },
   {
+    slug: "max",
     name: "Max",
     price: "299,000",
     period: "so'm/oy",
@@ -39,6 +42,7 @@ const plans = [
     ],
   },
   {
+    slug: "team",
     name: "Team",
     price: "799,000",
     period: "so'm/oy",
@@ -53,6 +57,26 @@ const plans = [
 ]
 
 export default function PricingPage() {
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+
+  async function handleSelect(slug: string) {
+    if (loadingPlan) return
+    setLoadingPlan(slug)
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: slug }),
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      }
+    } catch {
+      setLoadingPlan(null)
+    }
+  }
+
   return (
     <div className="relative min-h-screen text-foreground">
       <div className="fixed top-[10%] bottom-[10%] left-[20%] right-[20%] -z-10 pointer-events-none">
@@ -92,7 +116,11 @@ export default function PricingPage() {
                 custom={2 + i}
                 className="flex-1"
               >
-                <PricingCard {...plan} />
+                <PricingCard
+                  {...plan}
+                  onClick={() => handleSelect(plan.slug)}
+                  loading={loadingPlan === plan.slug}
+                />
               </motion.div>
             ))}
           </div>

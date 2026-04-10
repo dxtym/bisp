@@ -7,7 +7,7 @@ export interface IUser {
   image?: string;
   passwordHash?: string;
   queriesCount: number;
-  plan: "free" | "pro" | "max";
+  plan: "free" | "pro" | "max" | "team";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema<IUser>(
     },
     plan: {
       type: String,
-      enum: ["free", "pro", "max"],
+      enum: ["free", "pro", "max", "team"],
       default: "free",
     },
   },

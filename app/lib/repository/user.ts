@@ -68,6 +68,16 @@ class UserRepository {
     }
   }
 
+  public async updatePlan(id: string, plan: "pro" | "max" | "team"): Promise<void> {
+    await this.connect()
+
+    try {
+      await User.updateOne({ id }, { plan })
+    } catch (error) {
+      throw new Error(`Update plan error: ${error}`)
+    }
+  }
+
   public async checkAndDecrementQueryCount(id: string): Promise<boolean> {
     await this.connect();
 

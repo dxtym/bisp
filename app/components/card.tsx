@@ -13,6 +13,8 @@ type PricingCardProps = {
   period: string
   featured?: boolean
   benefits: Benefit[]
+  onClick?: () => void
+  loading?: boolean
 }
 
 export default function PricingCard({
@@ -21,6 +23,8 @@ export default function PricingCard({
   period,
   featured = false,
   benefits,
+  onClick,
+  loading = false,
 }: PricingCardProps) {
   return (
     <div
@@ -62,8 +66,10 @@ export default function PricingCard({
           "w-full border border-neutral-200",
           "dark:border-border dark:bg-white dark:text-zinc-900"
         )}
+        onClick={onClick}
+        disabled={loading}
       >
-        Tanlash
+        {loading ? "Yuklanmoqda..." : "Tanlash"}
       </Button>
     </div>
   )

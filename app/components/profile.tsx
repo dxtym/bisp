@@ -39,7 +39,7 @@ export default function Profile() {
                 {`So'rovlar: ${queriesCount} / 5`}
               </span>
             </div>
-            <div className="size-8 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium">
+            <div className="size-8 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium ring-2 ring-neutral-300 ring-offset-1 ring-offset-white dark:ring-white/20 dark:ring-offset-black">
               {session?.user?.image ? (
                 <Image
                   src={session.user.image}

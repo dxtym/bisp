@@ -1,16 +1,22 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { motion } from "motion/react"
+import { ArrowLeft } from "lucide-react"
+import { useSession } from "next-auth/react"
 import Footer from "@/components/footer"
 import PricingCard from "@/components/card"
+import UserAvatar from "@/components/avatar"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.12, duration: 0.5, ease: "easeOut" as const },
+    transition: { delay: i * 0.15, duration: 0.7, ease: "easeOut" as const },
   }),
 }
 
@@ -18,8 +24,7 @@ const plans = [
   {
     slug: "pro",
     name: "Pro",
-    price: "99,000",
-    period: "so'm/oy",
+    price: 99000,
     featured: false,
     benefits: [
       { label: "So'rovlar", value: "50 ta/kun" },
@@ -31,8 +36,7 @@ const plans = [
   {
     slug: "max",
     name: "Max",
-    price: "299,000",
-    period: "so'm/oy",
+    price: 299000,
     featured: true,
     benefits: [
       { label: "So'rovlar", value: "Cheksiz" },
@@ -44,8 +48,7 @@ const plans = [
   {
     slug: "team",
     name: "Team",
-    price: "799,000",
-    period: "so'm/oy",
+    price: 799000,
     featured: false,
     benefits: [
       { label: "Foydalanuvchilar", value: "10 tagacha" },
@@ -56,8 +59,32 @@ const plans = [
   },
 ]
 
+const faqs = [
+  {
+    question: "To'lov qanday amalga oshiriladi?",
+    answer: "To'lov Stripe orqali xavfsiz tarzda amalga oshiriladi. Bank kartasi orqali to'lash mumkin.",
+  },
+  {
+    question: "Obunani istalgan vaqt bekor qilish mumkinmi?",
+    answer: "Ha, obunani istalgan vaqtda bekor qilishingiz mumkin. Joriy to'lov davri tugaguncha albatta.",
+  },
+  {
+    question: "Yillik rejimda qanday chegirma olaman?",
+    answer: "Yillik to'lovda chegirma beriladi. Bu oylik to'lovga nisbatan sezilarli tejash imkonini beradi.",
+  },
+]
+
+const toggleItemClass =
+  "px-5 py-1.5 text-sm rounded-md data-[state=on]:bg-black/8 data-[state=on]:text-foreground text-muted-foreground dark:data-[state=on]:bg-white/10"
+
+function formatPrice(n: number) {
+  return n.toLocaleString("en-US")
+}
+
 export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
+  const [billing, setBilling] = useState<"monthly" | "yearly">("monthly")
+  const { data: session } = useSession()
 
   async function handleSelect(slug: string) {
     if (loadingPlan) return
@@ -69,35 +96,32 @@ export default function PricingPage() {
         body: JSON.stringify({ plan: slug }),
       })
       const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-      }
+      if (data.url) window.location.href = data.url
     } catch {
       setLoadingPlan(null)
     }
   }
 
+  const isYearly = billing === "yearly"
+
   return (
-    <div className="relative min-h-screen text-foreground">
-      <div className="fixed top-[10%] bottom-[10%] left-[20%] right-[20%] -z-10 pointer-events-none">
-        <div
-          className="h-full w-full"
-          style={{
-            backgroundSize: "50px 50px",
-            backgroundImage: `
-              linear-gradient(to right, rgb(120 120 120 / 0.15) 1px, transparent 1px),
-              linear-gradient(to bottom, rgb(120 120 120 / 0.15) 1px, transparent 1px)
-            `,
-            maskImage: "radial-gradient(circle at 50% 50%, black 30%, transparent 60%)",
-            WebkitMaskImage: "radial-gradient(circle at 50% 50%, black 30%, transparent 60%)",
-          }}
-        />
-      </div>
-      <main className="min-h-screen flex items-center justify-center px-4">
-        <div className="w-full max-w-5xl mx-auto space-y-10">
-          <div className="text-center space-y-2">
+    <div className="relative min-h-screen flex flex-col text-foreground">
+      <main className="flex-1 flex flex-col px-4 pt-8 pb-6">
+        <div className="w-full max-w-5xl mx-auto space-y-12">
+          <div className="flex items-center justify-between">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-base text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="size-5" />
+              Orqaga
+            </Link>
+            <UserAvatar name={session?.user?.name} image={session?.user?.image} />
+          </div>
+
+          <div className="text-center space-y-3">
             <motion.h1
-              className="text-4xl font-bold tracking-tight"
+              className="text-3xl font-bold tracking-tight"
               variants={fadeUp}
               initial="hidden"
               animate="visible"
@@ -105,8 +129,21 @@ export default function PricingPage() {
             >
               Tariflar
             </motion.h1>
+            <motion.div className="flex justify-center" variants={fadeUp} initial="hidden" animate="visible" custom={1}>
+              <ToggleGroup
+                type="single"
+                value={billing}
+                onValueChange={(v) => v && setBilling(v as "monthly" | "yearly")}
+                variant="outline"
+                className="border border-black/10 rounded-lg p-1 gap-1 dark:border-white/10"
+              >
+                <ToggleGroupItem value="monthly" className={toggleItemClass}>Oylik</ToggleGroupItem>
+                <ToggleGroupItem value="yearly" className={toggleItemClass}>Yillik</ToggleGroupItem>
+              </ToggleGroup>
+            </motion.div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
@@ -118,15 +155,36 @@ export default function PricingPage() {
               >
                 <PricingCard
                   {...plan}
+                  price={isYearly ? formatPrice(Math.round(plan.price * 12 * 0.7)) : formatPrice(Math.round(plan.price * 0.9))}
+                  originalPrice={isYearly ? formatPrice(plan.price * 12) : formatPrice(plan.price)}
                   onClick={() => handleSelect(plan.slug)}
                   loading={loadingPlan === plan.slug}
                 />
               </motion.div>
             ))}
           </div>
+
+          <motion.div className="space-y-3" variants={fadeUp} initial="hidden" animate="visible" custom={6}>
+            <div className="max-w-2xl mx-auto space-y-2">
+              <h2 className="text-3xl font-bold tracking-tight text-center">FAQ</h2>
+              <Accordion type="single" collapsible>
+                {faqs.map((faq) => (
+                  <AccordionItem key={faq.question} value={faq.question}>
+                    <AccordionTrigger className="text-sm font-medium text-left hover:no-underline hover:text-foreground/80">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-sm text-muted-foreground leading-relaxed">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </div>
+          </motion.div>
         </div>
       </main>
-      <footer className="fixed bottom-0 left-0 right-0 z-50 py-5">
+
+      <footer className="py-3">
         <Footer />
       </footer>
     </div>

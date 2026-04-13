@@ -1,11 +1,18 @@
 "use client"
 
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { motion } from "motion/react"
-import Link from "next/link"
-import { LuCircleCheck } from "react-icons/lu"
-import { Button } from "@/components/ui/button"
+import { CircleCheck } from "lucide-react"
 
 export default function CheckoutSuccessPage() {
+  const router = useRouter()
+
+  useEffect(() => {
+    const timer = setTimeout(() => router.push("/"), 3000)
+    return () => clearTimeout(timer)
+  }, [router])
+
   return (
     <div className="relative min-h-screen text-foreground flex items-center justify-center px-4">
       <div className="fixed top-[10%] bottom-[10%] left-[20%] right-[20%] -z-10 pointer-events-none">
@@ -28,16 +35,13 @@ export default function CheckoutSuccessPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <LuCircleCheck className="h-16 w-16 text-emerald-500 mx-auto" />
+        <CircleCheck className="h-16 w-16 text-emerald-500 mx-auto" />
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Tolov muvaffaqiyatli!</h1>
+          <h1 className="text-3xl font-bold tracking-tight">To'lov muvaffaqiyatli!</h1>
           <p className="text-muted-foreground">
             Obunangiz faollashtirildi. Barcha imkoniyatlardan foydalanishingiz mumkin.
           </p>
         </div>
-        <Button asChild className="dark:bg-white dark:text-zinc-900 border border-neutral-200 dark:border-border">
-          <Link href="/">Bosh sahifaga qaytish</Link>
-        </Button>
       </motion.div>
     </div>
   )

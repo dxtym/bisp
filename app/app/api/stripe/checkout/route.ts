@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
-import { stripe } from "@/lib/stripe"
+import { getStripe } from "@/lib/stripe"
 
 const PRICE_IDS: Record<string, string> = {
   pro: process.env.STRIPE_PRO_PRICE_ID!,
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
-    const checkoutSession = await stripe.checkout.sessions.create({
+    const checkoutSession = await getStripe().checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: PRICE_IDS[plan], quantity: 1 }],
       success_url: `${appUrl}/checkout/success`,

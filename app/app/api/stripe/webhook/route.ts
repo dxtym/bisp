@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import type Stripe from "stripe"
-import { stripe } from "@/lib/stripe"
+import { getStripe } from "@/lib/stripe"
 import { subscriptionRepository } from "@/lib/repository/subscription"
 import { userRepository } from "@/lib/repository/user"
 
@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
+    event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch {
     return NextResponse.json({ error: "Webhook signature verification failed" }, { status: 400 })
   }
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing metadata" }, { status: 400 })
     }
 
-    const subscription = await stripe.subscriptions.retrieve(session.subscription as string)
+    const subscription = await getStripe().subscriptions.retrieve(session.subscription as string)
 
     await subscriptionRepository.createSubscription({
       userId,

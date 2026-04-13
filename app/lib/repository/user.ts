@@ -71,8 +71,14 @@ class UserRepository {
   public async updatePlan(id: string, plan: "pro" | "max" | "team"): Promise<void> {
     await this.connect()
 
+    const queriesCount: Record<"pro" | "max" | "team", number> = {
+      pro: 50,
+      max: 1000,
+      team: 10000,
+    }
+
     try {
-      await User.updateOne({ id }, { plan })
+      await User.updateOne({ id }, { plan, queriesCount: queriesCount[plan] })
     } catch (error) {
       throw new Error(`Update plan error: ${error}`)
     }

@@ -1,6 +1,8 @@
 import type { RootState } from "@/lib/store/store";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { Schema, BlobFile } from "@/lib/repository/common";
+import { DbType } from "@/lib/db/types";
+import { fetchApi } from "@/lib/store/utils";
 
 export const STORAGE_KEY = "storage_key";
 export const FILE_STORAGE_KEY = "file_storage_key";
@@ -15,6 +17,7 @@ interface ConnectionState {
   fileId: string;
   fileName: string;
   blobs: BlobFile[];
+  dbType: DbType;
 }
 
 function loadFileStorage(): { fileId: string; blobs: BlobFile[] } {
@@ -38,21 +41,15 @@ const initialState: ConnectionState = {
   fileId: saved.fileId,
   fileName: "",
   blobs: saved.blobs,
+  dbType: "clickhouse",
 };
 
 export const getSchema = createAsyncThunk(
   "database/getSchema",
   async ({ url }: { url: string }) => {
-    try {
-      const response = await fetch(`/api/clickhouse/schema?url=${url}`);
-      const result = await response.json();
-      if (!result.success) throw new Error(result.message);
-
-      localStorage.setItem(STORAGE_KEY, url);
-      return result.data as Schema[];
-    } catch (error) {
-      throw new Error(`Failed to get schema: ${error}`);
-    }
+    const data = await fetchApi<Schema[]>(`/api/clickhouse/schema?url=${url}`);
+    localStorage.setItem(STORAGE_KEY, url);
+    return data;
   }
 );
 
@@ -94,6 +91,9 @@ const connectionSlice = createSlice({
         localStorage.removeItem(STORAGE_KEY);
       }
     },
+    setDbType(state, action: PayloadAction<DbType>) {
+      state.dbType = action.payload;
+    },
     clearFile(state) {
       state.fileId = "";
       state.fileName = "";
@@ -130,7 +130,7 @@ const connectionSlice = createSlice({
   },
 });
 
-export const { setUrl, clearUrl, setMode, clearFile } = connectionSlice.actions;
+export const { setUrl, clearUrl, setMode, setDbType, clearFile } = connectionSlice.actions;
 
 export const selectUrl = (state: RootState) => state.connection.url;
 export const selectSchema = (state: RootState) => state.connection.schema;
@@ -139,5 +139,6 @@ export const selectMode = (state: RootState) => state.connection.mode;
 export const selectFileId = (state: RootState) => state.connection.fileId;
 export const selectFileName = (state: RootState) => state.connection.fileName;
 export const selectBlobs = (state: RootState) => state.connection.blobs;
+export const selectDbType = (state: RootState) => state.connection.dbType;
 
 export default connectionSlice.reducer;

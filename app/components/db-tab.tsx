@@ -2,31 +2,48 @@
 
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
-import { getSchema, selectUrl, selectLoading, setUrl, clearUrl } from "@/lib/store/slices/connection";
+import {
+  getSchema,
+  selectUrl,
+  selectLoading,
+  selectDbType,
+  setUrl,
+  clearUrl,
+} from "@/lib/store/slices/connection";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from "@/components/ui/input-group";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { toast } from "sonner";
+
+const DEFAULT_CLICKHOUSE_URL = "https://explorer:@play.clickhouse.com:443";
+const DEFAULT_POSTGRES_URL = "postgresql://neondb_owner:npg_THqvucPL7Q0K@ep-summer-wind-alf7jtkn-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
 
 export default function DbTab() {
   const dispatch = useAppDispatch();
   const url = useAppSelector(selectUrl);
   const loading = useAppSelector(selectLoading);
+  const selectedDbType = useAppSelector(selectDbType);
 
   useEffect(() => {
     dispatch(clearUrl());
   }, [dispatch]);
 
+  const defaultUrl = selectedDbType === "postgres" ? DEFAULT_POSTGRES_URL : DEFAULT_CLICKHOUSE_URL;
+  
   const handleConnect = async () => {
-    if (!url.trim()) {
-      toast.error("Ulanish manzilini kiriting");
-      return;
-    }
+    const target = url.trim() || defaultUrl;
+    if (!url.trim()) dispatch(setUrl(defaultUrl));
     try {
-      await dispatch(getSchema({ url })).unwrap();
+      await dispatch(getSchema({ url: target })).unwrap();
       toast.success("Muvaffaqiyatli ulandi");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Ulanishda xatolik");
@@ -38,14 +55,23 @@ export default function DbTab() {
       <InputGroupInput
         value={url}
         onChange={(e) => dispatch(setUrl(e.target.value))}
-        placeholder="Malumotlar ombori ulanish manzili kiriting"
+        placeholder="Ulanish manzilini kiriting"
         className="text-xs flex-1"
         disabled={loading}
       />
       <InputGroupAddon align="inline-end">
-        <InputGroupButton variant="default" onClick={handleConnect} disabled={loading}>
-          Ulanish
-        </InputGroupButton>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InputGroupButton variant="default" onClick={handleConnect} disabled={loading}>
+                Ulanish
+              </InputGroupButton>
+            </TooltipTrigger>
+            <TooltipContent side="top">
+              Namuna
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </InputGroupAddon>
     </InputGroup>
   );

@@ -16,7 +16,6 @@ import {
   ModelSelector,
   ModelSelectorTrigger,
   ModelSelectorContent,
-  ModelSelectorInput,
   ModelSelectorList,
   ModelSelectorEmpty,
   ModelSelectorGroup,
@@ -24,8 +23,8 @@ import {
   ModelSelectorName,
 } from "@/components/ai-elements/model-selector"
 import { ChatStatus } from "ai";
-import { useAppSelector } from "@/lib/store/hooks";
-import { selectUrl } from "@/lib/store/slices/connection";
+import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
+import { selectUrl, selectSchema, selectDbType, setDbType } from "@/lib/store/slices/connection";
 import { SiClickhouse, SiPostgresql } from "react-icons/si";
 import { CheckIcon } from "lucide-react";
 import { type DbType, detectDbType } from "@/lib/db/types";
@@ -53,12 +52,16 @@ interface PromptProps {
 }
 
 export default function Prompt({ onSubmit, status }: PromptProps) {
+  const dispatch = useAppDispatch();
   const [text, setText] = useState<string>("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const url = useAppSelector(selectUrl);
+  const schema = useAppSelector(selectSchema);
+  const selectedDbType = useAppSelector(selectDbType);
 
-  const dbType = url ? detectDbType(url) : "clickhouse";
-  const { Icon: DbIcon, label: dbLabel } = DB_OPTIONS.find((o) => o.type === dbType)!;
+  const isConnected = !!url || schema.length > 0;
+  const displayedDbType: DbType = isConnected ? detectDbType(url) : selectedDbType;
+  const { Icon: DbIcon, label: dbLabel } = DB_OPTIONS.find((o) => o.type === displayedDbType)!;
 
   const handleSubmit = useCallback((message: PromptInputMessage) => {
     if (!message.text) return;
@@ -89,21 +92,24 @@ export default function Prompt({ onSubmit, status }: PromptProps) {
             <PromptInputTools>
               <ModelSelector>
                 <ModelSelectorTrigger asChild>
-                  <PromptInputButton size="sm">
+                  <PromptInputButton size="sm" disabled={isConnected}>
                     <DbIcon className="size-3.5" />
                     {dbLabel}
                   </PromptInputButton>
                 </ModelSelectorTrigger>
                 <ModelSelectorContent>
-                  <ModelSelectorInput placeholder="Qidiring..." />
                   <ModelSelectorList>
                     <ModelSelectorEmpty>Topilmadi</ModelSelectorEmpty>
                     <ModelSelectorGroup>
                       {DB_OPTIONS.map(({ type, label, Icon }) => (
-                        <ModelSelectorItem key={type} value={label} disabled>
+                        <ModelSelectorItem
+                          key={type}
+                          value={label}
+                          onSelect={() => dispatch(setDbType(type))}
+                        >
                           <Icon className="size-4" />
                           <ModelSelectorName>{label}</ModelSelectorName>
-                          {type === dbType && <CheckIcon className="ml-auto size-3.5" />}
+                          {type === displayedDbType && <CheckIcon className="ml-auto size-3.5" />}
                         </ModelSelectorItem>
                       ))}
                     </ModelSelectorGroup>

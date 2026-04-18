@@ -39,18 +39,16 @@ export default function Page() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar className="hidden lg:flex lg:w-1/2" />
-      <div className="flex w-full lg:w-1/2 items-center justify-center px-8 bg-muted/30">
+      <Sidebar className="hidden lg:flex lg:w-1/2 border-r border-border" />
+      <div className="flex w-full lg:w-1/2 items-center justify-center px-8">
         <div className="w-full max-w-sm space-y-8">
           <div className="space-y-1 text-center">
-            <h1 className="text-xl font-semibold">Ro&apos;yxatdan o&apos;tish</h1>
-            <p className="text-sm text-muted-foreground">
-              Yangi hisob yarating.
-            </p>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Ro&apos;yxatdan o&apos;tish</h1>
+            <p className="text-sm text-muted-foreground">Yangi hisob yarating.</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Ism</Label>
+              <Label htmlFor="name" className="text-sm font-medium">Ism</Label>
               <Input
                 id="name"
                 type="text"
@@ -58,11 +56,11 @@ export default function Page() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="capitalize border-neutral-700" 
+                className="capitalize rounded-sm"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -70,11 +68,11 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border-neutral-700"
+                className="rounded-sm"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Parol</Label>
+              <Label htmlFor="password" className="text-sm font-medium">Parol</Label>
               <Input
                 id="password"
                 type="password"
@@ -83,19 +81,22 @@ export default function Page() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                className="border-neutral-700" 
+                className="rounded-sm"
               />
             </div>
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
-            <Button type="submit" variant="secondary" className="w-full mt-3 border border-neutral-500 hover:border-neutral-600" disabled={loading}>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button
+              type="submit"
+              variant="secondary"
+              className="w-full mt-3 rounded-sm bg-foreground !text-background hover:bg-foreground/90 transition-colors"
+              disabled={loading}
+            >
               {loading ? "Ro'yxatdan o'tilmoqda..." : "Ro'yxatdan o'tish"}
             </Button>
           </form>
           <p className="text-sm text-center text-muted-foreground">
             Hisobingiz bormi?{" "}
-            <Link href="/sign-in" className="underline underline-offset-4">
+            <Link href="/sign-in" className="text-foreground underline underline-offset-4 hover:text-foreground/80 transition-colors">
               Kirish
             </Link>
           </p>

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 
 const SQL = "SELECT COUNT(*) AS total_users FROM users;"
 const RESULT = JSON.stringify([{ total_users: 1247 }], null, 2)
-const SCROLLBAR = { scrollbarWidth: "thin" as const, scrollbarColor: "rgb(138,138,138) transparent" }
+import { SCROLLBAR_THIN } from "@/lib/constants/ui"
 
 interface Props {
   delay: number
@@ -34,13 +34,13 @@ export default function Uncollapsed({ delay }: Props) {
       </div>
       <div className="border-t border-border p-2">
         <p className="mb-1 text-xs font-medium text-muted-foreground">Parametrlar</p>
-        <pre className="overflow-x-auto rounded bg-muted/50 p-2 text-xs pb-3" style={SCROLLBAR}>
+        <pre className="overflow-x-auto rounded bg-muted/50 p-2 text-xs pb-3" style={SCROLLBAR_THIN}>
           <code className="block whitespace-pre">{SQL}</code>
         </pre>
       </div>
       <div className="border-t border-border p-2">
         <p className="mb-1 text-xs font-medium text-muted-foreground">Natija</p>
-        <pre className="overflow-x-auto rounded bg-muted/50 p-2 text-xs pb-3" style={SCROLLBAR}>
+        <pre className="overflow-x-auto rounded bg-muted/50 p-2 text-xs pb-3" style={SCROLLBAR_THIN}>
           <code className="block whitespace-pre">{RESULT}</code>
         </pre>
       </div>

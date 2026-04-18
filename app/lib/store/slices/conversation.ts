@@ -1,6 +1,7 @@
 import type { IConversation, IMessage } from "@/lib/mongodb/models/conversation";
 import type { RootState } from "@/lib/store/store";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { fetchApi } from "@/lib/store/utils";
 
 interface ConversationState {
   conversations: IConversation[];
@@ -16,85 +17,47 @@ const initialState: ConversationState = {
 
 export const fetchConversations = createAsyncThunk(
   "conversation/fetchConversations",
-  async (userId: string) => {
-    try {
-      const response = await fetch(`/api/conversation?user_id=${userId}`);
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
-      return result.data as IConversation[];
-    } catch (error) {
-      throw new Error(`Failed to fetch conversations: ${error}`);
-    }
-  }
+  (userId: string) =>
+    fetchApi<IConversation[]>(`/api/conversation?user_id=${userId}`)
 );
 
 export const createConversation = createAsyncThunk(
   "conversation/createConversation",
-  async ({ userId, title }: { userId: string; title: string }) => {
-    try {
-      const response = await fetch("/api/conversation/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, title }),
-      });
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
-      return result.data as IConversation;
-    } catch (error) {
-      throw new Error(`Failed to create conversation: ${error}`);
-    }
-  }
+  ({ userId, title }: { userId: string; title: string }) =>
+    fetchApi<IConversation>("/api/conversation/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, title }),
+    })
 );
 
 export const addMessage = createAsyncThunk(
   "conversation/addMessage",
   async ({ conversationId, message }: { conversationId: string; message: IMessage }) => {
-    try {
-      const response = await fetch(`/api/conversation/${conversationId}/message`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message }),
-      });
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
-      return { conversationId, message };
-    } catch (error) {
-      throw new Error(`Failed to add message: ${error}`);
-    }
+    await fetchApi(`/api/conversation/${conversationId}/message`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message }),
+    });
+    return { conversationId, message };
   }
 );
 
 export const updateConversationTitle = createAsyncThunk(
   "conversation/updateConversationTitle",
-  async ({ conversationId, title }: { conversationId: string; title: string }) => {
-    try {
-      const response = await fetch(`/api/conversation/${conversationId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title }),
-      });
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
-      return result.data as IConversation;
-    } catch (error) {
-      throw new Error(`Failed to update conversation title: ${error}`);
-    }
-  }
+  ({ conversationId, title }: { conversationId: string; title: string }) =>
+    fetchApi<IConversation>(`/api/conversation/${conversationId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
+    })
 );
 
 export const removeConversation = createAsyncThunk(
   "conversation/removeConversation",
   async (conversationId: string) => {
-    try {
-      const response = await fetch(`/api/conversation/${conversationId}`, {
-        method: "DELETE",
-      });
-      const result = await response.json();
-      if (!result.success) throw new Error(result.error);
-      return conversationId;
-    } catch (error) {
-      throw new Error(`Failed to remove conversation: ${error}`);
-    }
+    await fetchApi(`/api/conversation/${conversationId}`, { method: "DELETE" });
+    return conversationId;
   }
 );
 
@@ -108,16 +71,12 @@ const conversationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchConversations.pending, (state) => {
-        state.isLoading = true;
-      })
+      .addCase(fetchConversations.pending, (state) => { state.isLoading = true; })
       .addCase(fetchConversations.fulfilled, (state, action) => {
         state.conversations = action.payload;
         state.isLoading = false;
       })
-      .addCase(fetchConversations.rejected, (state) => {
-        state.isLoading = false;
-      })
+      .addCase(fetchConversations.rejected, (state) => { state.isLoading = false; })
 
       .addCase(createConversation.fulfilled, (state, action) => {
         state.conversations.unshift(action.payload);
@@ -125,34 +84,22 @@ const conversationSlice = createSlice({
       })
 
       .addCase(updateConversationTitle.fulfilled, (state, action) => {
-        const updatedConversation = action.payload;
-        const index = state.conversations.findIndex(c => c.id === updatedConversation.id);
-        if (index !== -1) {
-          state.conversations[index] = updatedConversation;
-        }
-        if (state.conversation?.id === updatedConversation.id) {
-          state.conversation = updatedConversation;
-        }
+        const updated = action.payload;
+        const index = state.conversations.findIndex((c) => c.id === updated.id);
+        if (index !== -1) state.conversations[index] = updated;
+        if (state.conversation?.id === updated.id) state.conversation = updated;
       })
 
       .addCase(addMessage.fulfilled, (state, action) => {
         const { conversationId, message } = action.payload;
-        const conversationIndex = state.conversations.findIndex(c => c.id === conversationId);
-        if (conversationIndex !== -1) {
-          state.conversations[conversationIndex].messages.push(message);
-        }
-
-        if (state.conversation?.id === conversationId) {
-          state.conversation.messages.push(message);
-        }
+        const index = state.conversations.findIndex((c) => c.id === conversationId);
+        if (index !== -1) state.conversations[index].messages.push(message);
+        if (state.conversation?.id === conversationId) state.conversation.messages.push(message);
       })
 
       .addCase(removeConversation.fulfilled, (state, action) => {
-        const removedId = action.payload;
-        state.conversations = state.conversations.filter(c => c.id !== removedId);
-        if (state.conversation?.id === removedId) {
-          state.conversation = null;
-        }
+        state.conversations = state.conversations.filter((c) => c.id !== action.payload);
+        if (state.conversation?.id === action.payload) state.conversation = null;
       });
   },
 });

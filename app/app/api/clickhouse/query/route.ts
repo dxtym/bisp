@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { NextRequest } from "next/server";
 import { createDbClient } from "@/lib/db/factory";
-import { NextRequest, NextResponse } from "next/server";
+import { ok, fail } from "@/lib/api/response";
 
 const QueryRequest = z.object({
   query: z.string(),
@@ -9,27 +10,12 @@ const QueryRequest = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { query, url } = QueryRequest.parse(body);
-
-    if (!url) {
-      return NextResponse.json({
-        success: false,
-        message: "No connection URL provided",
-      }, { status: 400 });
-    }
-
+    const { query, url } = QueryRequest.parse(await request.json());
+    if (!url) return fail("No connection URL provided", 400);
     const client = createDbClient(url);
     const data = await client.executeQuery(query);
-
-    return NextResponse.json({
-      success: true,
-      data: data,
-    }, { status: 200 });
+    return ok(data);
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
-    }, { status: 500 });
+    return fail(error);
   }
 }

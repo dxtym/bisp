@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { ConversationRepository } from "@/lib/repository/conversation";
+import { ok, fail } from "@/lib/api/response";
 
 const repository = new ConversationRepository();
 
@@ -9,25 +10,11 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-
     const conversation = await repository.getById(id);
-
-    if (!conversation) {
-      return NextResponse.json({
-        success: false,
-        message: "Conversation not found",
-      }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: conversation,
-    }, { status: 200 });
+    if (!conversation) return fail("Conversation not found", 404);
+    return ok(conversation);
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
-    }, { status: 500 });
+    return fail(error);
   }
 }
 
@@ -37,34 +24,13 @@ export async function PATCH(
 ) {
   try {
     const { id } = await params;
-    const body = await req.json();
-    const { title } = body;
-
-    if (!title) {
-      return NextResponse.json({
-        success: false,
-        message: "Title required",
-      }, { status: 400 });
-    }
-
+    const { title } = await req.json();
+    if (!title) return fail("Title required", 400);
     const conversation = await repository.updateTitle(id, title.trim());
-
-    if (!conversation) {
-      return NextResponse.json({
-        success: false,
-        message: "Conversation not found",
-      }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: conversation,
-    }, { status: 200 });
+    if (!conversation) return fail("Conversation not found", 404);
+    return ok(conversation);
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
-    }, { status: 500 });
+    return fail(error);
   }
 }
 
@@ -74,24 +40,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-
-    const conversation = await repository.delete(id);
-
-    if (!conversation) {
-      return NextResponse.json({
-        success: false,
-        message: "Conversation not found",
-      }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Conversation deleted successfully",
-    }, { status: 200 });
+    const deleted = await repository.delete(id);
+    if (!deleted) return fail("Conversation not found", 404);
+    return ok({ deleted: true });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : "Something went wrong",
-    }, { status: 500 });
+    return fail(error);
   }
 }

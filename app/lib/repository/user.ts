@@ -1,101 +1,52 @@
 import { mongoDbConnect } from "@/lib/mongodb/client";
 import { User, type IUser } from "@/lib/mongodb/models/user";
+import { BaseRepository } from "@/lib/repository/base";
 
-class UserRepository {
-  private async connect(): Promise<void> {
+class UserRepository extends BaseRepository {
+  protected async connect(): Promise<void> {
     await mongoDbConnect();
   }
 
-  public async createUser(args: {
-    name: string;
-    email: string;
-    image?: string;
-  }): Promise<IUser> {
-    await this.connect();
-
-    try {
-      const user = await User.create({
-        id: crypto.randomUUID(),
-        name: args.name,
-        email: args.email,
-        image: args.image,
-      });
-      return user.toObject();
-    } catch (error) {
-      throw new Error(`Create user error: ${error}`);
-    }
+  public async createUser(args: { name: string; email: string; image?: string }): Promise<IUser> {
+    return this.run("Create user error", () =>
+      User.create({ id: crypto.randomUUID(), ...args }).then((u) => u.toObject())
+    );
   }
 
-  public async createUserWithCredentials(args: {
-    name: string;
-    email: string;
-    passwordHash: string;
-  }): Promise<IUser> {
-    await this.connect();
-
-    try {
-      const user = await User.create({
-        id: crypto.randomUUID(),
-        name: args.name,
-        email: args.email,
-        passwordHash: args.passwordHash,
-      });
-      return user.toObject();
-    } catch (error) {
-      throw new Error(`Create user error: ${error}`);
-    }
+  public async createUserWithCredentials(args: { name: string; email: string; passwordHash: string }): Promise<IUser> {
+    return this.run("Create user error", () =>
+      User.create({ id: crypto.randomUUID(), ...args }).then((u) => u.toObject())
+    );
   }
 
   public async getUserByEmail(email: string): Promise<IUser | null> {
-    await this.connect();
-
-    try {
-      const user = await User.findOne({ email }).lean();
-      return user;
-    } catch (error) {
-      throw new Error(`Get user error: ${error}`);
-    }
+    return this.run("Get user error", () =>
+      User.findOne({ email }).lean() as Promise<IUser | null>
+    );
   }
 
   public async getQueriesCount(id: string): Promise<number | null> {
-    await this.connect();
-
-    try {
+    return this.run("Get queries count error", async () => {
       const user = await User.findOne({ id }, { queriesCount: 1 }).lean();
       return user ? (user.queriesCount ?? 0) : null;
-    } catch (error) {
-      throw new Error(`Get queries count error: ${error}`);
-    }
+    });
   }
 
   public async updatePlan(id: string, plan: "pro" | "max" | "team"): Promise<void> {
-    await this.connect()
-
-    const queriesCount: Record<"pro" | "max" | "team", number> = {
-      pro: 50,
-      max: 1000,
-      team: 10000,
-    }
-
-    try {
-      await User.updateOne({ id }, { plan, queriesCount: queriesCount[plan] })
-    } catch (error) {
-      throw new Error(`Update plan error: ${error}`)
-    }
+    const queriesCount: Record<"pro" | "max" | "team", number> = { pro: 50, max: 1000, team: 10000 };
+    return this.run("Update plan error", () =>
+      User.updateOne({ id }, { plan, queriesCount: queriesCount[plan] }).then(() => undefined)
+    );
   }
 
   public async checkAndDecrementQueryCount(id: string): Promise<boolean> {
-    await this.connect();
-
-    try {
+    return this.run("Decrement query count error", async () => {
       const result = await User.updateOne(
         { id, queriesCount: { $gt: 0 } },
         { $inc: { queriesCount: -1 } }
       );
       return result.modifiedCount > 0;
-    } catch (error) {
-      throw new Error(`Decrement query count error: ${error}`);
-    }
+    });
   }
 }
 

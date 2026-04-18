@@ -13,6 +13,11 @@ export class PostgresClient implements DbClient {
     return rows as Record<string, unknown>[];
   }
 
+  async executeParameterized(query: string, params: unknown[]): Promise<Record<string, unknown>[]> {
+    const rows = await this.sql.unsafe(query, params as Parameters<typeof this.sql.unsafe>[1]);
+    return rows as Record<string, unknown>[];
+  }
+
   async ping(): Promise<boolean> {
     try {
       await this.sql`SELECT 1`;

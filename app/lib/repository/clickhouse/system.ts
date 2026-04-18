@@ -1,17 +1,13 @@
-
 import { ClickHouseWebClient } from "@/lib/clickhouse/client";
-import { ISystemRepository } from "@/lib/db/types";
-import { Table, Column, Schema } from "@/lib/repository/common";
+import type { Column, Table } from "@/lib/repository/common";
+import { BaseSystemRepository } from "@/lib/repository/system";
 
-
-export class ClickHouseSystemRepository implements ISystemRepository {
-  private readonly client: ClickHouseWebClient;
-
-  constructor(client: ClickHouseWebClient) {
-    this.client = client;
+export class ClickHouseSystemRepository extends BaseSystemRepository {
+  constructor(private readonly client: ClickHouseWebClient) {
+    super();
   }
 
-  private async getTables(): Promise<Table[]> {
+  protected async getTables(): Promise<Table[]> {
     try {
       const rows = await this.client.query({
         query: `
@@ -22,54 +18,28 @@ export class ClickHouseSystemRepository implements ISystemRepository {
         `,
         format: "JSONEachRow",
       });
-
-      const data = await rows.json();
-      return data as Table[];
+      return (await rows.json()) as Table[];
     } catch (error) {
       throw new Error(`Get tables error: ${error}`);
     }
   }
 
-  private async getColumns(table: string): Promise<Column[]> {
+  protected async getColumns(table: string): Promise<Column[]> {
     try {
       const rows = await this.client.query({
         query: `
           SELECT name, type
           FROM system.columns
-          WHERE
-              database = currentDatabase()
-              AND table = {table:String}
+          WHERE database = currentDatabase()
+            AND table = {table:String}
           SETTINGS use_query_cache = 0;
         `,
-        query_params: {
-          table: table,
-        },
+        query_params: { table },
         format: "JSONEachRow",
       });
-
-      const data = await rows.json();
-      return data as Column[];
+      return (await rows.json()) as Column[];
     } catch (error) {
       throw new Error(`Get columns error: ${error}`);
-    }
-  }
-
-  public async loadSchema(): Promise<Schema[]> {
-    try {
-      const schema: Schema[] = [];
-      const tables = await this.getTables();
-
-      for (const table of tables) {
-        const columns = await this.getColumns(table.name);
-        schema.push({
-          table: table.name,
-          columns,
-        });
-      }
-
-      return schema;
-    } catch (error) {
-      throw new Error(`Load schema error: ${error}`);
     }
   }
 }

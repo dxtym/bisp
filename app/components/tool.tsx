@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SCROLLBAR_THIN } from "@/lib/constants/ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -38,10 +39,7 @@ function Params({ input }: { input?: Record<string, unknown> }) {
       <p className="mb-1 text-xs font-medium text-muted-foreground">Parametrlar</p>
       <pre
         className="overflow-x-auto rounded bg-muted/50 p-2 text-xs pb-4"
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgb(138, 138, 138) transparent'
-        }}
+        style={SCROLLBAR_THIN}
       >
         <code className="block whitespace-pre">{JSON.stringify(input, null, 2)}</code>
       </pre>

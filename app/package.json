@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.54",
-    "@ai-sdk/openai": "^3.0.26",
+    "@ai-sdk/openai": "^3.0.53",
     "@ai-sdk/react": "^3.0.6",
     "@clickhouse/client-web": "^1.16.0",
+    "@pinecone-database/pinecone": "^7.2.0",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-hover-card": "^1.1.15",
     "@radix-ui/react-menubar": "^1.1.16",

@@ -4,8 +4,9 @@ const AGENT_PROMPT = `
   Only the final answer (after all 3 tools complete) should contain text.
   Final answer must be Uzbek, under 100 words, no markdown.
 
-  You must follow the exact sequence of tool calls for every request: translator > generator > executor.
-  Do not skip or reorder steps. If the question is out of scope, politely reject it in Uzbek.
+  Do not skip or reorder steps.
+  You must follow the exact sequence for every request: translator > generator > executor.
+  If the generator returns generation: null, irrelevant: true, stop the flow immediately.
 `
 
 const TOOL_DESCRIPTIONS = {

@@ -20,6 +20,7 @@ import {
 import anthropicClient from "@/lib/agents/anthropic/client";
 import openaiClient from "@/lib/agents/openai/client";
 import ollamaClient from "@/lib/agents/ollama/client";
+import { index, validate } from "@/lib/rag/schema";
 
 async function translator(prompt: string): Promise<string> {
   const { text } = await generateText({
@@ -30,7 +31,11 @@ async function translator(prompt: string): Promise<string> {
   return text;
 }
 
-async function generator(question: string, schema: Schema[]): Promise<string> {
+async function generator(question: string, schema: Schema[], namespace: string): Promise<string | null> {
+  await index(schema, namespace);
+  const ok = await validate(question, namespace);
+  if (!ok) return null;
+
   const metadata = schema.map((t) => `${t.table}: ${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")}`).join("\n");
   const { text: response } = await generateText({
     model: ollamaClient.model,
@@ -75,9 +80,14 @@ export async function POST(req: Request) {
       }, { status: 400 });
     }
 
+    const namespace = session.user.id;
+
     const hasQuota = await userRepository.checkAndDecrementQueryCount(session.user.id);
     if (!hasQuota) {
-      return NextResponse.json({ message: "Hisobingizda so'rovlar tugagan" }, { status: 403 });
+      return NextResponse.json({
+        success: false,
+        message: "Hisobingizda so'rovlar tugagan",
+      }, { status: 403 });
     }
 
     const modelMessages = await convertToModelMessages(messages);
@@ -101,7 +111,11 @@ export async function POST(req: Request) {
           inputSchema: z.object({
             question: z.string().describe(TOOL_DESCRIPTIONS.generator.question),
           }),
-          execute: async ({ question }) => ({ generation: await generator(question, schema) }),
+          execute: async ({ question }) => {
+            const generation = await generator(question, schema, namespace);
+            if (generation === null) return { generation: null, irrelevant: true };
+            return { generation };
+          },
         }),
         executor: tool({
           description: TOOL_DESCRIPTIONS.executor.tool,

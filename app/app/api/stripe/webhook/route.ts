@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest } from "next/server"
 import type Stripe from "stripe"
 import { getStripe } from "@/lib/stripe"
 import { subscriptionRepository } from "@/lib/repository/subscription"
 import { userRepository } from "@/lib/repository/user"
+import { ok, fail } from "@/lib/api/response"
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
   const sig = req.headers.get("stripe-signature")
-
   if (!sig) {
-    return NextResponse.json({ error: "Missing stripe-signature" }, { status: 400 })
+    return fail("Missing stripe-signature", 400)
   }
 
   let event: Stripe.Event
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   try {
     event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch {
-    return NextResponse.json({ error: "Webhook signature verification failed" }, { status: 400 })
+    return fail("Webhook signature verification failed", 400)
   }
 
   if (event.type === "checkout.session.completed") {
@@ -25,9 +25,8 @@ export async function POST(req: NextRequest) {
 
     const userId = session.metadata?.userId
     const plan = session.metadata?.plan as "pro" | "max" | "team"
-
     if (!userId || !plan) {
-      return NextResponse.json({ error: "Missing metadata" }, { status: 400 })
+      return fail("Missing metadata", 400)
     }
 
     const subscription = await getStripe().subscriptions.retrieve(session.subscription as string)
@@ -45,5 +44,5 @@ export async function POST(req: NextRequest) {
     await userRepository.updatePlan(userId, plan)
   }
 
-  return NextResponse.json({ received: true })
+  return ok({ received: true })
 }

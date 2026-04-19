@@ -29,7 +29,7 @@ export default function PricingCard({
   return (
     <div
       className={cn(
-        "flex-1 rounded-xl border border-neutral-200 bg-white shadow-sm dark:bg-neutral-950/60 dark:border-white/10 px-6 py-6 space-y-4",
+        "flex-1 rounded-xl border border-neutral-200 bg-white shadow-sm dark:bg-neutral-950 dark:border-white/10 px-6 py-6 space-y-4",
         "transition-all duration-500 hover:-translate-y-1 hover:shadow-lg hover:border-neutral-300 dark:hover:shadow-white/5 dark:hover:border-white/20",
         featured && "shadow-[0_0_30px_rgba(0,0,0,0.06)] dark:shadow-[0_0_40px_rgba(255,255,255,0.04)]"
       )}

@@ -97,7 +97,7 @@ export default function PricingPage() {
         body: JSON.stringify({ plan: slug }),
       })
       const data = await res.json()
-      if (data.url) window.location.href = data.url
+      if (data.data?.url) window.location.href = data.data.url
     } catch {
       setLoadingPlan(null)
     }

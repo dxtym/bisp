@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import Image from "next/image"
-import { LuLogOut, LuSparkles, LuSun, LuMoon, LuSearch } from "react-icons/lu"
+import { LuLogOut, LuSparkles, LuSun, LuMoon, LuSearch, LuUsers } from "react-icons/lu"
 
 export default function Profile() {
   const { data: session } = useSession()
@@ -22,7 +22,7 @@ export default function Profile() {
   useEffect(() => {
     fetch("/api/user/queries")
       .then((res) => res.json())
-      .then((data) => setQueriesCount(data.queriesCount ?? 0))
+      .then((data) => setQueriesCount(data.data?.queriesCount ?? 0))
       .catch(console.error)
   }, [])
 
@@ -79,6 +79,17 @@ export default function Profile() {
             {resolvedTheme === "dark" ? "Kunduzgi" : "Tungi"}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
+          {session?.user?.role === "admin" && (
+            <>
+              <DropdownMenuItem asChild>
+                <Link href="/admin/users" className="flex items-center gap-2">
+                  <LuUsers className="h-4 w-4" />
+                  Foydalanuvchilar
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
           <DropdownMenuItem
             onClick={() => signOut()}
             className="flex items-center gap-2"

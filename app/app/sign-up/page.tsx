@@ -33,7 +33,7 @@ export default function Page() {
       router.push("/sign-in")
     } else {
       const data = await res.json()
-      setError(data.message || "Xatolik yuz berdi")
+      setError(data.message || data.data?.message || "Xatolik yuz berdi")
     }
   }
 

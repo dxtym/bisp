@@ -8,6 +8,8 @@ export interface IUser {
   passwordHash?: string;
   queriesCount: number;
   plan: "free" | "pro" | "max" | "team";
+  role: "admin" | "user";
+  disabled: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,6 +49,15 @@ const userSchema = new mongoose.Schema<IUser>(
       type: String,
       enum: ["free", "pro", "max", "team"],
       default: "free",
+    },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

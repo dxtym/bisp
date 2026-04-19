@@ -61,8 +61,9 @@ export const uploadFile = createAsyncThunk(
     const response = await fetch("/api/upload", { method: "POST", body: formData });
     const result = await response.json();
     if (!result.success) throw new Error(result.message);
-    localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify({ fileId: result.fileId, blobs: result.blobs }));
-    return result as { fileId: string; fileName: string; schema: Schema[]; blobs: BlobFile[] };
+    const data = result.data as { fileId: string; fileName: string; schema: Schema[]; blobs: BlobFile[] };
+    localStorage.setItem(FILE_STORAGE_KEY, JSON.stringify({ fileId: data.fileId, blobs: data.blobs }));
+    return data;
   }
 );
 

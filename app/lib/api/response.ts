@@ -5,6 +5,7 @@ export function ok<T>(data: T, status = 200): NextResponse {
 }
 
 export function fail(error: unknown, status = 500): NextResponse {
-  const message = error instanceof Error ? error.message : "Something went wrong";
+  const message =
+    error instanceof Error ? error.message : typeof error === "string" ? error : "Something went wrong";
   return NextResponse.json({ success: false, message }, { status });
 }

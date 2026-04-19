@@ -38,18 +38,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             image: user.image || undefined,
           })
           user.id = created.id
+          ;(user as Record<string, unknown>).role = created.role
         } else {
+          if (existing.disabled) return false
           user.id = existing.id
+          ;(user as Record<string, unknown>).role = existing.role
         }
+      } else if (account?.provider === "credentials") {
+        const dbUser = user.email ? await userRepository.getUserByEmail(user.email) : null
+        if (dbUser?.disabled) return false
+        ;(user as Record<string, unknown>).role = dbUser?.role ?? "user"
       }
       return true
     },
     async jwt({ token, user }) {
       if (user?.id) token.userId = user.id
+      if ((user as Record<string, unknown>)?.role) token.role = (user as Record<string, unknown>).role as string
       return token
     },
     async session({ session, token }) {
       session.user.id = token.userId as string
+      session.user.role = (token.role as string | undefined) ?? "user"
       return session
     },
   },

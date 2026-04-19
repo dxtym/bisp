@@ -24,8 +24,8 @@ import {
 } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 
-const DEFAULT_CLICKHOUSE_URL = "https://explorer:@play.clickhouse.com:443";
-const DEFAULT_POSTGRES_URL = "postgresql://neondb_owner:npg_THqvucPL7Q0K@ep-summer-wind-alf7jtkn-pooler.c-3.eu-central-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+const DEFAULT_CLICKHOUSE_URL = process.env.NEXT_PUBLIC_DEFAULT_CLICKHOUSE_URL ?? "";
+const DEFAULT_POSTGRES_URL = process.env.NEXT_PUBLIC_DEFAULT_POSTGRES_URL ?? "";
 
 export default function DbTab() {
   const dispatch = useAppDispatch();

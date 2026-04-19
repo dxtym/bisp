@@ -1,21 +1,19 @@
-import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { put } from "@vercel/blob";
-import { auth } from "@/auth";
 import { sanitizeSheetName } from "@/lib/sqlite/client";
 import { BlobFile, Schema } from "@/lib/repository/common";
+import { ok, fail } from "@/lib/api/response";
+import { requireAuth } from "@/lib/api/auth";
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    const sessionOrResponse = await requireAuth();
+    if (sessionOrResponse instanceof Response) return sessionOrResponse;
 
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     if (!file) {
-      return NextResponse.json({ success: false, message: "No file provided" }, { status: 400 });
+      return fail("No file provided", 400);
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -39,17 +37,8 @@ export async function POST(req: Request) {
       schema.push({ table: safeName, columns });
     }
 
-    return NextResponse.json({
-      success: true,
-      fileId,
-      fileName: file.name,
-      schema,
-      blobs,
-    });
+    return ok({ fileId, fileName: file.name, schema, blobs });
   } catch (error) {
-    return NextResponse.json(
-      { success: false, message: error instanceof Error ? error.message : "Xatolik yuz berdi" },
-      { status: 500 }
-    );
+    return fail(error, 500);
   }
 }

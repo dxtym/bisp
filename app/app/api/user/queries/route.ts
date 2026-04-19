@@ -1,23 +1,16 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { userRepository } from "@/lib/repository/user";
+import { ok, fail } from "@/lib/api/response";
+import { requireAuth } from "@/lib/api/auth";
 
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({
-      message: "Unauthorized"
-    }, { status: 401 });
-  }
+  const sessionOrResponse = await requireAuth();
+  if (sessionOrResponse instanceof Response) return sessionOrResponse;
+  const session = sessionOrResponse;
 
   const queriesCount = await userRepository.getQueriesCount(session.user.id);
   if (queriesCount === null) {
-    return NextResponse.json({
-      message: "User not found"
-    }, { status: 404 });
+    return fail("User not found", 404);
   }
 
-  return NextResponse.json({
-    queriesCount
-  }, { status: 200 });
+  return ok({ queriesCount });
 }

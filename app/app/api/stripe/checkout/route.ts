@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
-import { auth } from "@/auth"
 import { getStripe } from "@/lib/stripe"
+import { ok, fail } from "@/lib/api/response"
+import { requireAuth } from "@/lib/api/auth"
 
 const PRICE_IDS: Record<string, string> = {
   pro: process.env.STRIPE_PRO_PRICE_ID!,
@@ -10,14 +10,13 @@ const PRICE_IDS: Record<string, string> = {
 
 export async function POST(req: Request) {
   try {
-    const session = await auth()
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-    }
+    const sessionOrResponse = await requireAuth()
+    if (sessionOrResponse instanceof Response) return sessionOrResponse
+    const session = sessionOrResponse
 
     const { plan } = await req.json()
     if (!plan || !PRICE_IDS[plan]) {
-      return NextResponse.json({ message: "Invalid plan" }, { status: 400 })
+      return fail("Invalid plan", 400)
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL
@@ -30,11 +29,8 @@ export async function POST(req: Request) {
       subscription_data: { metadata: { userId: session.user.id, plan } },
     })
 
-    return NextResponse.json({ url: checkoutSession.url })
+    return ok({ url: checkoutSession.url })
   } catch (error) {
-    return NextResponse.json(
-      { message: error instanceof Error ? error.message : "Xatolik yuz berdi" },
-      { status: 500 }
-    )
+    return fail(error, 500)
   }
 }

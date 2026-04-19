@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { NextResponse } from "next/server";
 import {
   tool,
   streamText,
@@ -8,8 +7,10 @@ import {
   convertToModelMessages,
 } from "ai";
 import type { UIMessage } from "ai";
-import { auth } from "@/auth";
+import { createHash } from "crypto";
 import { userRepository } from "@/lib/repository/user";
+import { ok, fail } from "@/lib/api/response";
+import { requireAuth } from "@/lib/api/auth";
 import { detectDbType, createDbClient, createSystemRepository } from "@/lib/db/factory";
 import type { Schema, BlobFile } from "@/lib/repository/common";
 import * as duckdbClient from "@/lib/sqlite/client";
@@ -46,21 +47,15 @@ async function generator(question: string, schema: Schema[], namespace: string):
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({
-        message: "Unauthorized"
-      }, { status: 401 });
-    }
+    const sessionOrResponse = await requireAuth();
+    if (sessionOrResponse instanceof Response) return sessionOrResponse;
+    const session = sessionOrResponse;
 
     const { messages, url, blobs }: { messages: UIMessage[]; url?: string; blobs?: BlobFile[] } = await req.json();
     const hasBlobs = !!(blobs?.length);
 
     if (!url && !hasBlobs) {
-      return NextResponse.json({
-        success: false,
-        message: "Ulanish manzili yoki fayl bering",
-      }, { status: 400 });
+      return fail("Ulanish manzili yoki fayl bering", 400);
     }
 
     let schema: Schema[] = [];
@@ -74,20 +69,16 @@ export async function POST(req: Request) {
         schema = await repository.loadSchema();
       }
     } catch (error) {
-      return NextResponse.json({
-        success: false,
-        message: error instanceof Error ? error.message : "Xatolik yuz berdi",
-      }, { status: 400 });
+      return fail(error, 400);
     }
 
-    const namespace = session.user.id;
+    const sourceKey = url ?? blobs!.map((b) => b.name).join(",");
+    const sourceHash = createHash("sha256").update(sourceKey).digest("hex").slice(0, 16);
+    const namespace = `${session.user.id}:${sourceHash}`;
 
     const hasQuota = await userRepository.checkAndDecrementQueryCount(session.user.id);
     if (!hasQuota) {
-      return NextResponse.json({
-        success: false,
-        message: "Hisobingizda so'rovlar tugagan",
-      }, { status: 403 });
+      return fail("Hisobingizda so'rovlar tugagan", 403);
     }
 
     const modelMessages = await convertToModelMessages(messages);
@@ -158,9 +149,6 @@ export async function POST(req: Request) {
       onError: (error) => (error instanceof Error ? error.message : "Xatolik yuz berdi"),
     });
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : "Xatolik yuz berdi",
-    }, { status: 500 });
+    return fail(error, 500);
   }
 }

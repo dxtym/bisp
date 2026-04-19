@@ -1,8 +1,9 @@
 import { mongoDbConnect } from "@/lib/mongodb/client"
 import { Subscription, type ISubscription } from "@/lib/mongodb/models/subscription"
+import { BaseRepository } from "@/lib/repository/base"
 
-class SubscriptionRepository {
-  private async connect(): Promise<void> {
+class SubscriptionRepository extends BaseRepository {
+  protected async connect(): Promise<void> {
     await mongoDbConnect()
   }
 
@@ -15,24 +16,15 @@ class SubscriptionRepository {
     status: string
     currentPeriodEnd: Date
   }): Promise<ISubscription> {
-    await this.connect()
-
-    try {
-      const subscription = await Subscription.create(args)
-      return subscription.toObject()
-    } catch (error) {
-      throw new Error(`Create subscription error: ${error}`)
-    }
+    return this.run("Create subscription error", () =>
+      Subscription.create(args).then((s) => s.toObject())
+    )
   }
 
   public async getByUserId(userId: string): Promise<ISubscription | null> {
-    await this.connect()
-
-    try {
-      return await Subscription.findOne({ userId }).sort({ createdAt: -1 }).lean()
-    } catch (error) {
-      throw new Error(`Get subscription error: ${error}`)
-    }
+    return this.run("Get subscription error", () =>
+      Subscription.findOne({ userId }).sort({ createdAt: -1 }).lean() as Promise<ISubscription | null>
+    )
   }
 }
 

@@ -47,13 +47,15 @@ export default function Chat() {
       body: () => {
         const url = localStorage.getItem(STORAGE_KEY) || undefined;
         let blobs: BlobFile[] | undefined;
-        try {
-          const raw = localStorage.getItem(FILE_STORAGE_KEY);
-          if (raw) {
-            const data = JSON.parse(raw);
-            if (data?.blobs) blobs = data.blobs;
-          }
-        } catch { }
+        if (!url) {
+          try {
+            const raw = localStorage.getItem(FILE_STORAGE_KEY);
+            if (raw) {
+              const data = JSON.parse(raw);
+              if (data?.blobs) blobs = data.blobs;
+            }
+          } catch { }
+        }
         return { url, blobs };
       }
     }),

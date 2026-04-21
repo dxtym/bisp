@@ -60,13 +60,13 @@ export async function POST(req: Request) {
 
     let schema: Schema[] = [];
     try {
-      if (hasBlobs) {
-        schema = await duckdbClient.loadSchemaFromUrls(blobs!);
-      } else {
-        const type = detectDbType(url!);
-        const client = createDbClient(url!);
+      if (url) {
+        const type = detectDbType(url);
+        const client = createDbClient(url);
         const repository = createSystemRepository(client, type);
         schema = await repository.loadSchema();
+      } else {
+        schema = await duckdbClient.loadSchemaFromUrls(blobs!);
       }
     } catch (error) {
       return fail(error, 400);

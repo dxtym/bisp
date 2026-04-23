@@ -6,7 +6,6 @@ import { motion } from "motion/react"
 import { ArrowLeft } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Footer from "@/components/footer"
-import GridBackground from "@/components/grid-background"
 import PricingCard from "@/components/card"
 import UserAvatar from "@/components/avatar"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
@@ -107,7 +106,6 @@ export default function PricingPage() {
 
   return (
     <div className="relative min-h-screen flex flex-col text-foreground">
-      <GridBackground />
       <main className="flex-1 flex flex-col px-4 pt-8 pb-6">
         <div className="w-full max-w-5xl mx-auto space-y-12">
           <div className="flex items-center justify-between">

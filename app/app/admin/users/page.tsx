@@ -6,23 +6,22 @@ import { useSession } from "next-auth/react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "motion/react"
-import { ArrowLeft, ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
+import { ArrowLeft, MoreHorizontal } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts"
-import GridBackground from "@/components/grid-background"
 import UserAvatar from "@/components/avatar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import type { ChartConfig } from "@/components/ui/chart"
+import { cn } from "@/lib/utils"
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.12, duration: 0.6, ease: "easeOut" as const },
+    transition: { delay: i * 0.15, duration: 0.7, ease: "easeOut" as const },
   }),
 }
 
@@ -37,10 +36,8 @@ const PERIODS = [
   { label: "90", days: 90 },
 ] as const
 
-
 type Period = 7 | 30 | 90
 
-const PAGE_SIZE = 10
 const PLAN_LABELS: Record<string, string> = { free: "Bepul", pro: "Pro", max: "Max", team: "Jamoa" }
 
 function SimpleTooltip({ active, payload }: { active?: boolean; payload?: { name?: string; value?: number; color?: string }[] }) {
@@ -79,9 +76,6 @@ export default function AdminUsersPage() {
   const [stats, setStats] = useState<DailyStat[]>([])
   const [period, setPeriod] = useState<Period>(30)
   const [loadingAction, setLoadingAction] = useState<string | null>(null)
-  const [emailFilter, setEmailFilter] = useState("")
-  const [selected, setSelected] = useState<Set<string>>(new Set())
-  const [page, setPage] = useState(0)
 
   useEffect(() => {
     if (status === "loading") return
@@ -120,27 +114,9 @@ export default function AdminUsersPage() {
 
   if (status === "loading" || session?.user?.role !== "admin") return null
 
-  const filteredUsers = users
-    .filter((u) => u.email.toLowerCase().includes(emailFilter.toLowerCase()))
-  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE)
-  const pagedUsers = filteredUsers.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
-  const allPageSelected = pagedUsers.length > 0 && pagedUsers.every((u) => selected.has(u.id))
-
-  function toggleSelect(id: string) {
-    setSelected((prev) => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
-  }
-  function toggleSelectAll() {
-    setSelected((prev) => {
-      const s = new Set(prev)
-      allPageSelected ? pagedUsers.forEach((u) => s.delete(u.id)) : pagedUsers.forEach((u) => s.add(u.id))
-      return s
-    })
-  }
-
   return (
     <div className="relative min-h-screen flex flex-col text-foreground">
-      <GridBackground />
-      <main className="flex-1 flex flex-col p-8">
+      <main className="flex-1 flex flex-col px-4 pt-8 pb-6">
         <div className="w-full max-w-5xl mx-auto space-y-8">
           <div className="flex items-center justify-between">
             <Link
@@ -176,7 +152,7 @@ export default function AdminUsersPage() {
                 ))}
               </div>
             </div>
-            <div className="rounded-sm border border-black/15 dark:border-white/15 bg-white dark:bg-neutral-950 p-4 shadow-lg">
+            <div className="rounded-sm border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-950 p-4 shadow-sm">
               <ChartContainer config={chartConfig} className="h-44 w-full [&_.recharts-cartesian-axis-tick_text]:!fill-foreground">
                 <BarChart data={stats} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
                   <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.08} />
@@ -205,111 +181,81 @@ export default function AdminUsersPage() {
           </motion.div>
 
           <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={2}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold">Ro&apos;yxat</h2>
-              <Input
-                placeholder="Emailni filtrlash..."
-                value={emailFilter}
-                onChange={(e) => { setEmailFilter(e.target.value); setPage(0) }}
-                className="max-w-xs h-8 text-sm bg-white dark:bg-neutral-950"
-              />
-            </div>
-            <div className="rounded-sm border border-black/15 dark:border-white/15 overflow-hidden bg-white dark:bg-neutral-950 shadow-lg">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="w-10 pl-4 align-middle">
-                      <input
-                        type="checkbox"
-                        checked={allPageSelected}
-                        onChange={toggleSelectAll}
-                        className="size-4 rounded-sm border border-input accent-foreground cursor-pointer align-middle"
-                      />
-                    </TableHead>
-                    <TableHead>Foydalanuvchi</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Tarif</TableHead>
-                    <TableHead className="text-center">Holat</TableHead>
-                    <TableHead className="w-10" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pagedUsers.map((user) => (
-                    <TableRow
-                      key={user.id}
-                      className={`transition-colors ${user.disabled ? "opacity-50" : ""} ${selected.has(user.id) ? "bg-muted/40" : ""}`}
-                    >
-                      <TableCell className="pl-4 align-middle" onClick={(e) => e.stopPropagation()}>
-                        <input
-                          type="checkbox"
-                          checked={selected.has(user.id)}
-                          onChange={() => toggleSelect(user.id)}
-                          className="size-4 rounded-sm border border-input accent-foreground cursor-pointer align-middle"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium cursor-pointer" onClick={() => router.push(`/user/${user.id}`)}>
-                        <div className="flex items-center gap-2">
-                          <div className="size-7 rounded-full overflow-hidden bg-muted flex items-center justify-center text-xs font-medium shrink-0">
-                            {user.image ? (
-                              <Image src={user.image} alt={user.name} width={28} height={28} className="object-cover" />
-                            ) : (
-                              <span>{user.name?.[0]?.toUpperCase() ?? "?"}</span>
-                            )}
-                          </div>
-                          <span>{user.name}</span>
-                          {user.role === "admin" && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20 shrink-0">
-                              admin
-                            </span>
+            <Table>
+              <TableHeader>
+                <TableRow className="hover:bg-transparent">
+                  <TableHead>Foydalanuvchi</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Tarif</TableHead>
+                  <TableHead className="text-center">Holat</TableHead>
+                  <TableHead className="text-center">Sana</TableHead>
+                  <TableHead className="w-10" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow
+                    key={user.id}
+                    className={cn("transition-colors", user.disabled && "opacity-50")}
+                  >
+                    <TableCell className="font-medium cursor-pointer" onClick={() => router.push(`/user/${user.id}`)}>
+                      <div className="flex items-center gap-2">
+                        <div className="size-7 rounded-full overflow-hidden bg-muted flex items-center justify-center text-xs font-medium shrink-0">
+                          {user.image ? (
+                            <Image src={user.image} alt={user.name} width={28} height={28} className="object-cover" />
+                          ) : (
+                            <span>{user.name?.[0]?.toUpperCase() ?? "?"}</span>
                           )}
                         </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground text-sm">{user.email}</TableCell>
-                      <TableCell className="text-sm">{PLAN_LABELS[user.plan] ?? user.plan}</TableCell>
-                      <TableCell>
-                        <span className={`size-2 rounded-full block mx-auto ${user.disabled ? "bg-destructive" : "bg-emerald-500"}`} />
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="size-7">
-                              <MoreHorizontal className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              disabled={loadingAction === user.id || user.role === "admin"}
-                              onClick={() => toggleDisabled(user)}
-                              className={user.disabled ? "text-emerald-600 dark:text-emerald-400" : "text-destructive focus:text-destructive"}
-                            >
-                              {loadingAction === user.id ? "..." : user.disabled ? "Faollashtirish" : "Faolsizlantirish"}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {pagedUsers.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={6} className="text-center text-muted-foreground py-10 text-sm">
-                        Foydalanuvchilar topilmadi
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-            <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-              <span>{selected.size} of {filteredUsers.length} qator tanlandi.</span>
-              <div className="flex gap-2">
-                <Button variant="outline" size="icon" className="size-7" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-                  <ChevronLeft className="size-4" />
-                </Button>
-                <Button variant="outline" size="icon" className="size-7" disabled={page + 1 >= totalPages} onClick={() => setPage((p) => p + 1)}>
-                  <ChevronRight className="size-4" />
-                </Button>
-              </div>
-            </div>
+                        <span>{user.name}</span>
+                        {user.role === "admin" && (
+                          <span className={cn(
+                            "text-[10px] px-1.5 py-0.5 rounded shrink-0",
+                            "bg-amber-100 text-amber-700 border border-amber-200",
+                            "dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20"
+                          )}>
+                            admin
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground text-sm">{user.email}</TableCell>
+                    <TableCell className="text-sm">{PLAN_LABELS[user.plan] ?? user.plan}</TableCell>
+                    <TableCell>
+                      <span className={cn("size-2 rounded-full block mx-auto", user.disabled ? "bg-destructive" : "bg-emerald-500")} />
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground text-center">
+                      {new Date(user.createdAt).toLocaleDateString("en-GB").replace(/\//g, ".")}
+                    </TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="size-7">
+                            <MoreHorizontal className="size-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            disabled={loadingAction === user.id || user.role === "admin"}
+                            onClick={() => toggleDisabled(user)}
+                            className={cn(user.disabled ? "text-emerald-600 dark:text-emerald-400" : "text-destructive focus:text-destructive")}
+                          >
+                            {loadingAction === user.id ? "..." : user.disabled ? "Faollashtirish" : "Faolsizlantirish"}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {users.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-10 text-sm">
+                      Foydalanuvchilar topilmadi
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
           </motion.div>
         </div>
       </main>

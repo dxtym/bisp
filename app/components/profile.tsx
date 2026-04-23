@@ -13,11 +13,14 @@ import {
 } from "./ui/dropdown-menu"
 import Image from "next/image"
 import { LuLogOut, LuSparkles, LuSun, LuMoon, LuSearch, LuUsers } from "react-icons/lu"
+import { cn } from "@/lib/utils"
+import SearchDialog from "./search-dialog"
 
 export default function Profile() {
   const { data: session } = useSession()
   const { resolvedTheme, setTheme } = useTheme()
   const [queriesCount, setQueriesCount] = useState<number>(0)
+  const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     fetch("/api/user/queries")
@@ -28,6 +31,7 @@ export default function Profile() {
 
   return (
     <div className="py-2">
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex w-full justify-between cursor-pointer items-center gap-3 rounded-sm bg-muted/50 border px-2 py-2 hover:bg-muted/80 transition-colors">
@@ -35,7 +39,7 @@ export default function Profile() {
               <span className="text-sm font-medium truncate">
                 {session?.user?.name ?? "Guest"}
               </span>
-              <span className={`text-xs truncate ${queriesCount === 0 ? "text-destructive" : "text-muted-foreground"}`}>
+              <span className={cn("text-xs truncate", queriesCount === 0 ? "text-destructive" : "text-muted-foreground")}>
                 {`So'rovlar: ${queriesCount} / 5`}
               </span>
             </div>
@@ -55,11 +59,9 @@ export default function Profile() {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="top" align="start" sideOffset={8} className="w-[var(--radix-dropdown-menu-trigger-width)]">
-          <DropdownMenuItem asChild>
-            <Link href="/search" className="flex items-center gap-2">
-              <LuSearch className="h-4 w-4" />
-              Qidiruv
-            </Link>
+          <DropdownMenuItem onSelect={() => setSearchOpen(true)} className="flex items-center gap-2">
+            <LuSearch className="h-4 w-4" />
+            Qidiruv
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/pricing" className="flex items-center gap-2">

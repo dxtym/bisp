@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { SCROLLBAR_THIN } from "@/lib/constants/ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -49,22 +50,26 @@ function Params({ input }: { input?: Record<string, unknown> }) {
 
 interface ApprovalProps {
   approvalId?: string
+  summary?: string
   onApprove?: (id: string) => void
   onDeny?: (id: string) => void
 }
 
-function Approval({ approvalId, onApprove, onDeny }: ApprovalProps) {
+function Approval({ approvalId, summary, onApprove, onDeny }: ApprovalProps) {
   if (!approvalId) return null
   return (
-    <div className="flex items-center gap-2 p-2">
-      <Button size="sm" onClick={() => onApprove?.(approvalId)}>
-        <LuCheck className="size-3" />
-        Tasdiqlash
-      </Button>
-      <Button size="sm" variant="outline" onClick={() => onDeny?.(approvalId)}>
-        <LuX className="size-3" />
-        Bekor qilish
-      </Button>
+    <div className="space-y-2 p-2">
+      {summary && <p className="text-sm text-muted-foreground">{summary}</p>}
+      <div className="flex items-center gap-2">
+        <Button size="sm" onClick={() => onApprove?.(approvalId)}>
+          <LuCheck className="size-3" />
+          Tasdiqlash
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => onDeny?.(approvalId)}>
+          <LuX className="size-3" />
+          Bekor qilish
+        </Button>
+      </div>
     </div>
   )
 }
@@ -75,10 +80,7 @@ function Result({ output }: { output?: unknown }) {
       <p className="mb-1 text-xs font-medium text-muted-foreground">Natija</p>
       <pre
         className="overflow-x-auto rounded bg-muted/50 p-2 text-xs pb-4"
-        style={{
-          scrollbarWidth: 'thin',
-          scrollbarColor: 'rgb(138 138 138) transparent'
-        }}
+        style={SCROLLBAR_THIN}
       >
         <code className="block whitespace-pre">{typeof output === "string" ? output : JSON.stringify(output, null, 2)}</code>
       </pre>
@@ -105,6 +107,9 @@ export default function Tool({
   onDeny
 }: Props) {
   const [isOpen, setIsOpen] = useState(state === "approval-requested")
+  const paramsInput = state === "approval-requested" && input
+    ? Object.fromEntries(Object.entries(input).filter(([k]) => k !== "summary"))
+    : input
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="my-1">
@@ -116,11 +121,11 @@ export default function Tool({
         <div className="flex items-center gap-3">
           <Badge
             variant="secondary"
-            className={`
-              gap-1 text-xs
-              ${state === "output-available" ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' : ''}
-              ${state === "output-error" ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' : ''}
-            `}
+            className={cn(
+              "gap-1 text-xs",
+              state === "output-available" && "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+              state === "output-error" && "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+            )}
           >
             {STATE_LABELS[state]}
           </Badge>
@@ -128,9 +133,14 @@ export default function Tool({
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent className="rounded-b border border-t-0 bg-background/50">
-        <Params input={input} />
+        <Params input={paramsInput} />
         {state === "approval-requested" && (
-          <Approval approvalId={approvalId} onApprove={onApprove} onDeny={onDeny} />
+          <Approval
+            approvalId={approvalId}
+            summary={input?.summary as string | undefined}
+            onApprove={onApprove}
+            onDeny={onDeny}
+          />
         )}
         {state === "output-available" && <Result output={output} />}
         {state === "output-error" && <Err errorText={errorText} />}

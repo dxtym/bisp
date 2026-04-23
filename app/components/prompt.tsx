@@ -13,20 +13,18 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input"
 import {
-  ModelSelector,
-  ModelSelectorTrigger,
-  ModelSelectorContent,
-  ModelSelectorList,
-  ModelSelectorEmpty,
-  ModelSelectorGroup,
-  ModelSelectorItem,
-  ModelSelectorName,
-} from "@/components/ai-elements/model-selector"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import Panel from "@/components/panel";
 import { ChatStatus } from "ai";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { selectUrl, selectSchema, selectDbType, setDbType } from "@/lib/store/slices/connection";
 import { SiClickhouse, SiPostgresql } from "react-icons/si";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, SlidersHorizontal } from "lucide-react";
 import { type DbType, detectDbType } from "@/lib/db/types";
 
 type DbOption = {
@@ -90,32 +88,34 @@ export default function Prompt({ onSubmit, status }: PromptProps) {
           </PromptInputBody>
           <PromptInputFooter className="flex justify-between items-center">
             <PromptInputTools>
-              <ModelSelector>
-                <ModelSelectorTrigger asChild>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <PromptInputButton size="sm">
+                    <SlidersHorizontal className="size-3.5" />
+                  </PromptInputButton>
+                </SheetTrigger>
+                <SheetContent side="right" className="p-0 flex flex-col sm:max-w-sm" showCloseButton={false}>
+                  <SheetTitle className="sr-only">Sozlama</SheetTitle>
+                  <Panel />
+                </SheetContent>
+              </Sheet>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <PromptInputButton size="sm" disabled={isConnected}>
                     <DbIcon className="size-3.5" />
                     {dbLabel}
                   </PromptInputButton>
-                </ModelSelectorTrigger>
-                <ModelSelectorContent>
-                  <ModelSelectorList>
-                    <ModelSelectorEmpty>Topilmadi</ModelSelectorEmpty>
-                    <ModelSelectorGroup>
-                      {DB_OPTIONS.map(({ type, label, Icon }) => (
-                        <ModelSelectorItem
-                          key={type}
-                          value={label}
-                          onSelect={() => dispatch(setDbType(type))}
-                        >
-                          <Icon className="size-4" />
-                          <ModelSelectorName>{label}</ModelSelectorName>
-                          {type === displayedDbType && <CheckIcon className="ml-auto size-3.5" />}
-                        </ModelSelectorItem>
-                      ))}
-                    </ModelSelectorGroup>
-                  </ModelSelectorList>
-                </ModelSelectorContent>
-              </ModelSelector>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-40">
+                  {DB_OPTIONS.map(({ type, label, Icon }) => (
+                    <DropdownMenuItem key={type} onSelect={() => dispatch(setDbType(type))}>
+                      <Icon className="size-4" />
+                      {label}
+                      {type === displayedDbType && <CheckIcon className="ml-auto size-3.5" />}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </PromptInputTools>
             <PromptInputSubmit disabled={!text} status={status} />
           </PromptInputFooter>

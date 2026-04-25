@@ -23,32 +23,33 @@ export async function POST(req: NextRequest) {
 
   const fresh = await webhookEventRepository.markProcessed("stripe", event.id)
   if (!fresh) {
-    return ok({ received: true, idempotent: true })
+    return ok({ received: true, type: event.type, idempotent: true })
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as Stripe.Checkout.Session
-
-    const userId = session.metadata?.userId
-    const plan = session.metadata?.plan as "pro" | "max" | "team"
-    if (!userId || !plan) {
-      return fail("Missing metadata", 400)
-    }
-
-    const subscription = await getStripe().subscriptions.retrieve(session.subscription as string)
-
-    await subscriptionRepository.createSubscription({
-      userId,
-      plan,
-      stripeCustomerId: session.customer as string,
-      stripeSubscriptionId: subscription.id,
-      stripeSessionId: session.id,
-      status: subscription.status,
-      currentPeriodEnd: new Date(subscription.items.data[0].current_period_end * 1000),
-    })
-
-    await userRepository.updatePlan(userId, plan)
+  if (event.type !== "checkout.session.completed") {
+    return ok({ received: true, type: event.type, handled: false })
   }
 
-  return ok({ received: true })
+  const session = event.data.object as Stripe.Checkout.Session
+  const userId = session.metadata?.userId
+  const plan = session.metadata?.plan as "pro" | "max" | "team"
+  if (!userId || !plan) {
+    return fail("Missing metadata", 400)
+  }
+
+  const subscription = await getStripe().subscriptions.retrieve(session.subscription as string)
+
+  await subscriptionRepository.createSubscription({
+    userId,
+    plan,
+    stripeCustomerId: session.customer as string,
+    stripeSubscriptionId: subscription.id,
+    stripeSessionId: session.id,
+    status: subscription.status,
+    currentPeriodEnd: new Date(subscription.items.data[0].current_period_end * 1000),
+  })
+
+  await userRepository.updatePlan(userId, plan)
+
+  return ok({ received: true, type: event.type, handled: true })
 }

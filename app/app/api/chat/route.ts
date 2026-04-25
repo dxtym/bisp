@@ -32,16 +32,15 @@ async function translator(prompt: string): Promise<string> {
   return text;
 }
 
-async function generator(question: string, schema: Schema[], namespace: string, errorContext?: string): Promise<string | null> {
+async function generator(question: string, schema: Schema[], namespace: string): Promise<string | null> {
   await index(schema, namespace);
   const ok = await validate(question, namespace);
   if (!ok) return null;
 
   const metadata = schema.map((t) => `${t.table}: ${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")}`).join("\n");
-  const errorClause = errorContext ? ` The previous SQL attempt failed with this error: "${errorContext}". Fix it.` : "";
   const { text: response } = await generateText({
     model: ollamaClient.model,
-    prompt: `Given the schema: ${metadata} Answer the question: ${question}${errorClause}`,
+    prompt: `Given the schema: ${metadata} Answer the question: ${question}`,
   });
   return response;
 }
@@ -83,11 +82,38 @@ export async function POST(req: Request) {
     }
 
     const modelMessages = await convertToModelMessages(messages);
-    const lastUserIdx = modelMessages.findLastIndex((m) => m.role === "user");
-    let toolStepCount = modelMessages.slice(lastUserIdx + 1).filter((m) => m.role === "tool").length;
-    let executionFailures = 0;
-    let needsRetry = false;
-    let retryExecutorPending = false;
+
+    type Phase = "translator" | "generator" | "executor" | "done";
+
+    function computePhase(msgs: typeof modelMessages): Phase {
+      let phase: Phase = "translator";
+      let failures = 0;
+      const userIdx = msgs.findLastIndex((m) => m.role === "user");
+      for (const msg of msgs.slice(userIdx + 1)) {
+        if (phase === "done") break;
+        if (msg.role !== "tool") continue;
+        for (const part of msg.content) {
+          if (phase === "done") break;
+          if (part.type !== "tool-result") continue;
+          const { toolName, output } = part;
+          if (toolName === "translator") {
+            phase = "generator";
+          } else if (toolName === "generator") {
+            const val = output.type === "json" ? (output.value as { irrelevant?: boolean }) : {};
+            phase = val.irrelevant === true ? "done" : "executor";
+          } else if (toolName === "executor") {
+            const val = output.type === "json" ? (output.value as { success: boolean }) : { success: false };
+            if (val.success) {
+              phase = "done";
+            } else {
+              failures++;
+              phase = failures < 3 ? "generator" : "done";
+            }
+          }
+        }
+      }
+      return phase;
+    }
 
     const result = streamText({
       model: anthropicClient.model,
@@ -107,8 +133,8 @@ export async function POST(req: Request) {
             question: z.string().describe(TOOL_DESCRIPTIONS.generator.question),
             errorContext: z.string().optional().describe(TOOL_DESCRIPTIONS.generator.errorContext),
           }),
-          execute: async ({ question, errorContext }) => {
-            const generation = await generator(question, schema, namespace, errorContext);
+          execute: async ({ question }) => {
+            const generation = await generator(question, schema, namespace);
             if (generation === null) return { generation: null, irrelevant: true };
             return { generation };
           },
@@ -137,36 +163,10 @@ export async function POST(req: Request) {
         }),
       },
       stopWhen: stepCountIs(10),
-      prepareStep: () => {
-        if (toolStepCount < 3 || needsRetry || retryExecutorPending) {
-          if (needsRetry) {
-            needsRetry = false;
-            retryExecutorPending = true;
-          } else if (retryExecutorPending) {
-            retryExecutorPending = false;
-          }
-          return { toolChoice: "required" };
-        }
-        return { toolChoice: "none", activeTools: [] };
-      },
-      onStepFinish: ({ toolCalls, toolResults }) => {
-        if (toolCalls.length > 0) toolStepCount++;
-        for (const result of toolResults) {
-          if (
-            result.toolName === "executor" &&
-            (result.output as { success: boolean })?.success === false &&
-            executionFailures < 3
-          ) {
-            executionFailures++;
-            needsRetry = true;
-          }
-        }
-      },
-      onFinish: () => {
-        toolStepCount = 0;
-        executionFailures = 0;
-        needsRetry = false;
-        retryExecutorPending = false;
+      prepareStep: ({ messages }) => {
+        const phase = computePhase(messages);
+        if (phase === "done") return { toolChoice: "none", activeTools: [] };
+        return { toolChoice: "required", activeTools: [phase] };
       },
     });
 

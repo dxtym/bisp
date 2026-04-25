@@ -3,7 +3,7 @@ import { embed, embedMany } from "ai";
 import type { Schema } from "@/lib/repository/common";
 import pineconeClient from "@/lib/agents/pinecone/client";
 
-const SIMILARITY_THRESHOLD = 0.2;
+const SIMILARITY_THRESHOLD = 0.15;
 
 const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY! });
 const embeddingModel = openai.embedding("text-embedding-3-small");
@@ -53,12 +53,11 @@ export async function validate(query: string, namespace: string): Promise<boolea
     .namespace(namespace);
 
   const result = await index.query({
-    vector: embedding,
     topK: 1,
+    vector: embedding,
     includeMetadata: false,
   });
 
   const topScore = result.matches?.[0]?.score ?? 0;
-  console.log("[RAG] top score:", topScore, "query:", query);
   return topScore >= SIMILARITY_THRESHOLD;
 }

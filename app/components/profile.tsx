@@ -20,12 +20,16 @@ export default function Profile() {
   const { data: session } = useSession()
   const { resolvedTheme, setTheme } = useTheme()
   const [queriesCount, setQueriesCount] = useState<number>(0)
+  const [limit, setLimit] = useState<number>(0)
   const [searchOpen, setSearchOpen] = useState(false)
 
   useEffect(() => {
     fetch("/api/user/queries")
       .then((res) => res.json())
-      .then((data) => setQueriesCount(data.data?.queriesCount ?? 0))
+      .then((data) => {
+        setQueriesCount(data.data?.queriesCount ?? 0)
+        setLimit(data.data?.limit ?? 0)
+      })
       .catch(console.error)
   }, [])
 
@@ -40,7 +44,7 @@ export default function Profile() {
                 {session?.user?.name ?? "Guest"}
               </span>
               <span className={cn("text-xs truncate", queriesCount === 0 ? "text-destructive" : "text-muted-foreground")}>
-                {`So'rovlar: ${queriesCount} / 5`}
+                {`So'rovlar: ${queriesCount} / ${limit}`}
               </span>
             </div>
             <div className="size-8 rounded-full overflow-hidden bg-muted flex items-center justify-center text-sm font-medium ring-2 ring-neutral-300 ring-offset-1 ring-offset-white dark:ring-white/20 dark:ring-offset-black">

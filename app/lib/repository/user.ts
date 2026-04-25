@@ -2,6 +2,7 @@ import { mongoDbConnect } from "@/lib/mongodb/client";
 import { User, type IUser } from "@/lib/mongodb/models/user";
 import { Conversation } from "@/lib/mongodb/models/conversation";
 import { BaseRepository } from "@/lib/repository/base";
+import { PLAN_LIMITS, type Plan } from "@/lib/constants/plans";
 
 class UserRepository extends BaseRepository {
   protected async connect(): Promise<void> {
@@ -20,17 +21,22 @@ class UserRepository extends BaseRepository {
     );
   }
 
-  public async getQueriesCount(id: string): Promise<number | null> {
-    return this.run("Get queries count error", async () => {
-      const user = await User.findOne({ id }, { queriesCount: 1 }).lean();
-      return user ? (user.queriesCount ?? 0) : null;
+  public async getQuotaInfo(id: string): Promise<{ queriesCount: number; plan: Plan; limit: number } | null> {
+    return this.run("Get quota info error", async () => {
+      const user = await User.findOne({ id }, { queriesCount: 1, plan: 1 }).lean();
+      if (!user) return null;
+      const plan = (user.plan ?? "free") as Plan;
+      return {
+        queriesCount: user.queriesCount ?? 0,
+        plan,
+        limit: PLAN_LIMITS[plan],
+      };
     });
   }
 
-  public async updatePlan(id: string, plan: "pro" | "max" | "team"): Promise<void> {
-    const queriesCount: Record<"pro" | "max" | "team", number> = { pro: 50, max: 1000, team: 10000 };
+  public async updatePlan(id: string, plan: Exclude<Plan, "free">): Promise<void> {
     return this.run("Update plan error", () =>
-      User.updateOne({ id }, { plan, queriesCount: queriesCount[plan] }).then(() => undefined)
+      User.updateOne({ id }, { plan, queriesCount: PLAN_LIMITS[plan] }).then(() => undefined)
     );
   }
 

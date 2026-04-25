@@ -7,10 +7,10 @@ export async function GET() {
   if (sessionOrResponse instanceof Response) return sessionOrResponse;
   const session = sessionOrResponse;
 
-  const queriesCount = await userRepository.getQueriesCount(session.user.id);
-  if (queriesCount === null) {
+  const quota = await userRepository.getQuotaInfo(session.user.id);
+  if (quota === null) {
     return fail("User not found", 404);
   }
 
-  return ok({ queriesCount });
+  return ok(quota);
 }

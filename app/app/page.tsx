@@ -18,7 +18,7 @@ export default function Home() {
   if (status === "loading") {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader size={24} className="text-muted-foreground" />
+        <Loader size={28} className="text-foreground" />
       </div>
     );
   }

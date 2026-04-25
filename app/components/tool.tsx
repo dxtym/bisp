@@ -4,6 +4,7 @@ import { SCROLLBAR_THIN } from "@/lib/constants/ui";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Textarea } from "@/components/ui/textarea";
 import { LuCheck, LuChevronDown, LuWrench, LuX } from "react-icons/lu";
 
 export type ToolState = "input-streaming" | "input-available" | "approval-requested" | "output-available" | "output-error"
@@ -16,7 +17,7 @@ const STATE_LABELS: Record<ToolState, string> = {
   "output-error": "Xatolik"
 }
 
-const TOOL_NAMES: Record<string, string> = {
+export const TOOL_NAMES: Record<string, string> = {
   "translator": "Tarjimon",
   "generator": "Mutafakkir",
   "executor": "Ijrochi"
@@ -29,7 +30,7 @@ interface Props {
   output?: unknown
   errorText?: string
   approvalId?: string
-  onApprove?: (id: string) => void
+  onApprove?: (id: string, editedQuery?: string) => void
   onDeny?: (id: string) => void
 }
 
@@ -51,17 +52,32 @@ function Params({ input }: { input?: Record<string, unknown> }) {
 interface ApprovalProps {
   approvalId?: string
   summary?: string
-  onApprove?: (id: string) => void
+  query?: string
+  onApprove?: (id: string, editedQuery?: string) => void
   onDeny?: (id: string) => void
 }
 
-function Approval({ approvalId, summary, onApprove, onDeny }: ApprovalProps) {
+function Approval({ approvalId, summary, query, onApprove, onDeny }: ApprovalProps) {
+  const [edited, setEdited] = useState(query ?? "")
   if (!approvalId) return null
+  const trimmed = edited.trim()
+  const changed = trimmed !== (query ?? "").trim()
   return (
     <div className="space-y-2 p-2">
       {summary && <p className="text-sm text-muted-foreground">{summary}</p>}
+      <Textarea
+        value={edited}
+        onChange={(e) => setEdited(e.target.value)}
+        spellCheck={false}
+        style={SCROLLBAR_THIN}
+        className="min-h-16 max-h-48 resize-none overflow-y-auto rounded border-0 bg-muted/50 p-2 font-mono text-xs leading-relaxed md:text-xs shadow-none focus-visible:ring-1 focus-visible:ring-ring/40 dark:bg-muted/50"
+      />
       <div className="flex items-center gap-2">
-        <Button size="sm" onClick={() => onApprove?.(approvalId)}>
+        <Button
+          size="sm"
+          disabled={trimmed.length === 0}
+          onClick={() => onApprove?.(approvalId, changed ? trimmed : undefined)}
+        >
           <LuCheck className="size-3" />
           Tasdiqlash
         </Button>
@@ -69,6 +85,11 @@ function Approval({ approvalId, summary, onApprove, onDeny }: ApprovalProps) {
           <LuX className="size-3" />
           Bekor qilish
         </Button>
+        {changed && (
+          <Badge variant="secondary" className="text-xs">
+            Tahrirlangan
+          </Badge>
+        )}
       </div>
     </div>
   )
@@ -108,7 +129,7 @@ export default function Tool({
 }: Props) {
   const [isOpen, setIsOpen] = useState(state === "approval-requested")
   const paramsInput = state === "approval-requested" && input
-    ? Object.fromEntries(Object.entries(input).filter(([k]) => k !== "summary"))
+    ? Object.fromEntries(Object.entries(input).filter(([k]) => k !== "summary" && k !== "query"))
     : input
 
   return (
@@ -138,6 +159,7 @@ export default function Tool({
           <Approval
             approvalId={approvalId}
             summary={input?.summary as string | undefined}
+            query={input?.query as string | undefined}
             onApprove={onApprove}
             onDeny={onDeny}
           />

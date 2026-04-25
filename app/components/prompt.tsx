@@ -22,10 +22,10 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 import Panel from "@/components/panel";
 import { ChatStatus } from "ai";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
-import { selectUrl, selectSchema, selectDbType, setDbType } from "@/lib/store/slices/connection";
+import { selectDbType, setDbType } from "@/lib/store/slices/connection";
 import { SiClickhouse, SiPostgresql } from "react-icons/si";
 import { CheckIcon, SlidersHorizontal } from "lucide-react";
-import { type DbType, detectDbType } from "@/lib/db/types";
+import { type DbType } from "@/lib/db/types";
 
 type DbOption = {
   type: DbType;
@@ -53,13 +53,9 @@ export default function Prompt({ onSubmit, status }: PromptProps) {
   const dispatch = useAppDispatch();
   const [text, setText] = useState<string>("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const url = useAppSelector(selectUrl);
-  const schema = useAppSelector(selectSchema);
   const selectedDbType = useAppSelector(selectDbType);
 
-  const isConnected = !!url || schema.length > 0;
-  const displayedDbType: DbType = isConnected ? detectDbType(url) : selectedDbType;
-  const { Icon: DbIcon, label: dbLabel } = DB_OPTIONS.find((o) => o.type === displayedDbType)!;
+  const { Icon: DbIcon, label: dbLabel } = DB_OPTIONS.find((o) => o.type === selectedDbType)!;
 
   const handleSubmit = useCallback((message: PromptInputMessage) => {
     if (!message.text) return;
@@ -101,7 +97,7 @@ export default function Prompt({ onSubmit, status }: PromptProps) {
               </Sheet>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <PromptInputButton size="sm" disabled={isConnected}>
+                  <PromptInputButton size="sm">
                     <DbIcon className="size-3.5" />
                     {dbLabel}
                   </PromptInputButton>
@@ -111,7 +107,7 @@ export default function Prompt({ onSubmit, status }: PromptProps) {
                     <DropdownMenuItem key={type} onSelect={() => dispatch(setDbType(type))}>
                       <Icon className="size-4" />
                       {label}
-                      {type === displayedDbType && <CheckIcon className="ml-auto size-3.5" />}
+                      {type === selectedDbType && <CheckIcon className="ml-auto size-3.5" />}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>

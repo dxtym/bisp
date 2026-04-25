@@ -93,7 +93,11 @@ const connectionSlice = createSlice({
       }
     },
     setDbType(state, action: PayloadAction<DbType>) {
+      if (state.dbType === action.payload) return;
       state.dbType = action.payload;
+      state.url = "";
+      state.schema = [];
+      localStorage.removeItem(STORAGE_KEY);
     },
     clearFile(state) {
       state.fileId = "";

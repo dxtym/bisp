@@ -1,6 +1,5 @@
 "use client"
 
-import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import {
   getSchema,
@@ -8,7 +7,6 @@ import {
   selectLoading,
   selectDbType,
   setUrl,
-  clearUrl,
 } from "@/lib/store/slices/connection";
 import {
   InputGroup,
@@ -33,10 +31,6 @@ export default function DbTab() {
   const loading = useAppSelector(selectLoading);
   const selectedDbType = useAppSelector(selectDbType);
 
-  useEffect(() => {
-    dispatch(clearUrl());
-  }, [dispatch]);
-
   const defaultUrl = selectedDbType === "postgres" ? DEFAULT_POSTGRES_URL : DEFAULT_CLICKHOUSE_URL;
   
   const handleConnect = async () => {
@@ -55,7 +49,7 @@ export default function DbTab() {
       <InputGroupInput
         value={url}
         onChange={(e) => dispatch(setUrl(e.target.value))}
-        placeholder="Ulanish manzilini kiriting"
+        placeholder={defaultUrl || "Ulanish manzilini kiriting"}
         className="text-xs flex-1"
         disabled={loading}
       />

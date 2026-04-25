@@ -117,7 +117,25 @@ export default function Chat() {
     messageRef.current = last.id
   }, [messages, dispatch, conversation])
 
-  const handleApprove = (approvalId: string) => {
+  const handleApprove = (approvalId: string, editedQuery?: string) => {
+    if (editedQuery) {
+      setMessages((prev) =>
+        prev.map((m) => {
+          if (m.role !== "assistant") return m
+          let touched = false
+          const parts = m.parts.map((p) => {
+            const tp = p as Record<string, unknown>
+            const approval = tp.approval as { id?: string } | undefined
+            if (approval?.id !== approvalId) return p
+            const input = tp.input as Record<string, unknown> | undefined
+            if (!input || input.query === editedQuery) return p
+            touched = true
+            return { ...tp, input: { ...input, query: editedQuery } } as typeof p
+          })
+          return touched ? { ...m, parts } : m
+        })
+      )
+    }
     addToolApprovalResponse({ id: approvalId, approved: true })
   }
 

@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "motion/react"
-import { ArrowLeft, MoreHorizontal } from "lucide-react"
+import { ArrowLeft, MoreHorizontal, ShieldCheck } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts"
 import UserAvatar from "@/components/avatar"
 import { Button } from "@/components/ui/button"
@@ -126,7 +126,9 @@ export default function AdminUsersPage() {
               <ArrowLeft className="size-5" />
               Orqaga
             </Link>
-            <UserAvatar name={session?.user?.name} image={session?.user?.image} />
+            <div className="mr-[3px]">
+              <UserAvatar name={session?.user?.name} image={session?.user?.image} />
+            </div>
           </div>
 
           <motion.h1 className="text-3xl font-bold tracking-tight" variants={fadeUp} initial="hidden" animate="visible" custom={0}>
@@ -209,13 +211,7 @@ export default function AdminUsersPage() {
                         </div>
                         <span>{user.name}</span>
                         {user.role === "admin" && (
-                          <span className={cn(
-                            "text-[10px] px-1.5 py-0.5 rounded shrink-0",
-                            "bg-amber-100 text-amber-700 border border-amber-200",
-                            "dark:bg-amber-500/10 dark:text-amber-300 dark:border-amber-500/20"
-                          )}>
-                            admin
-                          </span>
+                          <ShieldCheck className="size-3.5 shrink-0 text-black dark:text-white" aria-label="admin" />
                         )}
                       </div>
                     </TableCell>

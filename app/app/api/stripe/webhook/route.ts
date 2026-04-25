@@ -3,6 +3,7 @@ import type Stripe from "stripe"
 import { getStripe } from "@/lib/stripe"
 import { subscriptionRepository } from "@/lib/repository/subscription"
 import { userRepository } from "@/lib/repository/user"
+import { webhookEventRepository } from "@/lib/repository/webhook-event"
 import { ok, fail } from "@/lib/api/response"
 
 export async function POST(req: NextRequest) {
@@ -18,6 +19,11 @@ export async function POST(req: NextRequest) {
     event = getStripe().webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!)
   } catch {
     return fail("Webhook signature verification failed", 400)
+  }
+
+  const fresh = await webhookEventRepository.markProcessed("stripe", event.id)
+  if (!fresh) {
+    return ok({ received: true, idempotent: true })
   }
 
   if (event.type === "checkout.session.completed") {

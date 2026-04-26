@@ -26,9 +26,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
           error:
             "group-[.toaster]:border-destructive/30",
           success:
-            "group-[.toaster]:border-border",
+            "group-[.toaster]:border-border [&_svg]:text-green-500",
           icon:
-            "group-[.toast]:[&>svg]:size-3.5",
+            "group-[.toast]:[&>svg]:size-5",
         },
       }}
       {...props}

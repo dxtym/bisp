@@ -43,7 +43,7 @@ export default function Page() {
       <div className="flex w-full lg:w-1/2 items-center justify-center px-8">
         <div className="w-full max-w-sm space-y-8">
           <div className="space-y-1 text-center">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Ro&apos;yxatdan o&apos;tish</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">Royxatdan otish</h1>
             <p className="text-sm text-muted-foreground">Yangi hisob yarating.</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -88,7 +88,7 @@ export default function Page() {
             <Button
               type="submit"
               variant="secondary"
-              className="w-full mt-3 rounded-sm bg-foreground !text-background hover:bg-foreground/90 transition-colors"
+              className="w-full mt-3 rounded-sm bg-foreground text-background! hover:bg-foreground/90 transition-colors"
               disabled={loading}
             >
               {loading ? "Ro'yxatdan o'tilmoqda..." : "Ro'yxatdan o'tish"}

@@ -70,7 +70,10 @@ function Approval({ approvalId, summary, query, onApprove, onDeny }: ApprovalPro
         onChange={(e) => setEdited(e.target.value)}
         spellCheck={false}
         style={SCROLLBAR_THIN}
-        className="min-h-16 max-h-48 resize-none overflow-y-auto rounded border-0 bg-muted/50 p-2 font-mono text-xs leading-relaxed md:text-xs shadow-none focus-visible:ring-1 focus-visible:ring-ring/40 dark:bg-muted/50"
+        className={cn(
+          "min-h-16 max-h-48 resize-none overflow-y-auto rounded border-0 bg-muted/50 p-2 font-mono text-xs leading-relaxed md:text-xs shadow-none",
+          "focus-visible:ring-1 focus-visible:ring-ring/40 dark:bg-muted/50"
+        )}
       />
       <div className="flex items-center gap-2">
         <Button

@@ -52,7 +52,7 @@ export default function Hero() {
           <Link href="/sign-in">
             <Button
               variant="secondary"
-              className="px-8 rounded-sm bg-neutral-900 !text-white hover:bg-black dark:bg-white dark:!text-black dark:hover:bg-neutral-100"
+              className="px-8 rounded-sm bg-neutral-900 text-white! hover:bg-black dark:bg-white dark:text-black! dark:hover:bg-neutral-100"
             >
               Kirish
             </Button>

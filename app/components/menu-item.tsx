@@ -50,7 +50,7 @@ export default function MenuItem({ c, isActive, isDeleting, onSelect, onDelete, 
           )}
           onClick={stopAndRun(() => onTogglePin(c.id, !pinned))}
           disabled={isDeleting}
-          aria-label={pinned ? "Arxivdan olib tashlash" : "Arxivga qo'shish"}
+          aria-label={pinned ? "Arxivdan olib tashlash" : "Arxivga qoshish"}
         >
           {pinned ? <LuPinOff className="h-3.5 w-3.5" /> : <LuPin className="h-3.5 w-3.5" />}
         </Button>

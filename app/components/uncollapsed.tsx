@@ -3,10 +3,10 @@
 import { motion } from "motion/react"
 import { LuWrench, LuChevronDown } from "react-icons/lu"
 import { Badge } from "@/components/ui/badge"
+import { SCROLLBAR_THIN } from "@/lib/constants/ui"
 
 const SQL = "SELECT COUNT(*) AS total_users FROM users;"
 const RESULT = JSON.stringify([{ total_users: 1247 }], null, 2)
-import { SCROLLBAR_THIN } from "@/lib/constants/ui"
 
 interface Props {
   delay: number

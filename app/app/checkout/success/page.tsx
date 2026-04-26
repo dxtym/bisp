@@ -37,7 +37,7 @@ export default function CheckoutSuccessPage() {
       >
         <CircleCheck className="h-16 w-16 text-emerald-500 mx-auto" />
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">To'lov muvaffaqiyatli!</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Tolov muvaffaqiyatli!</h1>
           <p className="text-muted-foreground">
             Obunangiz faollashtirildi. Barcha imkoniyatlardan foydalanishingiz mumkin.
           </p>

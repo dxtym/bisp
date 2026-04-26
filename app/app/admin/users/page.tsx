@@ -130,11 +130,9 @@ export default function AdminUsersPage() {
               <UserAvatar name={session?.user?.name} image={session?.user?.image} />
             </div>
           </div>
-
           <motion.h1 className="text-3xl font-bold tracking-tight" variants={fadeUp} initial="hidden" animate="visible" custom={0}>
             Foydalanuvchilar
           </motion.h1>
-
           <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={1}>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-semibold">So&apos;rovlar</h2>
@@ -181,7 +179,6 @@ export default function AdminUsersPage() {
               </ChartContainer>
             </div>
           </motion.div>
-
           <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={2}>
             <Table>
               <TableHeader>

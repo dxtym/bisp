@@ -61,7 +61,7 @@ export default function Page() {
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -72,7 +72,7 @@ export default function Page() {
             <Button
               type="submit"
               variant="secondary"
-              className="w-full mt-3 rounded-sm bg-foreground !text-background hover:bg-foreground/90 transition-colors"
+              className="w-full mt-3 rounded-sm bg-foreground text-background! hover:bg-foreground/90 transition-colors"
               disabled={loading}
             >
               {loading ? "Kirish..." : "Kirish"}
@@ -92,7 +92,7 @@ export default function Page() {
             Google orqali kirish
           </Button>
           <p className="text-sm text-center text-muted-foreground">
-            Hisobingiz yo&apos;qmi?{" "}
+            Hisobingiz yoqmi?{" "}
             <Link href="/sign-up" className="text-foreground underline underline-offset-4 hover:text-foreground/80 transition-colors">
               Royxatdan oting
             </Link>

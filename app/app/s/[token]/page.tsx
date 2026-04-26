@@ -7,14 +7,10 @@ import { ConversationRepository } from "@/lib/repository/conversation";
 import { userRepository } from "@/lib/repository/user";
 import { cn } from "@/lib/utils";
 
-const repository = new ConversationRepository();
 const AVATAR_SIZE = 32;
+const repository = new ConversationRepository();
 
-export default async function SharedConversationPage({
-  params,
-}: {
-  params: Promise<{ token: string }>;
-}) {
+export default async function SharedConversationPage({ params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
   const conversation = await repository.getByShareToken(token);
   if (!conversation) notFound();
@@ -35,18 +31,17 @@ export default async function SharedConversationPage({
           <Link href="/" className="shrink-0" aria-label="Sinash">
             <Button
               size="icon"
-              className="group rounded-sm bg-neutral-900 !text-white hover:bg-black dark:bg-white dark:!text-black dark:hover:bg-neutral-100"
+              className="group rounded-sm bg-neutral-900 text-white! hover:bg-black dark:bg-white dark:!text-black dark:hover:bg-neutral-100"
             >
               <LuArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Button>
           </Link>
         </div>
       </header>
-
       <main className="mx-auto w-full max-w-3xl flex-1 space-y-4 px-6 py-8">
         {conversation.messages.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-12">
-            Suhbat bo&apos;sh.
+            Suhbat bosh.
           </p>
         ) : (
           conversation.messages.map((m, i) => (
@@ -79,15 +74,12 @@ export default async function SharedConversationPage({
           ))
         )}
       </main>
-
       <div className="sticky bottom-0 border-t bg-background">
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 px-6 py-5 text-center">
           <p className="text-sm text-muted-foreground">
-            Kutoob bilan o&apos;z ma&apos;lumotlaringizni tahlil qiling.
+            Kutoob bilan oz malumotlaringizni tahlil qiling.
           </p>
-          <p className="text-xs text-muted-foreground/80">
-            © {new Date().getFullYear()}
-          </p>
+          <p className="text-sms text-muted-foreground/80">{new Date().getFullYear()}</p>
         </div>
       </div>
     </div>

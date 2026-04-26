@@ -23,7 +23,7 @@ export default function Panel() {
         className="gap-0"
       >
         <div className="flex flex-col gap-3">
-          <TabsList className="w-full !h-8 !rounded-sm">
+          <TabsList className="w-full h-8! rounded-sm!">
             <TabsTrigger value="database" className="flex-1 text-sm"><Database className="size-3.5" />Ombor</TabsTrigger>
             <TabsTrigger value="file" className="flex-1 text-sm"><FileSpreadsheet className="size-3.5" />Fayl</TabsTrigger>
           </TabsList>

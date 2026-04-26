@@ -107,14 +107,14 @@ export default function Menu() {
           <>
             {pinned.length > 0 && (
               <SidebarGroup className="p-0">
-                <SidebarGroupLabel className="text-base">Arxiv</SidebarGroupLabel>
+                <SidebarGroupLabel className="text-sm">Arxiv</SidebarGroupLabel>
                 <SidebarGroupContent>
                   <SidebarMenu>{pinned.map(renderItem)}</SidebarMenu>
                 </SidebarGroupContent>
               </SidebarGroup>
             )}
             <SidebarGroup className="p-0">
-              <SidebarGroupLabel className="text-base">Suhbatlar</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-sm">Suhbatlar</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>{unpinned.map(renderItem)}</SidebarMenu>
               </SidebarGroupContent>

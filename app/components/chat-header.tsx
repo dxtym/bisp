@@ -36,7 +36,7 @@ export default function ChatHeader() {
             variant="ghost"
             className={cn("h-8 w-8 p-0", isPinned && "text-foreground")}
             onClick={handleTogglePin}
-            aria-label={isPinned ? "Arxivdan olib tashlash" : "Arxivga qo'shish"}
+            aria-label={isPinned ? "Arxivdan olib tashlash" : "Arxivga qoshish"}
           >
             {isPinned ? <LuPinOff className="h-4 w-4" /> : <LuPin className="h-4 w-4" />}
           </Button>

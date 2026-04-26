@@ -18,9 +18,8 @@ const AGENT_PROMPT = `
 
   End rule:
   When executor returns success: true, do NOT call any tool again. The pipeline is over.
-  Output one short Uzbek paragraph describing what the returned result shows
-  (key numbers, rows, or findings) — not what the query does, that is already in summary.
-  Under 100 words, no markdown. This text ends the turn.
+  Output one short Uzbek paragraph describing what the returned result shows and not what
+  the query does, that is already in summary. Under 100 words, no markdown.
 `
 
 const TOOL_DESCRIPTIONS = {

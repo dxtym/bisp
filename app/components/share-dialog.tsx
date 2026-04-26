@@ -69,9 +69,9 @@ export default function ShareDialog({ open, onOpenChange, conversationId, shareT
         <DialogHeader>
           <DialogTitle>Suhbatni ulashish</DialogTitle>
           <DialogDescription>
-            Havolaga ega bo&apos;lgan{" "}
+            Havolaga ega bolgan{" "}
             <span className="font-semibold underline underline-offset-4 decoration-2">har kim</span>{" "}
-            ushbu suhbatni o&apos;qiy oladi.
+            ushbu suhbatni oqiy oladi.
           </DialogDescription>
         </DialogHeader>
 

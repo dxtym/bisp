@@ -122,17 +122,17 @@ export default function Chat() {
       setMessages((prev) =>
         prev.map((m) => {
           if (m.role !== "assistant") return m
-          let touched = false
+          let flag = false
           const parts = m.parts.map((p) => {
             const tp = p as Record<string, unknown>
             const approval = tp.approval as { id?: string } | undefined
             if (approval?.id !== approvalId) return p
             const input = tp.input as Record<string, unknown> | undefined
             if (!input || input.query === editedQuery) return p
-            touched = true
+            flag = true
             return { ...tp, input: { ...input, query: editedQuery } } as typeof p
           })
-          return touched ? { ...m, parts } : m
+          return flag ? { ...m, parts } : m
         })
       )
     }

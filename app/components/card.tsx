@@ -48,7 +48,7 @@ export default function PricingCard({
           <span className="text-sm text-muted-foreground">so&apos;m</span>
         </div>
         <p className={cn("text-lg text-neutral-400 line-through dark:text-neutral-500", !originalPrice && "invisible")}>
-          {originalPrice} so&apos;m
+          {originalPrice} som
         </p>
       </div>
       <hr className="border-border" />

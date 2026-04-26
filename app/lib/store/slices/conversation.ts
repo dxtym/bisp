@@ -61,6 +61,40 @@ export const removeConversation = createAsyncThunk(
   }
 );
 
+export const togglePin = createAsyncThunk(
+  "conversation/togglePin",
+  ({ conversationId, isPinned }: { conversationId: string; isPinned: boolean }) =>
+    fetchApi<IConversation>(`/api/conversation/${conversationId}/pin`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ isPinned }),
+    })
+);
+
+export const shareConversation = createAsyncThunk(
+  "conversation/shareConversation",
+  (conversationId: string) =>
+    fetchApi<{ shareToken: string; shareUrl: string; conversation: IConversation }>(
+      `/api/conversation/${conversationId}/share`,
+      { method: "POST" }
+    )
+);
+
+export const unshareConversation = createAsyncThunk(
+  "conversation/unshareConversation",
+  (conversationId: string) =>
+    fetchApi<{ conversation: IConversation }>(
+      `/api/conversation/${conversationId}/share`,
+      { method: "DELETE" }
+    )
+);
+
+function applyUpdate(state: ConversationState, updated: IConversation) {
+  const index = state.conversations.findIndex((c) => c.id === updated.id);
+  if (index !== -1) state.conversations[index] = updated;
+  if (state.conversation?.id === updated.id) state.conversation = updated;
+}
+
 const conversationSlice = createSlice({
   name: "conversation",
   initialState,
@@ -84,10 +118,7 @@ const conversationSlice = createSlice({
       })
 
       .addCase(updateConversationTitle.fulfilled, (state, action) => {
-        const updated = action.payload;
-        const index = state.conversations.findIndex((c) => c.id === updated.id);
-        if (index !== -1) state.conversations[index] = updated;
-        if (state.conversation?.id === updated.id) state.conversation = updated;
+        applyUpdate(state, action.payload);
       })
 
       .addCase(addMessage.fulfilled, (state, action) => {
@@ -100,6 +131,18 @@ const conversationSlice = createSlice({
       .addCase(removeConversation.fulfilled, (state, action) => {
         state.conversations = state.conversations.filter((c) => c.id !== action.payload);
         if (state.conversation?.id === action.payload) state.conversation = null;
+      })
+
+      .addCase(togglePin.fulfilled, (state, action) => {
+        applyUpdate(state, action.payload);
+      })
+
+      .addCase(shareConversation.fulfilled, (state, action) => {
+        applyUpdate(state, action.payload.conversation);
+      })
+
+      .addCase(unshareConversation.fulfilled, (state, action) => {
+        applyUpdate(state, action.payload.conversation);
       });
   },
 });
@@ -109,5 +152,9 @@ export const { setConversation } = conversationSlice.actions;
 export const selectConversations = (state: RootState) => state.conversation.conversations;
 export const selectConversation = (state: RootState) => state.conversation.conversation;
 export const selectIsLoading = (state: RootState) => state.conversation.isLoading;
+export const selectPinnedConversations = (state: RootState) =>
+  state.conversation.conversations.filter((c) => c.isPinned);
+export const selectUnpinnedConversations = (state: RootState) =>
+  state.conversation.conversations.filter((c) => !c.isPinned);
 
 export default conversationSlice.reducer;

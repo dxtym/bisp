@@ -8,7 +8,9 @@ export default auth((req) => {
     pathname.startsWith("/sign-in") ||
     pathname.startsWith("/sign-up") ||
     pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/api/stripe/webhook")
+    pathname.startsWith("/api/stripe/webhook") ||
+    pathname.startsWith("/s/") ||
+    pathname.startsWith("/api/share/")
 
   if (!req.auth && !isPublic) {
     return NextResponse.redirect(new URL("/sign-in", req.nextUrl.origin))

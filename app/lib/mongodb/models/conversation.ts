@@ -11,6 +11,8 @@ export interface IConversation {
   userId: string;
   title: string;
   messages: IMessage[];
+  isPinned?: boolean;
+  shareToken?: string | null;
   createdAt: Date | string;
 }
 
@@ -52,6 +54,17 @@ const conversationSchema = new mongoose.Schema<IConversation>(
     messages: {
       type: [messageSchema],
       default: []
+    },
+    isPinned: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    shareToken: {
+      type: String,
+      index: true,
+      unique: true,
+      sparse: true,
     },
   },
   { _id: true, timestamps: true }

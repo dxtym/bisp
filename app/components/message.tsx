@@ -33,7 +33,7 @@ function Flow({ message }: { message: UIMessage }) {
     stateByPhase.set(phase, (part as { state: ToolState }).state)
   }
   if (stateByPhase.size === 0) return null
-  const allDone = Array.from(stateByPhase.values()).every((s) => s === "output-available")
+  const allDone = PHASES.every((p) => stateByPhase.get(p) === "output-available")
   if (allDone) return null
 
   return (

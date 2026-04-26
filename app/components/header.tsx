@@ -10,7 +10,7 @@ type MenuHeaderProps = {
 export default function Header({ onCreate }: MenuHeaderProps) {
   return (
     <div className="flex justify-between items-center p-1">
-      <p className="text-sm font-semibold">Suhbatlar</p>
+      <p className="text-base font-semibold">Suhbatlar</p>
       <Button
         size="sm"
         variant="ghost"

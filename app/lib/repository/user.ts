@@ -21,6 +21,12 @@ class UserRepository extends BaseRepository {
     );
   }
 
+  public async getById(id: string): Promise<IUser | null> {
+    return this.run("Get user by id error", () =>
+      User.findOne({ id }, { id: 1, name: 1, image: 1 }).lean<IUser | null>()
+    );
+  }
+
   public async getQuotaInfo(id: string): Promise<{ queriesCount: number; plan: Plan; limit: number } | null> {
     return this.run("Get quota info error", async () => {
       const user = await User.findOne({ id }, { queriesCount: 1, plan: 1 }).lean();

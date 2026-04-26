@@ -52,4 +52,30 @@ export class ConversationRepository extends BaseRepository {
       return result.deletedCount > 0;
     });
   }
+
+  public async setPinned(conversationId: string, isPinned: boolean): Promise<IConversation | null> {
+    return this.run("Set pinned error", () =>
+      Conversation.findOneAndUpdate(
+        { id: conversationId },
+        { isPinned },
+        { new: true }
+      ).lean<IConversation | null>()
+    );
+  }
+
+  public async setShareToken(conversationId: string, token: string | null): Promise<IConversation | null> {
+    return this.run("Set share token error", () =>
+      Conversation.findOneAndUpdate(
+        { id: conversationId },
+        token === null ? { $unset: { shareToken: "" } } : { shareToken: token },
+        { new: true }
+      ).lean<IConversation | null>()
+    );
+  }
+
+  public async getByShareToken(token: string): Promise<IConversation | null> {
+    return this.run("Get by share token error", () =>
+      Conversation.findOne({ shareToken: token }).lean<IConversation | null>()
+    );
+  }
 }

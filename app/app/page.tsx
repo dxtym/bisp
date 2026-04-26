@@ -5,11 +5,11 @@ import { Loader } from "@/components/ai-elements/loader";
 import Main from "@/components/main";
 import Chat from "@/components/chat";
 import Menu from "@/components/menu";
+import ChatHeader from "@/components/chat-header";
 import { Provider } from "@/components/providers/store";
 import {
   SidebarProvider,
   SidebarInset,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 
 export default function Home() {
@@ -34,9 +34,7 @@ export default function Home() {
         <SidebarInset className="flex flex-col h-[calc(100svh-1rem)] overflow-hidden">
           <div className="flex flex-1 h-full">
             <div className="flex-1 overflow-y-auto">
-              <div className="p-3 border-b">
-                <SidebarTrigger />
-              </div>
+              <ChatHeader />
               <div className="h-[calc(100vh-1rem-3.5rem)]">
                 <Chat />
               </div>
